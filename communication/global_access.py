@@ -41,6 +41,6 @@ class Container:
 
 
 RCV_QUEUES = Container()
-SND_QUEUES = Container()
+SND_QUEUE = Container()
 CONNECTED_CLIENTS = Container()
 

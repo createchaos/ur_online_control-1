@@ -108,10 +108,8 @@ class ActuatorSocket(BaseClientSocket):
             pass
     
     
-    def publish_client(self):
-                
-        super(ActuatorSocket, self).publish_client()
-                
+    def publish_queues(self):
+        super(ActuatorSocket, self).publish_queues()        
         global_access.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_CARTESIAN: self.current_pose_cartesian_queue})
         global_access.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_JOINT: self.current_pose_joints_queue})
         global_access.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_DIGITAL_IN: self.current_digital_in_queue})    

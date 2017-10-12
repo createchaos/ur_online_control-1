@@ -20,6 +20,7 @@ MSG_INT_LIST = 13
 MSG_FLOAT_LIST = 14
 MSG_STRING = 15
 MSG_QUIT = 16
+MSG_INT = 17
 
 COMMAND_ID_MOVEL = 1 
 COMMAND_ID_MOVEJ = 2
@@ -40,7 +41,8 @@ msg_identifier_dict = {'MSG_IDENTIFIER': 1,
                        'MSG_INT_LIST': 13, 
                        'MSG_FLOAT_LIST': 14, 
                        'MSG_STRING': 15, 
-                       'MSG_QUIT': 16
+                       'MSG_QUIT': 16,
+                       'MSG_INT': 17
                        }
 
 # different command identifiers are sent after msg_id MSG_COMMAND

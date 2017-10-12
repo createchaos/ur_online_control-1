@@ -11,7 +11,7 @@ import time
 import sys
 
 from ur_online_control.communication.msg_identifiers import *
-import ur_online_control.control_core.global_access as global_access
+import ur_online_control.communication.global_access as global_access
 
 class BaseClientSocket(object):
     
@@ -107,6 +107,7 @@ class BaseClientSocket(object):
             #socket_type = [message_ids[1]]
             self.identifier = identifier
             self.stdout("Received identifier.")
+            self.publish_queues()
             self.publish_client()
                                      
         elif msg_id == MSG_FLOAT_LIST: 
@@ -123,13 +124,13 @@ class BaseClientSocket(object):
             self._process_other_messages(msg_len, msg_id, raw_msg)
     
     
-    def publish_client(self):
-        global_access.CONNECTED_CLIENTS.put(self.identifier)
-        global_access.SND_QUEUES.put(self.identifier, self.snd_queue)
-        
+    def publish_queues(self):
+        global_access.SND_QUEUE.put(self.identifier, self.snd_queue)
         global_access.RCV_QUEUES.put(self.identifier, {MSG_FLOAT_LIST: self.float_list_queue})
         global_access.RCV_QUEUES.put(self.identifier, {MSG_STRING: self.string_queue})
         
+    def publish_client(self):
+        global_access.CONNECTED_CLIENTS.put(self.identifier)
         
     def close(self):
         self.running = False

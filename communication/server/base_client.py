@@ -63,8 +63,11 @@ class BaseClient(object):
             if e.errno == 10004:
                 # A blocking operation was interrupted by a call to WSACancelBlockingCall
                 pass
-            if e.errno == 10035:
+            elif e.errno == 10035:
                 # A non-blocking socket operation could not be completed immediately
+                pass
+            elif e.errno == 10022:
+                # A request to send or receive data was disallowed because the ...
                 pass
             else:
                 self.stdout("socket.error in receiver: %s" % str(e))

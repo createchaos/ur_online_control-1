@@ -67,7 +67,7 @@ def send_script(ur_ip, script):
 
 class URDriver(object):
     
-    def __init__(self, server_ip, server_port, tool_angle_axis = [0,0,0,0,0,0], ip = "127.0.0.1", name = "UR5"):
+    def __init__(self, server_ip, server_port, tool_angle_axis = [0,0,0,0,0,0], ip = "127.0.0.1", name = "UR"):
                 
         program = generate_ur_program()
         
