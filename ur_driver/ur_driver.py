@@ -5,8 +5,8 @@ Created on 22.11.2016
 '''
 import os
 import socket
-from ur_online_communication.communication import msg_identifier_dict, command_identifier_dict
-from ur_online_communication.useful import read_file_to_string, read_file_to_list
+from ur_online_control.communication import msg_identifier_dict, command_identifier_dict
+from ur_online_control.utilities import read_file_to_string, read_file_to_list
 
 # https://www.universal-robots.com/how-tos-and-faqs/how-to/ur-how-tos/remote-control-via-tcpip-16496/
 UR_SERVER_PORT = 30002
@@ -22,7 +22,7 @@ def generate_ur_program():
     global msg_identifier_dict
     global command_identifier_dict
     
-    path = "templates" # the path of the template files
+    path = os.path.join(os.path.dirname(__file__), "templates") # the path of the template files
     
     globals_file = os.path.join(path, "globals.urp")
     methods_file = os.path.join(path, "methods.urp")
@@ -97,15 +97,15 @@ class URDriver(object):
 
 if __name__ == "__main__":
     
-    server_ip = "192.168.10.30"
+    server_ip = "192.168.10.12"
     server_port = 30003
     tool_angle_axis = [0.0, 0.0, 115.6, 0.234, 1.57, 0.0]
-    name = "UR5"
-    ur_ip = "192.168.10.10"
+    name = "UR10"
+    ur_ip = "192.168.10.11"
     
     ur_driver = URDriver(server_ip, server_port, tool_angle_axis, ur_ip, "UR10")
     print ur_driver
-    #ur_driver.send()
+    ur_driver.send()
 
     
 
