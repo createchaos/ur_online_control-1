@@ -44,6 +44,7 @@ class ActuatorSocket(BaseClientSocket):
         if self.state == READY_TO_PROGRAM:
             self.command_counter = 0
             self.command_counter_executed = 0
+            global_access.CONNECTED_CLIENTS.put(self.identifier, self.state)
         else:
             self.stdout("reset_counters: state is not READY_TO_PROGRAM ")
         

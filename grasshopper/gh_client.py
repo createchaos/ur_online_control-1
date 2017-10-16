@@ -20,9 +20,12 @@ class GHClient(BaseClient):
         
 if __name__ == "__main__":
     server_address = "192.168.10.12"
+    server_address = "127.0.0.1"
     server_port = 30003
     client = GHClient(server_address, server_port)
     client.connect_to_server()    
     client.start()
+    client.send(MSG_FLOAT_LIST, [1.2, 3.6, 4, 6, 7])
+    client.send(MSG_INT, 1)
     client.send(MSG_FLOAT_LIST, [1.2, 3.6, 4, 6, 7])
     

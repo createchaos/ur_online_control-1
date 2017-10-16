@@ -26,6 +26,7 @@ if len(sys.argv) > 1:
     print(sys.argv)
 else:
     server_address = "192.168.10.12"
+    server_address = "127.0.0.1"
     server_port = 30003
     ur_ip = "192.168.10.11"
 
@@ -52,13 +53,15 @@ def main():
     while True:
         # let gh control if we should continue
         continue_fabrication = gh.wait_for_int()
+        print(continue_fabrication)
         if not continue_fabrication:
             break
         msg_float_list = gh.wait_for_float_list()
         # we know this are commands, so we format them accordingly
         commands = format_commands(msg_float_list)
         for cmd in commands:
-            ur.send_command(cmd)
+            print(cmd)
+            #ur.send_command(cmd)
         ur.wait_for_ready()
         # wait for sensor value
         digital_in = ur.wait_for_digital_in()

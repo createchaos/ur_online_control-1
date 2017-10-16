@@ -8,6 +8,7 @@ from __future__ import print_function
 import global_access
 from msg_identifiers import *
 import time
+from ur_online_control.communication.states import *
 
 msg_identifier_names = {v: k for k, v in msg_identifier_dict.iteritems()}
 
@@ -60,6 +61,13 @@ class ClientWrapper(object):
     def wait_for_int(self):
         # still needs to be implemented
         return self.wait_for_message(MSG_INT)
+    
+    def wait_for_ready(self):
+        state = global_access.CONNECTED_CLIENTS.get(self.identifier)
+        while state != READY_TO_PROGRAM or state != READY:
+            time.sleep(0.1)
+            state = global_access.CONNECTED_CLIENTS.get(self.identifier)
+        return state
     
     
     

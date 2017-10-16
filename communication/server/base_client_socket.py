@@ -11,7 +11,9 @@ import time
 import sys
 
 from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.communication.states import *
 import ur_online_control.communication.global_access as global_access
+
 
 class BaseClientSocket(object):
     
@@ -37,10 +39,13 @@ class BaseClientSocket(object):
         # rcv_queues
         self.float_list_queue = Queue()
         self.string_queue = Queue()    
+        self.int_queue = Queue()
         
         self.identifier = ""
         
         self.byteorder_isset = False
+        
+        self.state = READY
             
     def stdout(self, msg):
         print "%s:" % self.identifier, msg
@@ -95,6 +100,9 @@ class BaseClientSocket(object):
     def _process_msg_string(self, msg):
         self.string_queue.put(msg)
     
+    def _process_msg_int(self, msg):
+        self.int_queue.put(msg)
+    
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
         self.stdout("msg_id %d" % msg_id)
         self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
@@ -118,6 +126,10 @@ class BaseClientSocket(object):
             msg = str(raw_msg)
             self._process_msg_string(msg)
             
+        elif msg_id == MSG_INT:
+            msg = struct.unpack_from(self.byteorder + "i", raw_msg)[0]
+            self._process_msg_int(msg)
+            
         elif msg_id == MSG_QUIT:
             self.close()  
         else:
@@ -128,9 +140,10 @@ class BaseClientSocket(object):
         global_access.SND_QUEUE.put(self.identifier, self.snd_queue)
         global_access.RCV_QUEUES.put(self.identifier, {MSG_FLOAT_LIST: self.float_list_queue})
         global_access.RCV_QUEUES.put(self.identifier, {MSG_STRING: self.string_queue})
+        global_access.RCV_QUEUES.put(self.identifier, {MSG_INT: self.int_queue})
         
     def publish_client(self):
-        global_access.CONNECTED_CLIENTS.put(self.identifier)
+        global_access.CONNECTED_CLIENTS.put(self.identifier, self.state)
         
     def close(self):
         self.running = False

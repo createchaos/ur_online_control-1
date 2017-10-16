@@ -144,6 +144,11 @@ class BaseClient(object):
             params = [msg_snd_len, msg_id, msg]
             buf = struct.pack(self.byteorder + "2i" + str(len(msg)) +  "s", *params)
         
+        elif msg_id == MSG_INT:
+            msg_snd_len = 4 + 4
+            params = [msg_snd_len, msg_id, msg]
+            buf = struct.pack(self.byteorder + "3i", *params)
+        
         elif msg_id == MSG_QUIT:
             msg_snd_len = 4
             params = [msg_snd_len, msg_id]
