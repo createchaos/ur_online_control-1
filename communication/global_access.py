@@ -18,7 +18,10 @@ class Container:
     def put(self, key, value = None):
         self.lock.acquire()
         if key in self.storage:
-            self.storage[key].update(value)
+            if type(self.storage[key]) == type({}):
+                self.storage[key].update(value)
+            else:
+                self.storage.update({key: value}) 
         else:
             self.storage.update({key: value}) 
         self.lock.release()
@@ -38,7 +41,6 @@ class Container:
     def __repr__(self):
         return str(self.storage)
     
-
 
 RCV_QUEUES = Container()
 SND_QUEUE = Container()

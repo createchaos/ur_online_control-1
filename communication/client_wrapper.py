@@ -64,10 +64,31 @@ class ClientWrapper(object):
     
     def wait_for_ready(self):
         state = global_access.CONNECTED_CLIENTS.get(self.identifier)
-        while state != READY_TO_PROGRAM or state != READY:
+        while state != READY_TO_PROGRAM:
             time.sleep(0.1)
             state = global_access.CONNECTED_CLIENTS.get(self.identifier)
         return state
+    
+    def send(self, msg_id, msg):
+        global_access.CONNECTED_CLIENTS.put(self.identifier, EXECUTING)
+        self.snd_queue.put((msg_id, msg))
+    
+    def send_float_list(self, msg):
+        self.send(MSG_FLOAT_LIST, msg)
+    
+    def send_command(self, cmd_id, msg):
+        self.send(MSG_COMMAND, (cmd_id, msg))
+    
+    def send_command_movel(self, msg):
+        self.send_command(COMMAND_ID_MOVEL, msg)
+    
+    def send_command_movej(self, msg):
+        self.send_command(COMMAND_ID_MOVEJ, msg)
+    
+    def send_command_digital_out(self, msg):
+        self.send_command(COMMAND_ID_DIGITAL_OUT, msg)
+        
+    
     
     
     

@@ -51,9 +51,6 @@ class ActuatorSocket(BaseClientSocket):
     def update(self):
         pass
     
-    def set_state(self, state):
-        self.state = state
-    
     def get_command_counter(self):
         return self.command_counter
     
@@ -79,7 +76,7 @@ class ActuatorSocket(BaseClientSocket):
         if not len(self.stack) and self.stack_counter == 0: 
             if msg_counter == self.command_counter:
                 " The actuator is ready to be programmed"
-                self.set_state(READY_TO_PROGRAM)
+                self.state = READY_TO_PROGRAM
                 self.reset_counters()
                 self.stdout("Set state to READY_TO_PROGRAM")
                 #self.update()
@@ -89,7 +86,7 @@ class ActuatorSocket(BaseClientSocket):
             for i in range(min(self.stack_size, len(self.stack))):
                 cmd = self.stack.pop(0)
                 self.command_counter += 1
-                self.set_state(EXECUTING)
+                self.state = EXECUTING
                 self.send(MSG_COMMAND, cmd)
                 self.stack_counter -= 1
                 
@@ -98,7 +95,7 @@ class ActuatorSocket(BaseClientSocket):
             try:
                 cmd = self.stack.pop(0)
                 self.command_counter += 1   
-                self.set_state(EXECUTING)
+                self.state = EXECUTING
                 self.send(MSG_COMMAND, cmd)
                 self.stack_counter -= 1
                 
@@ -143,7 +140,7 @@ class ActuatorSocket(BaseClientSocket):
             self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
     
     def _process_msg_cmd_received(self, msg_counter):
-        self.set_state(READY_TO_RECEIVE)
+        self.state = READY_TO_RECEIVE
         self.stack_counter += 1
         #self.handle_stack()
     

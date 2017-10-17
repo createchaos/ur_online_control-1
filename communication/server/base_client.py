@@ -35,6 +35,9 @@ class BaseClient(object):
     def stdout(self, msg):
         msg = "%s: %s" % (self.identifier, str(msg))
         print msg
+    
+    def update(self):
+        pass
         
     def run_inner_while(self):
         # GH does not like while loops. If we use this class in GH, we need to
@@ -166,29 +169,33 @@ class BaseClient(object):
  
     def read(self):
         """ The transmission protocol for messages is 
-        [length msg in bytes] [msg identifier] [other bytes which will be read out according to msg identifier] """
+        [length msg in bytes] [msg identifier] [other bytes which will be read 
+        out according to msg identifier] """
         
-        "1. read msg length"
+        # read msg length
         self.msg_rcv += self.socket.recv(4)
         if len(self.msg_rcv) < 4:
             return
         
         msg_length = struct.unpack_from(self.byteorder + "i", self.msg_rcv, 0)[0]   
         
-        "2. read msg according to msg_length"
+        # read msg according to msg_length
         self.msg_rcv += self.socket.recv(msg_length)
         
-        "3. message identifier"
+        # read message identifier
         self.msg_rcv = self.msg_rcv[4:]
         msg_id = struct.unpack_from(self.byteorder + "i", self.msg_rcv[:4], 0)[0]
         
         raw_msg = self.msg_rcv[4:]
         
-        " reset msg_rcv"
+        # reset msg_rcv
         self.msg_rcv = ""
         
-        "4. pass message id and raw message to process method "
+        # 4. pass message id and raw message to process method
         self.process(msg_length, msg_id, raw_msg)
+        
+        # 5. update 
+        self.update()
     
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
         self.stdout("Message identifier unknown: %d, message: %s" % (msg_id, raw_msg))

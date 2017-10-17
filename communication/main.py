@@ -62,6 +62,9 @@ def main():
         for cmd in commands:
             print(cmd)
             #ur.send_command(cmd)
+        time.sleep(1)
+        gh.send_float_list(commands[0])
+        """
         ur.wait_for_ready()
         # wait for sensor value
         digital_in = ur.wait_for_digital_in()
@@ -71,6 +74,7 @@ def main():
         gh.send_float_list(digital_in)
         gh.send_float_list(current_pose_joint)
         gh.send_float_list(current_pose_cartesian)
+        """
         
     server.close()
     

@@ -8,7 +8,3 @@ READY_TO_PROGRAM = 1 # the buffer of the robot is empty, he is ready to receive 
 EXECUTING = 2 # the robot is executing the command
 READY_TO_RECEIVE = 3 # the buffer of the robot has space, he is ready to receive the next command
 COMMAND_EXECUTED = 6
-
-
-READY = 4
-BUSY = 5

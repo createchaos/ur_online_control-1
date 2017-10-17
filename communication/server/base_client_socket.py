@@ -45,7 +45,7 @@ class BaseClientSocket(object):
         
         self.byteorder_isset = False
         
-        self.state = READY
+        self.state = READY_TO_PROGRAM
             
     def stdout(self, msg):
         print "%s:" % self.identifier, msg
