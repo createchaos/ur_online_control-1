@@ -44,7 +44,7 @@ class ActuatorSocket(BaseClientSocket):
         if self.state == READY_TO_PROGRAM:
             self.command_counter = 0
             self.command_counter_executed = 0
-            global_access.CONNECTED_CLIENTS.put(self.identifier, self.state)
+            container.CONNECTED_CLIENTS.put(self.identifier, self.state)
         else:
             self.stdout("reset_counters: state is not READY_TO_PROGRAM ")
         
@@ -108,9 +108,9 @@ class ActuatorSocket(BaseClientSocket):
     
     def publish_queues(self):
         super(ActuatorSocket, self).publish_queues()        
-        global_access.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_CARTESIAN: self.current_pose_cartesian_queue})
-        global_access.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_JOINT: self.current_pose_joints_queue})
-        global_access.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_DIGITAL_IN: self.current_digital_in_queue})    
+        container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_CARTESIAN: self.current_pose_cartesian_queue})
+        container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_JOINT: self.current_pose_joints_queue})
+        container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_DIGITAL_IN: self.current_digital_in_queue})    
 
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
         
@@ -241,15 +241,14 @@ class URSocket(ActuatorSocket):
         elif command_id == COMMAND_ID_DIGITAL_OUT:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             params = [msg_command_length, msg_id, command_id, self.get_command_counter()] + cmd
+            
+        elif command_id == COMMAND_ID_WAIT:
+            msg_command_length = 4 * (1 + 1 + 1 + 1)
+            cmd *= self.MULT
+            params = [msg_command_length, msg_id, command_id, self.get_command_counter(), cmd]
         else:
             raise("command_id unknown.")
             
-        buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
-        return buf
-    
-    def _format_io_on_off(self, msg_id, value):
-        msg_command_length = 4 * 2
-        params = [msg_command_length, msg_id, value]
         buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
         return buf
     

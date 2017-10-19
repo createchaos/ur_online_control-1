@@ -112,9 +112,12 @@ def read_and_identify():
 				params = socket_read_binary_integer(6 + 4)
 				BUFFER_JOINT[WRITE_PTR] = p[params[1]/(MULT), params[2]/(MULT), params[3]/(MULT), params[4]/MULT, params[5]/MULT, params[6]/MULT]
 				BUFFER_PARAMS[WRITE_PTR] = p[params[7]/(MM2M*MULT), params[8]/(MM2M*MULT), params[9]/(MM2M*MULT), params[10]/MULT, 0, 0]				
-			else: #if msg_command_id == COMMAND_ID_DIGITAL_OUT:
+			elif msg_command_id == COMMAND_ID_DIGITAL_OUT:
 				params = socket_read_binary_integer(1 + 1)
-				BUFFER_PARAMS[WRITE_PTR] = p[params[1], params[2], 0, 0, 0, 0] # number, boolean			
+				BUFFER_PARAMS[WRITE_PTR] = p[params[1], params[2], 0, 0, 0, 0] # number, boolean
+			else: #if msg_command_id == COMMAND_ID_WAIT:
+				params = socket_read_binary_integer(1)
+				BUFFER_PARAMS[WRITE_PTR] = p[params[1]/MULT, 0, 0, 0, 0, 0] # number
 			end
 			
 			send_command_received(command_counter)
@@ -216,7 +219,7 @@ def execute_from_buffer():
 		rad = params[2]
 		time = params[3]
 		my_movej(joints, acc, vel, rad, time)
-	else: #if msg_command_id == COMMAND_ID_DIGITAL_OUT:
+	elif msg_command_id == COMMAND_ID_DIGITAL_OUT:
 		params = BUFFER_PARAMS[READ_PTR]
 		number = params[0]
 		value = params[1]
@@ -225,6 +228,12 @@ def execute_from_buffer():
 		else:
 			set_digital_out(number, False)
 		end
+	else: #if msg_command_id == COMMAND_ID_WAIT:
+		params = BUFFER_PARAMS[READ_PTR]
+		time_to_wait = params[0]
+		textmsg("Sleeping")
+		textmsg(time_to_wait)
+		sleep(time_to_wait)
 	end
 	
 	# send executed

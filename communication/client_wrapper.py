@@ -4,10 +4,10 @@ Created on 11.10.2017
 @author: rustr
 '''
 from __future__ import print_function
-
-import global_access
-from msg_identifiers import *
 import time
+
+import ur_online_control.communication.container as container
+from ur_online_control.communication.msg_identifiers import *
 from ur_online_control.communication.states import *
 
 msg_identifier_names = {v: k for k, v in msg_identifier_dict.iteritems()}
@@ -24,14 +24,14 @@ class ClientWrapper(object):
     
     def wait_for_connected(self):
         print("Waiting until client %s is connected..." % self.identifier)
-        connected_clients = global_access.CONNECTED_CLIENTS.keys()
+        connected_clients = container.CONNECTED_CLIENTS.keys()
         while self.identifier not in connected_clients:
             time.sleep(0.1)
-            connected_clients = global_access.CONNECTED_CLIENTS.keys()
+            connected_clients = container.CONNECTED_CLIENTS.keys()
         print("Client %s is connected." % self.identifier)
         self.connected = True
-        self.snd_queue = global_access.SND_QUEUE.get(self.identifier)
-        self.rcv_queues = global_access.RCV_QUEUES.get(self.identifier)
+        self.snd_queue = container.SND_QUEUE.get(self.identifier)
+        self.rcv_queues = container.RCV_QUEUES.get(self.identifier)
         """
         
         for msg_id in self.rcv_queues:
@@ -41,8 +41,7 @@ class ClientWrapper(object):
             exec("self.%s_queue = " % msg_id_name[4:].lower())
             print("key", key)
         """
-        
-         
+          
     def wait_for_message(self, msg_id):
         if not self.connected:
             print("Client %s is NOT yet connected." % self.identifier)
@@ -63,31 +62,33 @@ class ClientWrapper(object):
         return self.wait_for_message(MSG_INT)
     
     def wait_for_ready(self):
-        state = global_access.CONNECTED_CLIENTS.get(self.identifier)
+        state = container.CONNECTED_CLIENTS.get(self.identifier)
         while state != READY_TO_PROGRAM:
             time.sleep(0.1)
-            state = global_access.CONNECTED_CLIENTS.get(self.identifier)
+            state = container.CONNECTED_CLIENTS.get(self.identifier)
         return state
     
     def send(self, msg_id, msg):
-        global_access.CONNECTED_CLIENTS.put(self.identifier, EXECUTING)
+        container.CONNECTED_CLIENTS.put(self.identifier, EXECUTING)
         self.snd_queue.put((msg_id, msg))
     
-    def send_float_list(self, msg):
-        self.send(MSG_FLOAT_LIST, msg)
+    def send_float_list(self, float_list):
+        self.send(MSG_FLOAT_LIST, float_list)
     
     def send_command(self, cmd_id, msg):
-        self.send(MSG_COMMAND, (cmd_id, msg))
+        self.send(MSG_COMMAND, [cmd_id, msg])
     
-    def send_command_movel(self, msg):
-        self.send_command(COMMAND_ID_MOVEL, msg)
+    def send_command_movel(self, float_list):
+        self.send_command(COMMAND_ID_MOVEL, float_list)
     
-    def send_command_movej(self, msg):
-        self.send_command(COMMAND_ID_MOVEJ, msg)
+    def send_command_movej(self, float_list):
+        self.send_command(COMMAND_ID_MOVEJ, float_list)
     
-    def send_command_digital_out(self, msg):
-        self.send_command(COMMAND_ID_DIGITAL_OUT, msg)
-        
+    def send_command_digital_out(self, number, boolean):
+        self.send_command(COMMAND_ID_DIGITAL_OUT, [number, int(boolean)])
+    
+    def send_command_wait(self, time_to_wait_in_seconds):
+        self.send_command(COMMAND_ID_WAIT, time_to_wait_in_seconds)
     
     
     

@@ -8,13 +8,13 @@ import time
 import sys
 import os
 
-# set the paths
+# set the paths to find library
 file_dir = os.path.dirname( __file__)
 parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
 sys.path.append(file_dir)
 sys.path.append(parent_dir)
 
-import ur_online_control.communication.global_access as global_access
+import ur_online_control.communication.container as container
 from ur_online_control.communication.server import Server
 from ur_online_control.communication.client_wrapper import ClientWrapper
 from ur_online_control.communication.formatting import format_commands

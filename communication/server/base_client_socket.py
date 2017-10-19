@@ -12,7 +12,7 @@ import sys
 
 from ur_online_control.communication.msg_identifiers import *
 from ur_online_control.communication.states import *
-import ur_online_control.communication.global_access as global_access
+import ur_online_control.communication.container as container
 
 
 class BaseClientSocket(object):
@@ -137,13 +137,13 @@ class BaseClientSocket(object):
     
     
     def publish_queues(self):
-        global_access.SND_QUEUE.put(self.identifier, self.snd_queue)
-        global_access.RCV_QUEUES.put(self.identifier, {MSG_FLOAT_LIST: self.float_list_queue})
-        global_access.RCV_QUEUES.put(self.identifier, {MSG_STRING: self.string_queue})
-        global_access.RCV_QUEUES.put(self.identifier, {MSG_INT: self.int_queue})
+        container.SND_QUEUE.put(self.identifier, self.snd_queue)
+        container.RCV_QUEUES.put(self.identifier, {MSG_FLOAT_LIST: self.float_list_queue})
+        container.RCV_QUEUES.put(self.identifier, {MSG_STRING: self.string_queue})
+        container.RCV_QUEUES.put(self.identifier, {MSG_INT: self.int_queue})
         
     def publish_client(self):
-        global_access.CONNECTED_CLIENTS.put(self.identifier, self.state)
+        container.CONNECTED_CLIENTS.put(self.identifier, self.state)
         
     def close(self):
         self.running = False
