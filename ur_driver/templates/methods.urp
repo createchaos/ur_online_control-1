@@ -1,7 +1,7 @@
 def send_command_received(command_counter):
 	enter_critical
-	msg_length = 4 + 4 
-	socket_send_int(msg_length) 
+	msg_length = 4 + 4
+	socket_send_int(msg_length)
 	socket_send_int(MSG_COMMAND_RECEIVED)
 	socket_send_int(command_counter)
 	exit_critical
@@ -10,7 +10,7 @@ end
 def send_command_executed(command_counter):
 	enter_critical
 	msg_length = 4 + 4
-	socket_send_int(msg_length) 
+	socket_send_int(msg_length)
 	socket_send_int(MSG_COMMAND_EXECUTED)
 	socket_send_int(command_counter)
 	exit_critical
@@ -20,7 +20,7 @@ def send_current_pose_cartesian():
 	enter_critical
 	current_pose = get_forward_kin() # p[x,y,z,ax,ay,az]
 	msg_length = 6 * 4 + 4
-	socket_send_int(msg_length) 
+	socket_send_int(msg_length)
 	socket_send_int(MSG_CURRENT_POSE_CARTESIAN)
 	i = 0
 	while (i < 6):
@@ -38,7 +38,7 @@ def send_current_pose_joints():
 	enter_critical
 	q = get_joint_positions()
 	msg_length = 6 * 4 + 4
-	socket_send_int(msg_length) 
+	socket_send_int(msg_length)
 	socket_send_int(MSG_CURRENT_POSE_JOINT)
 	i = 0
 	while (i < 6):
@@ -53,7 +53,7 @@ def send_current_digital_in():
 	di_num = 8
 	enter_critical
 	msg_length = 4 + (4 + 4) * di_num
-	socket_send_int(msg_length) 
+	socket_send_int(msg_length)
 	socket_send_int(MSG_CURRENT_DIGITAL_IN)
 	i = 0
 	while i < di_num:
@@ -69,7 +69,7 @@ def send_digital_in(number):
 	enter_critical
 	value = get_digital_in(number)
 	msg_length = 4 + 4 + 4
-	socket_send_int(msg_length) 
+	socket_send_int(msg_length)
 	socket_send_int(MSG_DIGITAL_IN)
 	socket_send_int(number)
 	socket_send_int(value)
@@ -78,7 +78,7 @@ end
 
 def send_id_message():
 	msg_length = 4 + ID_MESSAGE_LENGTH
-	socket_send_int(msg_length) 
+	socket_send_int(msg_length)
 	socket_send_int(MSG_IDENTIFIER)
 	socket_send_string(ID_MESSAGE)
 	textmsg("Sent message ID.")
@@ -90,28 +90,23 @@ def read_and_identify():
 	if rcv[0] == 2:
 		msg_length = rcv[1]
 		msg_id = rcv[2]
-		if msg_id == MSG_COMMAND:	
+		if msg_id == MSG_COMMAND:
 			rcv2 = socket_read_binary_integer(2)
 			msg_command_id = rcv2[1]
 			command_counter = rcv2[2]
-			
-			# wait until it is possible to write to the buffer
-			while BUFFER_LENGTH < MAX_BUFFER_SIZE:
-				sleep(0.008)
-			end
-			
+
 			BUFFER_COMMAND[WRITE_PTR] = msg_command_id
 			BUFFER_COMMAND_COUNTER[WRITE_PTR] = command_counter
-			
+
 			if msg_command_id == COMMAND_ID_MOVEL:
 				params = socket_read_binary_integer(6 + 4)
 				BUFFER_POSE[WRITE_PTR] = p[params[1]/(MM2M*MULT), params[2]/(MM2M*MULT), params[3]/(MM2M*MULT), params[4]/MULT, params[5]/MULT, params[6]/MULT]
 				BUFFER_PARAMS[WRITE_PTR] = p[params[7]/(MM2M*MULT), params[8]/(MM2M*MULT), params[9]/(MM2M*MULT), params[10]/MULT, 0, 0]
 			elif msg_command_id == COMMAND_ID_MOVEJ:
-				# we must make a pose, because of URScript restrictions	
+				# we must make a pose, because of URScript restrictions
 				params = socket_read_binary_integer(6 + 4)
 				BUFFER_JOINT[WRITE_PTR] = p[params[1]/(MULT), params[2]/(MULT), params[3]/(MULT), params[4]/MULT, params[5]/MULT, params[6]/MULT]
-				BUFFER_PARAMS[WRITE_PTR] = p[params[7]/(MM2M*MULT), params[8]/(MM2M*MULT), params[9]/(MM2M*MULT), params[10]/MULT, 0, 0]				
+				BUFFER_PARAMS[WRITE_PTR] = p[params[7]/(MM2M*MULT), params[8]/(MM2M*MULT), params[9]/(MM2M*MULT), params[10]/MULT, 0, 0]
 			elif msg_command_id == COMMAND_ID_DIGITAL_OUT:
 				params = socket_read_binary_integer(1 + 1)
 				BUFFER_PARAMS[WRITE_PTR] = p[params[1], params[2], 0, 0, 0, 0] # number, boolean
@@ -119,7 +114,9 @@ def read_and_identify():
 				params = socket_read_binary_integer(1)
 				BUFFER_PARAMS[WRITE_PTR] = p[params[1]/MULT, 0, 0, 0, 0, 0] # number
 			end
-			
+
+			textmsg(command_counter)
+
 			send_command_received(command_counter)
 			enter_critical
 			while LOCK == 1:
@@ -130,7 +127,7 @@ def read_and_identify():
 			WRITE_PTR = (WRITE_PTR + 1) % MAX_BUFFER_SIZE
 			LOCK = 0
 			exit_critical
-						
+
 		elif msg_id == MSG_CURRENT_POSE_CARTESIAN:
 			send_current_pose_cartesian()
 		elif msg_id == MSG_CURRENT_POSE_JOINT:
@@ -162,7 +159,7 @@ end
 def my_movel(pose, acc, vel, rad, time):
 	if vel != 0:
 		if rad != 0:
-			movel(pose, v=vel, r=rad) 
+			movel(pose, v=vel, r=rad)
 		else:
 			if acc != 0:
 				movel(pose, v=vel, a=acc)
@@ -204,16 +201,16 @@ def execute_from_buffer():
 	command_counter = BUFFER_COMMAND_COUNTER[READ_PTR]
 	if msg_command_id == COMMAND_ID_MOVEL:
 		pose = BUFFER_POSE[READ_PTR]
-		params = BUFFER_PARAMS[READ_PTR]           
+		params = BUFFER_PARAMS[READ_PTR]
 		acc = params[0]
 		vel = params[1] * GLOBAL_SPEED
 		rad = params[2]
 		time = params[3]
-		my_movel(pose, acc, vel, rad, time)		
+		my_movel(pose, acc, vel, rad, time)
 	elif msg_command_id == COMMAND_ID_MOVEJ:
 		jp = BUFFER_JOINT[READ_PTR]
-		joints = [jp[0], jp[1], jp[2], jp[3], jp[4], jp[5]]              
-		params = BUFFER_PARAMS[READ_PTR]           
+		joints = [jp[0], jp[1], jp[2], jp[3], jp[4], jp[5]]
+		params = BUFFER_PARAMS[READ_PTR]
 		acc = params[0]
 		vel = params[1] * GLOBAL_SPEED
 		rad = params[2]
@@ -235,10 +232,10 @@ def execute_from_buffer():
 		textmsg(time_to_wait)
 		sleep(time_to_wait)
 	end
-	
+
 	# send executed
 	send_command_executed(command_counter)
-	
+
 	enter_critical
 	while LOCK == 1:
 		sleep(0.0001)
@@ -250,7 +247,7 @@ def execute_from_buffer():
 	exit_critical
 end
 
-thread thread_execute_from_buffer():		
+thread thread_execute_from_buffer():
 	while RUNNING:
 		if BUFFER_LENGTH > 0:
 			if LOCK == 0:
@@ -262,7 +259,7 @@ thread thread_execute_from_buffer():
 	sync()
 end
 
-thread thread_publish_state():		
+thread thread_publish_state():
 	while RUNNING:
 		send_current_pose_cartesian()
 		send_current_pose_joints()

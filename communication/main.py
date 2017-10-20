@@ -26,29 +26,26 @@ if len(sys.argv) > 1:
     print(sys.argv)
 else:
     server_address = "192.168.10.12"
-    server_address = "127.0.0.1"
+    #server_address = "127.0.0.1"
     server_port = 30003
     ur_ip = "192.168.10.11"
 
 
 def main():
-            
+
     # start the server
     server = Server(server_address, server_port)
     server.start()
     server.client_ips.update({"UR": ur_ip})
-    
+
     # create client wrappers, that wrap the underlying communication to the sockets
     gh = ClientWrapper("GH")
     ur = ClientWrapper("UR")
-    
+
     # wait for the clients to be connected
     gh.wait_for_connected()
-    #ur.wait_for_connected()
-    
-    msg_float_list = gh.wait_for_float_list()
-    print(msg_float_list)
-    
+    ur.wait_for_connected()
+
     # now enter fabrication loop
     while True:
         # let gh control if we should continue
@@ -60,14 +57,15 @@ def main():
         # we know this are commands, so we format them accordingly
         commands = format_commands(msg_float_list)
         for cmd in commands:
-            print(cmd)
-            #ur.send_command(cmd)
-        time.sleep(1)
+            x, y, z, ax, ay, az, speed, radius = cmd
+            ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+        ur.wait_for_ready()
         gh.send_float_list(commands[0])
+        print("============================================================")
         """
         ur.wait_for_ready()
         # wait for sensor value
-        digital_in = ur.wait_for_digital_in()
+        digital_in = ur.wait_for_digital_in(number)
         current_pose_joint = ur.wait_for_current_pose_joint()
         current_pose_cartesian = ur.get_current_pose_cartesian()
         # send further to gh
@@ -75,15 +73,12 @@ def main():
         gh.send_float_list(current_pose_joint)
         gh.send_float_list(current_pose_cartesian)
         """
-        
+
     server.close()
-    
+
     print("Please press a key to terminate the program.")
     junk = sys.stdin.readline()
     print("Done.")
-     
+
 if __name__ == "__main__":
-    main()  
-    
-    
-    
+    main()

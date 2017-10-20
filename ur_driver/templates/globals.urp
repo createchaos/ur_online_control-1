@@ -5,10 +5,10 @@ set_tcp({TOOL})
 SERVER_ADDRESS = "{SERVER_ADDRESS}"
 PORT = {PORT}
 RUNNING = False # is set to True when id message is send
-	
-ID_MESSAGE = "{NAME} SND RCV"
-ID_MESSAGE_LENGTH = {NAME_LENGTH} + 8
-	
+
+ID_MESSAGE = "{NAME}"
+ID_MESSAGE_LENGTH = {NAME_LENGTH}
+
 MM2M = 1000.0 # mm to m
 MULT = 100000.0
 
