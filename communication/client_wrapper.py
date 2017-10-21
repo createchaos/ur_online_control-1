@@ -35,9 +35,8 @@ class ClientWrapper(object):
         print("Waiting until client %s is connected..." % self.identifier)
         connected_clients = list(container.CONNECTED_CLIENTS.keys())
         while self.identifier not in connected_clients:
-            time.sleep(0.5)
+            time.sleep(0.1)
             connected_clients = list(container.CONNECTED_CLIENTS.keys())
-            print(connected_clients)
         print("Client %s is connected." % self.identifier)
         self.connected = True
         self.snd_queue = container.SND_QUEUE.get(self.identifier)

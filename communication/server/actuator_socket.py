@@ -56,17 +56,19 @@ class ActuatorSocket(BaseClientSocket):
     def update(self):
         pass
 
-    def get_command_counter(self):
-        return self.command_counter
-
     def set_command_counter_executed(self, msg_counter):
         self.command_counter_executed = msg_counter
         self.update()
 
-    def send_command(self, command_id, msg):
+    def send_command(self, msg_id, msg):
         """ Puts the message on the stack and calls handle_stack """
-        self.stack.append([command_id, msg])
+        self.stack.append([msg_id, msg])
         self.handle_stack()
+    
+    def _send_command(self, cmd):
+        msg_id, msg = cmd
+        buf = self._format_command(msg_id, msg)
+        self.socket.send(buf)
 
     def _format_command(self, msg_id, msg):
         pass
@@ -80,35 +82,35 @@ class ActuatorSocket(BaseClientSocket):
     def handle_stack(self, msg_counter = None):
         if not len(self.stack) and self.stack_counter == 0:
             if msg_counter == self.command_counter:
-                " The actuator is ready to be programmed"
+                # The actuator is ready to be programmed
                 self.state = READY_TO_PROGRAM
                 self.reset_counters()
                 self.stdout("Set state to READY_TO_PROGRAM")
                 #self.update()
 
         elif len(self.stack) and self.stack_counter == 0 :
-            " The actuator is ready to be programmed, and receives first packet from the stack "
+            # The actuator is ready to be programmed, and receives first packet from the stack
             for i in range(min(self.stack_size, len(self.stack))):
                 cmd = self.stack.pop(0)
                 self.command_counter += 1
                 self.state = EXECUTING
-                self.send(MSG_COMMAND, cmd)
+                print("hier")
+                self._send_command(cmd)
                 self.stack_counter -= 1
 
         elif len(self.stack) and -self.stack_size <= self.stack_counter and self.stack_counter < 0 :
-            " The actuator is currently executing, but ready to receive another packet from the stack "
+            # The actuator is currently executing, but ready to receive another packet from the stack
             try:
                 cmd = self.stack.pop(0)
                 self.command_counter += 1
                 self.state = EXECUTING
-                self.send(MSG_COMMAND, cmd)
+                self._send_command(cmd)
                 self.stack_counter -= 1
 
             except IndexError: # does happen sometimes: not thread-safe ??
-                print("indexerror")
                 pass
         else:
-            " The actuator must still accomplish some commands and return them "
+            # The actuator must still accomplish some commands and return them
             pass
 
 
@@ -244,17 +246,17 @@ class URSocket(ActuatorSocket):
         if command_id == COMMAND_ID_MOVEL or command_id == COMMAND_ID_MOVEJ:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             cmd = [c * self.MULT for c in cmd]
-            params = [msg_command_length, msg_id, command_id, self.get_command_counter()] + cmd
-            print cmd
+            params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
+            print("self.command_counter %i" % self.command_counter)
 
         elif command_id == COMMAND_ID_DIGITAL_OUT:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
-            params = [msg_command_length, msg_id, command_id, self.get_command_counter()] + cmd
+            params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
 
         elif command_id == COMMAND_ID_WAIT:
             msg_command_length = 4 * (1 + 1 + 1 + 1)
             cmd *= self.MULT
-            params = [msg_command_length, msg_id, command_id, self.get_command_counter(), cmd]
+            params = [msg_command_length, msg_id, command_id, self.command_counter, cmd]
         else:
             raise("command_id unknown.")
 

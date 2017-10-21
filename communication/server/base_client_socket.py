@@ -110,6 +110,9 @@ class BaseClientSocket(object):
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
         self.stdout("msg_id %d" % msg_id)
         self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
+    
+    def _format_other_messages(self, msg_id, msg):
+        pass
 
     def process(self, msg_len, msg_id, raw_msg):
 
@@ -150,6 +153,9 @@ class BaseClientSocket(object):
 
     def close(self):
         self.running = False
+    
+    def send_command(self, command_id, msg):
+        pass
 
     def send(self, msg_id, msg = None):
         ''' The transmission protocol for send messages is
@@ -167,6 +173,10 @@ class BaseClientSocket(object):
             msg = [float(item) for item in msg] # change tuple to list
             params = [msg_snd_len, msg_id] + msg
             buf = struct.pack(self.byteorder + "2i" + str(len(msg)) +  "f", *params)
+        
+        elif msg_id == MSG_COMMAND:
+            self.send_command(msg_id, msg)
+            return
 
         else:
             buf = self._format_other_messages(msg_id, msg)

@@ -4,13 +4,8 @@ Created on 15.10.2017
 @author: rustr
 '''
 
-def flatten_list(array, return_array = []):  
-    if type(array) == list or type(array) == tuple:
-        for x in array:
-            return_array += flatten_list(x, [])
-    else:
-        return_array += [array]
-    return return_array
+def flatten_list(array):
+    return [item for sublist in array for item in sublist]
 
  
 def divide_list_by_number(array, number):
