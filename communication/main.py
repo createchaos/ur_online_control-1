@@ -55,16 +55,23 @@ def main():
         if not continue_fabrication:
             break
         # receive further information from gh
-                
+        # e.g. send number of commands:
+        # number = gh.wait_for_int()
+        # commands = []
+        # for i in range(number):
+        #       cmd = gh.wait_for_float_list()
+        #       commands.append(cmd)
+
+
         picking_pose_cmd = gh.wait_for_float_list()
         savety_pose_cmd = gh.wait_for_float_list()
-    
+
         len_command = gh.wait_for_int()
         commands_flattened = gh.wait_for_float_list()
         # the commands are formatted according to the sent length
         commands = format_commands(commands_flattened, len_command)
         print("We received %i commands." % len(commands))
-        
+
         # 1. move to savety pose
         x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
         ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
@@ -78,14 +85,14 @@ def main():
         # 5. move to savety pose
         x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
         ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
-        
+
         # placing path
         for i in range(0, len(commands), 3):
-            
+
             savety_cmd1 = commands[i]
             placing_cmd = commands[i+1]
             savety_cmd2 = commands[i+2]
-            
+
             # 5. move to savety pose 1
             x, y, z, ax, ay, az, speed, radius = savety_cmd1
             ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
@@ -96,10 +103,12 @@ def main():
             ur.send_command_wait(2.)
             # 8. open gripper
             ur.send_command_digital_out(2, True) # open tool
+            # 7. wait
+            ur.send_command_wait(1.)
             # 9. move to savety pose 2
             x, y, z, ax, ay, az, speed, radius = savety_cmd2
             ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-            
+
             # 1. move to savety pose
             x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
             ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
@@ -113,8 +122,8 @@ def main():
             # 5. move to savety pose
             x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
             ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
-            
-                        
+
+
         ur.wait_for_ready()
         gh.send_float_list(commands[0])
         print("============================================================")
