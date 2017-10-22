@@ -14,7 +14,6 @@ def divide_list(array, number):
     else:
         return [array[x:x+number] for x in range(0, len(array), number)]
 
-def format_commands(msg_float_list):
-    len_commands = 8
+def format_commands(msg_float_list, len_commands):
     commands = divide_list_by_number(msg_float_list, len_commands)
     return commands

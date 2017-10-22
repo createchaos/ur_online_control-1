@@ -97,6 +97,7 @@ def read_and_identify():
 
 			BUFFER_COMMAND[WRITE_PTR] = msg_command_id
 			BUFFER_COMMAND_COUNTER[WRITE_PTR] = command_counter
+			
 
 			if msg_command_id == COMMAND_ID_MOVEL:
 				params = socket_read_binary_integer(6 + 4)
@@ -112,10 +113,9 @@ def read_and_identify():
 				BUFFER_PARAMS[WRITE_PTR] = p[params[1], params[2], 0, 0, 0, 0] # number, boolean
 			else: #if msg_command_id == COMMAND_ID_WAIT:
 				params = socket_read_binary_integer(1)
+				#textmsg(params[1])
 				BUFFER_PARAMS[WRITE_PTR] = p[params[1]/MULT, 0, 0, 0, 0, 0] # number
 			end
-
-			textmsg(command_counter)
 
 			send_command_received(command_counter)
 			enter_critical
@@ -157,12 +157,17 @@ def read_and_identify():
 end
 
 def my_movel(pose, acc, vel, rad, time):
+	textmsg(acc)
+	textmsg(vel)
+	textmsg(rad)
+	textmsg(time)
 	if vel != 0:
 		if rad != 0:
 			movel(pose, v=vel, r=rad)
 		else:
 			if acc != 0:
-				movel(pose, v=vel, a=acc)
+				textmsg("hier")
+				movel(pose, a=acc, v=vel)
 			else:
 				movel(pose, v=vel)
 			end

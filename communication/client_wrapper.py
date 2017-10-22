@@ -71,14 +71,21 @@ class ClientWrapper(object):
         return self.wait_for_message(MSG_INT)
 
     def wait_for_ready(self):
-        state = container.CONNECTED_CLIENTS.get(self.identifier)
+        state, number = container.CONNECTED_CLIENTS.get(self.identifier)
         while state != READY_TO_PROGRAM:
             time.sleep(0.1)
-            state = container.CONNECTED_CLIENTS.get(self.identifier)
+            state, number = container.CONNECTED_CLIENTS.get(self.identifier)
         return state
+    
+    def wait_for_command_executed(self, number):
+        state, numex = container.CONNECTED_CLIENTS.get(self.identifier)
+        while numex <= number:
+            time.sleep(0.1)
+            state, numex = container.CONNECTED_CLIENTS.get(self.identifier)
+        return numex
 
-    def send(self, msg_id, msg):
-        container.CONNECTED_CLIENTS.put(self.identifier, EXECUTING)
+    def send(self, msg_id, msg=None):
+        container.CONNECTED_CLIENTS.put(self.identifier, [EXECUTING, 0])
         self.snd_queue.put((msg_id, msg))
 
     def send_float_list(self, float_list):
@@ -97,4 +104,7 @@ class ClientWrapper(object):
         self.send_command(COMMAND_ID_DIGITAL_OUT, [number, int(boolean)])
 
     def send_command_wait(self, time_to_wait_in_seconds):
-        self.send_command(COMMAND_ID_WAIT, time_to_wait_in_seconds)
+        self.send_command(COMMAND_ID_WAIT, [time_to_wait_in_seconds])
+    
+    def quit(self):
+        self.send(MSG_QUIT)

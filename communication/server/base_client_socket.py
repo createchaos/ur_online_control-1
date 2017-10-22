@@ -149,7 +149,7 @@ class BaseClientSocket(object):
         container.RCV_QUEUES.put(self.identifier, {MSG_INT: self.int_queue})
 
     def publish_client(self):
-        container.CONNECTED_CLIENTS.put(self.identifier, self.state)
+        container.CONNECTED_CLIENTS.put(self.identifier, [self.state, 0])
 
     def close(self):
         self.running = False

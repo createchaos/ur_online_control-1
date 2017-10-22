@@ -25,7 +25,7 @@ MSG_INT = 17
 COMMAND_ID_MOVEL = 1 
 COMMAND_ID_MOVEJ = 2
 COMMAND_ID_DIGITAL_OUT = 3
-COMMAND_ID_WAIT = 3
+COMMAND_ID_WAIT = 4
 
 msg_identifier_dict = {'MSG_IDENTIFIER': 1, 
                        'MSG_COMMAND': 2,
@@ -49,7 +49,9 @@ msg_identifier_dict = {'MSG_IDENTIFIER': 1,
 # different command identifiers are sent after msg_id MSG_COMMAND
 command_identifier_dict = {'COMMAND_ID_MOVEL': 1, 
                            'COMMAND_ID_MOVEJ': 2,
-                           'COMMAND_ID_DIGITAL_OUT': 3}
+                           'COMMAND_ID_DIGITAL_OUT': 3,
+                           'COMMAND_ID_WAIT': 4
+                           }
 
 
 

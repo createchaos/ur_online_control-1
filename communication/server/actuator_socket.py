@@ -49,16 +49,12 @@ class ActuatorSocket(BaseClientSocket):
         if self.state == READY_TO_PROGRAM:
             self.command_counter = 0
             self.command_counter_executed = 0
-            container.CONNECTED_CLIENTS.put(self.identifier, self.state)
+            container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
         else:
             self.stdout("reset_counters: state is not READY_TO_PROGRAM ")
 
     def update(self):
-        pass
-
-    def set_command_counter_executed(self, msg_counter):
-        self.command_counter_executed = msg_counter
-        self.update()
+        container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
 
     def send_command(self, msg_id, msg):
         """ Puts the message on the stack and calls handle_stack """
@@ -86,7 +82,7 @@ class ActuatorSocket(BaseClientSocket):
                 self.state = READY_TO_PROGRAM
                 self.reset_counters()
                 self.stdout("Set state to READY_TO_PROGRAM")
-                #self.update()
+                self.update()
 
         elif len(self.stack) and self.stack_counter == 0 :
             # The actuator is ready to be programmed, and receives first packet from the stack
@@ -94,7 +90,6 @@ class ActuatorSocket(BaseClientSocket):
                 cmd = self.stack.pop(0)
                 self.command_counter += 1
                 self.state = EXECUTING
-                print("hier")
                 self._send_command(cmd)
                 self.stack_counter -= 1
 
@@ -126,12 +121,10 @@ class ActuatorSocket(BaseClientSocket):
 
         if msg_id == MSG_COMMAND_RECEIVED:
             msg_counter = struct.unpack_from(self.byteorder + "i", raw_msg)[0]
-            print("MSG_COMMAND_RECEIVED %i" % msg_counter)
             self._process_msg_cmd_received(msg_counter)
 
         elif msg_id == MSG_COMMAND_EXECUTED:
             msg_counter = struct.unpack_from(self.byteorder + "i", raw_msg)[0]
-            print("MSG_COMMAND_EXECUTED %i" % msg_counter)
             self._process_msg_cmd_executed(msg_counter)
 
         elif msg_id == MSG_CURRENT_POSE_CARTESIAN:
@@ -155,7 +148,8 @@ class ActuatorSocket(BaseClientSocket):
         #self.handle_stack()
 
     def _process_msg_cmd_executed(self, msg_counter):
-        self.set_command_counter_executed(msg_counter)
+        self.command_counter_executed = msg_counter
+        self.update()
         self.handle_stack(msg_counter)
 
     def _format_other_messages(self, msg_id, msg):
@@ -228,11 +222,16 @@ class URSocket(ActuatorSocket):
     MULT = 100000.0 # for converting the integers to floats
 
     def __init__(self, socket, ip, parent):
-
-        ActuatorSocket.__init__(self, socket, ip, parent)
+        super(URSocket, self).__init__(socket, ip, parent)
 
         self.stack_size = 5
         self.byteorder = "!"
+    
+    def update(self):
+        """This method is called on READY_TO_PROGRAM and MSG_COUNTER_EXECUTED.
+        """
+        super(URSocket, self).update()
+        
 
     def _format_command(self, msg_id, msg):
         """
@@ -247,16 +246,15 @@ class URSocket(ActuatorSocket):
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
-            print("self.command_counter %i" % self.command_counter)
 
         elif command_id == COMMAND_ID_DIGITAL_OUT:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
 
         elif command_id == COMMAND_ID_WAIT:
-            msg_command_length = 4 * (1 + 1 + 1 + 1)
-            cmd *= self.MULT
-            params = [msg_command_length, msg_id, command_id, self.command_counter, cmd]
+            msg_command_length = 4 * (len(cmd) + 1 + 1 + 1)
+            cmd = [c * self.MULT for c in cmd]
+            params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
         else:
             raise("command_id unknown.")
 
