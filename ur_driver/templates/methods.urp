@@ -157,16 +157,11 @@ def read_and_identify():
 end
 
 def my_movel(pose, acc, vel, rad, time):
-	textmsg(acc)
-	textmsg(vel)
-	textmsg(rad)
-	textmsg(time)
 	if vel != 0:
 		if rad != 0:
 			movel(pose, v=vel, r=rad)
 		else:
 			if acc != 0:
-				textmsg("hier")
 				movel(pose, a=acc, v=vel)
 			else:
 				movel(pose, v=vel)
