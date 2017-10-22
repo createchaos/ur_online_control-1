@@ -55,25 +55,68 @@ def main():
         if not continue_fabrication:
             break
         # receive further information from gh
-        picking_pose = gh.wait_for_float_list()
+                
+        picking_pose_cmd = gh.wait_for_float_list()
+        savety_pose_cmd = gh.wait_for_float_list()
+    
         len_command = gh.wait_for_int()
         commands_flattened = gh.wait_for_float_list()
         # the commands are formatted according to the sent length
         commands = format_commands(commands_flattened, len_command)
         print("We received %i commands." % len(commands))
         
-        for cmd in commands:
-            ur.send_command_digital_out(2, True) # open tool
-            ur.send_command_movel(picking_pose, a=100, v=30)
-            ur.send_command_digital_out(2, False) # close tool
+        # 1. move to savety pose
+        x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
+        ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+        # 2. open gripper
+        ur.send_command_digital_out(2, True) # open tool
+        # 3. move to picking pose
+        x, y, z, ax, ay, az, acc, vel = picking_pose_cmd
+        ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+        # 4. Close gripper
+        ur.send_command_digital_out(2, False) # close tool
+        # 5. move to savety pose
+        x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
+        ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+        
+        # placing path
+        for i in range(0, len(commands), 3):
             
-            x, y, z, ax, ay, az, speed, radius = cmd
+            savety_cmd1 = commands[i]
+            placing_cmd = commands[i+1]
+            savety_cmd2 = commands[i+2]
+            
+            # 5. move to savety pose 1
+            x, y, z, ax, ay, az, speed, radius = savety_cmd1
             ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+            # 6. move to placing pose
+            x, y, z, ax, ay, az, speed, radius = placing_cmd
+            ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+            # 7. wait
             ur.send_command_wait(2.)
+            # 8. open gripper
             ur.send_command_digital_out(2, True) # open tool
+            # 9. move to savety pose 2
+            x, y, z, ax, ay, az, speed, radius = savety_cmd2
+            ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
             
+            # 1. move to savety pose
+            x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
+            ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+            # 2. open gripper
+            ur.send_command_digital_out(2, True) # open tool
+            # 3. move to picking pose
+            x, y, z, ax, ay, az, acc, vel = picking_pose_cmd
+            ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+            # 4. Close gripper
+            ur.send_command_digital_out(2, False) # close tool
+            # 5. move to savety pose
+            x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
+            ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+            
+                        
         ur.wait_for_ready()
-        #gh.send_float_list(commands[0])
+        gh.send_float_list(commands[0])
         print("============================================================")
         break
         """
