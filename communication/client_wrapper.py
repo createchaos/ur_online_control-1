@@ -93,12 +93,18 @@ class ClientWrapper(object):
 
     def send_command(self, cmd_id, msg):
         self.send(MSG_COMMAND, [cmd_id, msg])
-
+        
     def send_command_movel(self, pose_cartesian, a=0, v=0, r=0, t=0):
         self.send_command(COMMAND_ID_MOVEL, pose_cartesian + [a, v, r, t])
 
     def send_command_movej(self, pose_joints, a=0, v=0, r=0, t=0):
         self.send_command(COMMAND_ID_MOVEJ, pose_joints + [a, v, r, t])
+    
+    #def send_command_movec(self, pose_joints, a=0, v=0, r=0, t=0):
+    #    self.send_command(COMMAND_ID_MOVEC, pose_joints + [a, v, r, t])
+    
+    #def send_command_movep(self, pose_joints, a=0, v=0, r=0, t=0):
+    #    self.send_command(COMMAND_ID_MOVEP, pose_joints + [a, v, r, t])
 
     def send_command_digital_out(self, number, boolean):
         self.send_command(COMMAND_ID_DIGITAL_OUT, [number, int(boolean)])
@@ -106,5 +112,19 @@ class ClientWrapper(object):
     def send_command_wait(self, time_to_wait_in_seconds):
         self.send_command(COMMAND_ID_WAIT, [time_to_wait_in_seconds])
     
+    def send_command_tcp(self, tcp):
+        self.send_command(COMMAND_ID_TCP, tcp)
+    
+    def send_command_popup(self):
+        self.send_command(COMMAND_ID_POPUP, None)
+    
     def quit(self):
         self.send(MSG_QUIT)
+    
+    def send_tcp(self, tcp):
+        self.send(MSG_TCP, tcp)
+    
+    def send_popup(self):
+        self.send(MSG_POPUP)
+        
+        

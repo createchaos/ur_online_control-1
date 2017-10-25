@@ -98,7 +98,6 @@ def read_and_identify():
 			BUFFER_COMMAND[WRITE_PTR] = msg_command_id
 			BUFFER_COMMAND_COUNTER[WRITE_PTR] = command_counter
 			
-
 			if msg_command_id == COMMAND_ID_MOVEL:
 				params = socket_read_binary_integer(6 + 4)
 				BUFFER_POSE[WRITE_PTR] = p[params[1]/(MM2M*MULT), params[2]/(MM2M*MULT), params[3]/(MM2M*MULT), params[4]/MULT, params[5]/MULT, params[6]/MULT]
@@ -111,10 +110,15 @@ def read_and_identify():
 			elif msg_command_id == COMMAND_ID_DIGITAL_OUT:
 				params = socket_read_binary_integer(1 + 1)
 				BUFFER_PARAMS[WRITE_PTR] = p[params[1], params[2], 0, 0, 0, 0] # number, boolean
-			else: #if msg_command_id == COMMAND_ID_WAIT:
+			elif msg_command_id == COMMAND_ID_WAIT:
 				params = socket_read_binary_integer(1)
 				#textmsg(params[1])
 				BUFFER_PARAMS[WRITE_PTR] = p[params[1]/MULT, 0, 0, 0, 0, 0] # number
+			elif msg_command_id == COMMAND_ID_TCP:
+			     params = socket_read_binary_integer(6)
+			     BUFFER_POSE[WRITE_PTR] = p[params[1]/(MM2M*MULT), params[2]/(MM2M*MULT), params[3]/(MM2M*MULT), params[4]/MULT, params[5]/MULT, params[6]/MULT]
+			else: # msg_command_id == COMMAND_ID_POPUP:
+			     textmsg("COMMAND_ID_POPUP")
 			end
 
 			send_command_received(command_counter)
@@ -225,12 +229,18 @@ def execute_from_buffer():
 		else:
 			set_digital_out(number, False)
 		end
-	else: #if msg_command_id == COMMAND_ID_WAIT:
+	elif msg_command_id == COMMAND_ID_WAIT:
 		params = BUFFER_PARAMS[READ_PTR]
 		time_to_wait = params[0]
 		textmsg("Sleeping")
 		textmsg(time_to_wait)
 		sleep(time_to_wait)
+	elif msg_command_id == COMMAND_ID_TCP:
+	   tcp = BUFFER_POSE[READ_PTR]
+	   set_tcp(tcp)
+	   textmsg("COMMAND_ID_TCP")
+	else: # msg_command_id == COMMAND_ID_POPUP:
+	   popup("Continue?", title="compas Popup!")
 	end
 
 	# send executed

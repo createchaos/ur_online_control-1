@@ -22,10 +22,18 @@ MSG_STRING = 15
 MSG_QUIT = 16
 MSG_INT = 17
 
+MSG_TCP = 18
+MSG_POPUP = 19
+
 COMMAND_ID_MOVEL = 1 
 COMMAND_ID_MOVEJ = 2
-COMMAND_ID_DIGITAL_OUT = 3
-COMMAND_ID_WAIT = 4
+COMMAND_ID_MOVEC = 3
+COMMAND_ID_MOVEP = 4
+COMMAND_ID_DIGITAL_OUT = 5
+COMMAND_ID_WAIT = 6
+COMMAND_ID_TCP = 7
+COMMAND_ID_POPUP = 8
+
 
 msg_identifier_dict = {'MSG_IDENTIFIER': 1, 
                        'MSG_COMMAND': 2,
@@ -43,14 +51,20 @@ msg_identifier_dict = {'MSG_IDENTIFIER': 1,
                        'MSG_FLOAT_LIST': 14, 
                        'MSG_STRING': 15, 
                        'MSG_QUIT': 16,
-                       'MSG_INT': 17
+                       'MSG_INT': 17,
+                       'MSG_TCP': 18,
+                       'MSG_POPUP': 19
                        }
 
 # different command identifiers are sent after msg_id MSG_COMMAND
 command_identifier_dict = {'COMMAND_ID_MOVEL': 1, 
                            'COMMAND_ID_MOVEJ': 2,
-                           'COMMAND_ID_DIGITAL_OUT': 3,
-                           'COMMAND_ID_WAIT': 4
+                           'COMMAND_ID_MOVEC': 3,
+                           'COMMAND_ID_MOVEP': 4,
+                           'COMMAND_ID_DIGITAL_OUT': 5,
+                           'COMMAND_ID_WAIT': 6,
+                           'COMMAND_ID_TCP': 7,
+                           'COMMAND_ID_POPUP': 8
                            }
 
 

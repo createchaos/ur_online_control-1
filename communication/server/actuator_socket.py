@@ -169,6 +169,14 @@ class ActuatorSocket(BaseClientSocket):
 
         elif msg_id == MSG_SPEED:
             buf = self._format_speed(msg_id, msg)
+        
+        elif msg_id == MSG_TCP:
+            buf = self._format_tcp(msg_id, msg)
+            
+        elif msg_id == MSG_POPUP:
+            msg_snd_len = 4
+            params = [msg_snd_len, msg_id]
+            buf = struct.pack(self.byteorder + "2i", *params)
 
         return buf
 
@@ -182,6 +190,9 @@ class ActuatorSocket(BaseClientSocket):
         pass
 
     def _format_speed(self, msg_id, msg):
+        pass
+    
+    def _format_tcp(self, msg_id, msg):
         pass
 
     def _process_current_pose_cartesian(self, current_pose_cartesian):
@@ -242,11 +253,17 @@ class URSocket(ActuatorSocket):
 
         command_id, cmd = msg
 
-        if command_id == COMMAND_ID_MOVEL or command_id == COMMAND_ID_MOVEJ:
+        if command_id in [COMMAND_ID_MOVEL, COMMAND_ID_MOVEJ]:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
-
+        
+        elif command_id == COMMAND_ID_MOVEC:
+            raise NotImplementedError("")
+        
+        elif command_id == COMMAND_ID_MOVEP:
+            raise NotImplementedError("")
+        
         elif command_id == COMMAND_ID_DIGITAL_OUT:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
@@ -255,6 +272,16 @@ class URSocket(ActuatorSocket):
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1)
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
+        
+        elif command_id == COMMAND_ID_TCP:
+            msg_command_length = 4 * (len(cmd) + 1 + 1 + 1)
+            cmd = [c * self.MULT for c in cmd]
+            params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
+            
+        elif command_id == COMMAND_ID_POPUP:
+            msg_command_length = 4 * (1 + 1 + 1)
+            params = [msg_command_length, msg_id, command_id, self.command_counter]
+        
         else:
             raise("command_id unknown.")
 
@@ -265,6 +292,13 @@ class URSocket(ActuatorSocket):
         msg_command_length = 4 * 2
         speed *= self.MULT
         params = [msg_command_length, msg_id, speed]
+        buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
+        return buf
+    
+    def _format_tcp(self, msg_id, msg):
+        msg_command_length = 4 * (len(msg) + 1)
+        msg = [c * self.MULT for c in msg]
+        params = [msg_command_length, msg_id] + msg
         buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
         return buf
 
