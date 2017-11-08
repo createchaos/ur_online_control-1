@@ -43,6 +43,7 @@ class ActuatorSocket(BaseClientSocket):
         self.current_pose_cartesian_queue = LifoQueue()
         self.current_pose_joints_queue = LifoQueue()
         self.current_digital_in_queue = LifoQueue()
+        self.current_analog_in_queue = LifoQueue()
 
 
     def reset_counters(self):
@@ -114,6 +115,7 @@ class ActuatorSocket(BaseClientSocket):
         container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_CARTESIAN: self.current_pose_cartesian_queue})
         container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_POSE_JOINT: self.current_pose_joints_queue})
         container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_DIGITAL_IN: self.current_digital_in_queue})
+        container.RCV_QUEUES.put(self.identifier, {MSG_CURRENT_ANALOG_IN: self.current_analog_in_queue})
 
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
 
@@ -138,6 +140,10 @@ class ActuatorSocket(BaseClientSocket):
         elif msg_id == MSG_CURRENT_DIGITAL_IN:
             current_digital_in = self._format_current_digital_in(msg_len, raw_msg)
             self._process_current_digital_in(current_digital_in)
+            
+        elif msg_id == MSG_CURRENT_ANALOG_IN:
+            current_analog_in = self._format_current_analog_in(msg_len, raw_msg)
+            self._process_current_analog_in(current_analog_in)
         else:
             self.stdout("msg_id %d" % msg_id)
             self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
@@ -188,6 +194,9 @@ class ActuatorSocket(BaseClientSocket):
 
     def _format_current_digital_in(self, msg_len, raw_msg):
         pass
+    
+    def _format_current_analog_in(self, msg_len, raw_msg):
+        pass
 
     def _format_speed(self, msg_id, msg):
         pass
@@ -202,6 +211,9 @@ class ActuatorSocket(BaseClientSocket):
         pass
 
     def _process_current_digital_in(self, digital_in):
+        pass
+    
+    def _process_current_analog_in(self, digital_in):
         pass
 
     def get_from_queue(self, queue):
@@ -320,6 +332,14 @@ class URSocket(ActuatorSocket):
         # make number, value pairs
         current_digital_in = [[current_digital_in[i], current_digital_in[i+1]] for i in range(0, len(current_digital_in), 2)]
         return current_digital_in
+    
+    def _format_current_analog_in(self, msg_len, raw_msg):
+        ai_num = (msg_len - 4)/4
+        current_analog_in = struct.unpack_from(self.byteorder + "%ii" % (ai_num), raw_msg)
+        # make number, value pairs
+        current_analog_in = [[current_analog_in[i], current_analog_in[i+1]/self.MULT] for i in range(0, len(current_analog_in), 2)]
+        #print current_analog_in
+        return current_analog_in
 
     def _process_current_pose_cartesian(self, current_pose_cartesian):
         self.current_pose_cartesian_queue.put(current_pose_cartesian)
@@ -329,3 +349,6 @@ class URSocket(ActuatorSocket):
 
     def _process_current_digital_in(self, current_digital_in):
         self.current_digital_in_queue.put(current_digital_in)
+    
+    def _process_current_analog_in(self, current_analog_in):
+        self.current_analog_in_queue.put(current_analog_in)

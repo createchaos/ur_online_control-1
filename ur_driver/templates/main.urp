@@ -1,3 +1,5 @@
+# wait until server has started
+sleep(0.5)
 # connect to server
 success = socket_open(SERVER_ADDRESS, PORT)
 if success:

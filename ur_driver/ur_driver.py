@@ -105,7 +105,7 @@ if __name__ == "__main__":
     
     ur_driver = URDriver(server_ip, server_port, tool_angle_axis, ur_ip, "UR10")
     print ur_driver
-    ur_driver.send()
+    #ur_driver.send()
 
     
 

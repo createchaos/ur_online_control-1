@@ -62,6 +62,15 @@ class ClientWrapper(object):
         print("Waiting for message %s from %s" % (msg_identifier_names[msg_id], self.identifier))
         msg = self.rcv_queues[msg_id].get(block = True)
         return msg
+    
+    def wait_for_current_pose_joint(self):
+        return self.wait_for_message(MSG_CURRENT_POSE_JOINT)
+    
+    def wait_for_current_pose_cartesian(self):
+        return self.wait_for_message(MSG_CURRENT_POSE_CARTESIAN)
+    
+    def wait_for_current_digital_in(self):
+        return self.wait_for_message(MSG_CURRENT_DIGITAL_IN)
 
     def wait_for_float_list(self):
         return self.wait_for_message(MSG_FLOAT_LIST)
@@ -91,32 +100,34 @@ class ClientWrapper(object):
     def send_float_list(self, float_list):
         self.send(MSG_FLOAT_LIST, float_list)
 
-    def send_command(self, cmd_id, msg):
+    def send_command(self, cmd_id, msg, wait):
         self.send(MSG_COMMAND, [cmd_id, msg])
+        if wait:
+            self.wait_for_ready()
         
-    def send_command_movel(self, pose_cartesian, a=0, v=0, r=0, t=0):
-        self.send_command(COMMAND_ID_MOVEL, pose_cartesian + [a, v, r, t])
+    def send_command_movel(self, pose_cartesian, a=0, v=0, r=0, t=0, wait=False):
+        self.send_command(COMMAND_ID_MOVEL, pose_cartesian + [a, v, r, t], wait)
 
-    def send_command_movej(self, pose_joints, a=0, v=0, r=0, t=0):
-        self.send_command(COMMAND_ID_MOVEJ, pose_joints + [a, v, r, t])
+    def send_command_movej(self, pose_joints, a=0, v=0, r=0, t=0, wait=False):
+        self.send_command(COMMAND_ID_MOVEJ, pose_joints + [a, v, r, t], wait)
     
-    #def send_command_movec(self, pose_joints, a=0, v=0, r=0, t=0):
+    #def send_command_movec(self, pose_joints, a=0, v=0, r=0, t=0, wait=False):
     #    self.send_command(COMMAND_ID_MOVEC, pose_joints + [a, v, r, t])
     
-    #def send_command_movep(self, pose_joints, a=0, v=0, r=0, t=0):
+    #def send_command_movep(self, pose_joints, a=0, v=0, r=0, t=0, wait=False):
     #    self.send_command(COMMAND_ID_MOVEP, pose_joints + [a, v, r, t])
 
-    def send_command_digital_out(self, number, boolean):
-        self.send_command(COMMAND_ID_DIGITAL_OUT, [number, int(boolean)])
+    def send_command_digital_out(self, number, boolean, wait=False):
+        self.send_command(COMMAND_ID_DIGITAL_OUT, [number, int(boolean)], wait)
 
-    def send_command_wait(self, time_to_wait_in_seconds):
-        self.send_command(COMMAND_ID_WAIT, [time_to_wait_in_seconds])
+    def send_command_wait(self, time_to_wait_in_seconds, wait=False):
+        self.send_command(COMMAND_ID_WAIT, [time_to_wait_in_seconds], wait)
     
-    def send_command_tcp(self, tcp):
-        self.send_command(COMMAND_ID_TCP, tcp)
+    def send_command_tcp(self, tcp, wait=False):
+        self.send_command(COMMAND_ID_TCP, tcp, wait)
     
-    def send_command_popup(self):
-        self.send_command(COMMAND_ID_POPUP, None)
+    def send_command_popup(self, wait=False):
+        self.send_command(COMMAND_ID_POPUP, None, wait)
     
     def quit(self):
         self.send(MSG_QUIT)
@@ -126,5 +137,12 @@ class ClientWrapper(object):
     
     def send_popup(self):
         self.send(MSG_POPUP)
-        
+
+
+if __name__ == "__main__":
+    
+    def test(a, b=3, c=4, **kwargs):
+        print(a, b, c, kwargs)
+    
+    test(4, wait=True)
         

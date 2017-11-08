@@ -65,6 +65,23 @@ def send_current_digital_in():
 	exit_critical
 end
 
+def send_current_analog_in():
+    ai = [0, 1]
+    ai_num = 2
+    enter_critical
+    msg_length = 4 + (4 + 4) * ai_num
+    socket_send_int(msg_length)
+    socket_send_int(MSG_CURRENT_ANALOG_IN)
+    i = 0
+    while i < ai_num:
+        value = get_analog_in(ai[i])
+        socket_send_int(ai[i])
+        socket_send_int(value*MULT)
+        i = i + 1
+    end
+    exit_critical
+end
+
 def send_digital_in(number):
 	enter_critical
 	value = get_digital_in(number)
@@ -274,6 +291,7 @@ thread thread_publish_state():
 		send_current_pose_cartesian()
 		send_current_pose_joints()
 		send_current_digital_in()
+		send_current_analog_in()
 		sleep(0.05)
 		sync()
 	end

@@ -11,9 +11,10 @@ MSG_COMMAND_EXECUTED = 4
 MSG_CURRENT_POSE_CARTESIAN = 5 # [position, orientation]
 MSG_CURRENT_POSE_JOINT = 6 # [j1j2j3j4j5j6]
 MSG_CURRENT_DIGITAL_IN = 7 # get a list of xx digital in number, values
+MSG_CURRENT_ANALOG_IN = 20 # get a list of xx analog in number, values
 MSG_ANALOG_IN = 8
 MSG_ANALOG_OUT = 9
-MSG_DIGITAL_IN = 10,
+MSG_DIGITAL_IN = 10
 MSG_DIGITAL_OUT = 11
 MSG_SPEED = 12 # set a global speed var 0 - 1
 MSG_INT_LIST = 13
@@ -24,6 +25,7 @@ MSG_INT = 17
 
 MSG_TCP = 18
 MSG_POPUP = 19
+# attention 20 is set!
 
 COMMAND_ID_MOVEL = 1 
 COMMAND_ID_MOVEJ = 2
@@ -42,6 +44,7 @@ msg_identifier_dict = {'MSG_IDENTIFIER': 1,
                        'MSG_CURRENT_POSE_CARTESIAN': 5, 
                        'MSG_CURRENT_POSE_JOINT': 6, 
                        'MSG_CURRENT_DIGITAL_IN': 7,
+                       'MSG_CURRENT_ANALOG_IN': 20,
                        'MSG_ANALOG_IN': 8, 
                        'MSG_ANALOG_OUT': 9, 
                        'MSG_DIGITAL_IN': 10,
