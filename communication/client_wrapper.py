@@ -32,12 +32,12 @@ class ClientWrapper(object):
         self.waiting_time_queue = 0.1
 
     def wait_for_connected(self):
-        print("Waiting until client %s is connected..." % self.identifier)
+        print("%s: Waiting to get connected..." % self.identifier)
         connected_clients = list(container.CONNECTED_CLIENTS.keys())
         while self.identifier not in connected_clients:
             time.sleep(0.1)
             connected_clients = list(container.CONNECTED_CLIENTS.keys())
-        print("Client %s is connected." % self.identifier)
+        print("%s: Client is connected." % self.identifier)
         self.connected = True
         self.snd_queue = container.SND_QUEUE.get(self.identifier)
         self.rcv_queues = container.RCV_QUEUES.get(self.identifier)
@@ -53,13 +53,13 @@ class ClientWrapper(object):
 
     def wait_for_message(self, msg_id):
         if not self.connected:
-            print("Client %s is NOT yet connected." % self.identifier)
+            print("%s: Client is NOT yet connected." % self.identifier)
             return
         if msg_id not in self.rcv_queues:
-            print("Client %s does NOT send messages of type %s." % (self.identifier, msg_identifier_names[msg_id]))
+            print("%s: Client does NOT send messages of type %s." % (self.identifier, msg_identifier_names[msg_id]))
             return
 
-        print("Waiting for message %s from %s" % (msg_identifier_names[msg_id], self.identifier))
+        print("%s: Waiting for message %s." % (self.identifier, msg_identifier_names[msg_id]))
         msg = self.rcv_queues[msg_id].get(block = True)
         return msg
     
