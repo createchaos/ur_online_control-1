@@ -1,5 +1,13 @@
 # set the tool
 set_tcp({TOOL})
+set_digital_out(0, False)
+set_digital_out(1, False)
+set_digital_out(2, False)
+set_digital_out(3, False)
+set_digital_out(4, False)
+set_digital_out(5, False)
+set_digital_out(6, False)
+set_digital_out(7, False)
 
 # globals for online communication
 SERVER_ADDRESS = "{SERVER_ADDRESS}"
