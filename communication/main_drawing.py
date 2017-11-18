@@ -62,8 +62,9 @@ def main():
         print("We received %i commands." % len(commands))
 
         for cmd in commands:
-            x, y, z, ax, ay, az, speed, radius = cmd
+            x, y, z, ax, ay, az, acceleration, speed, radius = cmd
             ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+            #ur.send_command_movel([x, y, z, ax, ay, az], v=speed, a=acceleration)
             
         ur.wait_for_ready()
         print("============================================================")
