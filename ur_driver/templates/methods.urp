@@ -190,7 +190,7 @@ def my_movel(pose, acc, vel, rad, time):
 		end
 	else: # time != 0:
 		if rad != 0:
-			movel(pose, r=rad, t=time)
+			movel(pose, t=time, r=rad)
 		else:
 			movel(pose, t=time)
 		end
