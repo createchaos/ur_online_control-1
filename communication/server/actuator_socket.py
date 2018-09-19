@@ -140,10 +140,11 @@ class ActuatorSocket(BaseClientSocket):
         elif msg_id == MSG_CURRENT_DIGITAL_IN:
             current_digital_in = self._format_current_digital_in(msg_len, raw_msg)
             self._process_current_digital_in(current_digital_in)
-            
+        
         elif msg_id == MSG_CURRENT_ANALOG_IN:
             current_analog_in = self._format_current_analog_in(msg_len, raw_msg)
             self._process_current_analog_in(current_analog_in)
+
         else:
             self.stdout("msg_id %d" % msg_id)
             self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
@@ -160,12 +161,18 @@ class ActuatorSocket(BaseClientSocket):
 
     def _format_other_messages(self, msg_id, msg):
         buf = None
+
         if msg_id in [MSG_CURRENT_POSE_CARTESIAN, MSG_CURRENT_POSE_JOINT]:
             msg_snd_len = 4
             params = [msg_snd_len, msg_id]
             buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
 
         elif msg_id == MSG_DIGITAL_IN:
+            msg_snd_len = 4 + 4
+            params = [msg_snd_len, msg_id, int(msg)]
+            buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
+        
+        elif msg_id == MSG_ANALOG_IN:
             msg_snd_len = 4 + 4
             params = [msg_snd_len, msg_id, int(msg)]
             buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
@@ -194,7 +201,7 @@ class ActuatorSocket(BaseClientSocket):
 
     def _format_current_digital_in(self, msg_len, raw_msg):
         pass
-    
+
     def _format_current_analog_in(self, msg_len, raw_msg):
         pass
 
@@ -212,8 +219,8 @@ class ActuatorSocket(BaseClientSocket):
 
     def _process_current_digital_in(self, digital_in):
         pass
-    
-    def _process_current_analog_in(self, digital_in):
+
+    def _process_current_analog_in(self, analog_in):
         pass
 
     def get_from_queue(self, queue):
@@ -238,6 +245,9 @@ class ActuatorSocket(BaseClientSocket):
 
     def get_current_digital_in(self):
         return self.get_from_queue(self.current_digital_in_queue)
+    
+    def get_current_analog_in(self):
+        return self.get_from_queue(self.current_analog_in_queue)
 
 
 class URSocket(ActuatorSocket):
@@ -334,11 +344,10 @@ class URSocket(ActuatorSocket):
         return current_digital_in
     
     def _format_current_analog_in(self, msg_len, raw_msg):
-        ai_num = (msg_len - 4)/4
-        current_analog_in = struct.unpack_from(self.byteorder + "%ii" % (ai_num), raw_msg)
+        di_num = (msg_len - 4)/4
+        current_analog_in = struct.unpack_from(self.byteorder + "%ii" % (di_num), raw_msg)
         # make number, value pairs
-        current_analog_in = [[current_analog_in[i], current_analog_in[i+1]/self.MULT] for i in range(0, len(current_analog_in), 2)]
-        #print current_analog_in
+        current_analog_in = [[current_analog_in[i], current_analog_in[i+1] / self.MULT] for i in range(0, len(current_analog_in), 2)]
         return current_analog_in
 
     def _process_current_pose_cartesian(self, current_pose_cartesian):

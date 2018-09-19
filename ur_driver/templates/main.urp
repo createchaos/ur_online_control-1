@@ -1,5 +1,3 @@
-# wait until server has started
-sleep(0.5)
 # connect to server
 success = socket_open(SERVER_ADDRESS, PORT)
 if success:
@@ -10,7 +8,7 @@ if success:
 	thread_execute = run thread_execute_from_buffer()
 	thread_publish = run thread_publish_state()
 
-	
+
 	# the main loop
 	while RUNNING == True:
 		if BUFFER_LENGTH < MAX_BUFFER_SIZE:

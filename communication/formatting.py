@@ -17,7 +17,3 @@ def divide_list(array, number):
 def format_commands(msg_float_list, len_commands):
     commands = divide_list_by_number(msg_float_list, len_commands)
     return commands
-
-
-if __name__ == "__main__":
-    print format_commands(range(8), 8)

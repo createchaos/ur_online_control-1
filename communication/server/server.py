@@ -62,7 +62,7 @@ class Server(object):
                 inv_map = {v: k for k, v in self.client_ips.iteritems()}
             else:
                 inv_map = {v: k for k, v in self.client_ips.items()}
-            #print("%sSocket(sock, ip, self)" % inv_map[ip])
+            print("%sSocket(sock, ip, self)" % inv_map[ip])
             client_socket = eval("%sSocket(sock, ip, self)" % inv_map[ip])
         else:
             client_socket = BaseClientSocket(sock, ip, self)
