@@ -25,7 +25,8 @@ class GHClient(BaseClient):
         
         
 if __name__ == "__main__":
-    server_address = "192.168.10.12"
+    #server_address = "192.168.10.12" 
+    server_address = "169.254.84.205"
     server_address = "127.0.0.1"
     server_port = 30003
     client = GHClient(server_address, server_port)
