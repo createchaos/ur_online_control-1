@@ -52,7 +52,7 @@ def main():
         
         gh.send_float_list([sum])
         
-    ur.quit()
+    gh.quit()
     server.close()
     time.sleep(2)
     print("Done.")
