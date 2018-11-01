@@ -57,7 +57,9 @@ class Tool(object):
                 tmodel.append(xtransform_function(m, transformation, copy=True))
         else:
             for m in self.model:
-                mtxyz = transform_points(m.xyz, transformation)
+                xyz = [(a['x'], a['y'], a['z']) for k, a in m.vertices(True)]
+                mtxyz = transform_points(xyz, transformation)
+                #mtxyz = transform_points(m.xyz, transformation)
                 faces = [m.face_vertices(fkey) for fkey in m.faces()]
                 tmodel.append(Mesh.from_vertices_and_faces(mtxyz, faces))
         return tmodel
