@@ -86,16 +86,17 @@ class ClientWrapper(object):
         for i, v in msg:
             if i == number:
                 return v
-     def wait_for_current_analog_in(self, number):
+
+    def wait_for_current_analog_in(self, number):
         msg = self.wait_for_message(MSG_CURRENT_ANALOG_IN)
         for i, v in msg:
             if i == number:
                 return v
 
-     def wait_for_current_pose_joint(self):
+    def wait_for_current_pose_joint(self):
         return self.wait_for_message(MSG_CURRENT_POSE_JOINT)
 
-     def wait_for_current_pose_cartesian(self):
+    def wait_for_current_pose_cartesian(self):
         return self.wait_for_message(MSG_CURRENT_POSE_CARTESIAN)
 
     def send(self, msg_id, msg=None):
