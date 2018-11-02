@@ -34,3 +34,8 @@ ENV/
 # eclipse
 .project
 .pydevproject
+
+# Rhino
+.3dm
+.3dmbak
+.rws
