@@ -1,4 +1,8 @@
-# Start server
+# Example to send something between Server and Grasshopper
+
+You could use this, for example if you have heavy calculation outside of grasshopper. (Calculation server)
+
+## Start server
 
 If starting the server from grasshopper does not work:
 

@@ -5,7 +5,7 @@ Created on 09.10.2017
 '''
 
 def read_file_to_string(afile):
-    with open(afile) as f:
+    with file(afile) as f:
         afile_str = f.read()
     return afile_str
 

@@ -14,7 +14,7 @@ from compas.geometry.xforms import Transformation
 
 from .kinematics import forward_kinematics
 from .kinematics import inverse_kinematics
-from .robot import BaseConfiguration
+from compas_fab.robots import Configuration
 from .tool import Tool
 
 class UR(object):
@@ -160,7 +160,7 @@ class UR(object):
             transformations (:obj:`list` of :class:`Transformation`): The
                 transformations for each link.
         """
-        q0, q1, q2, q3, q4, q5 = configuration.joint_values
+        q0, q1, q2, q3, q4, q5 = configuration.values
         j0, j1, j2, j3, j4, j5 = self.j0, self.j1, self.j2, self.j3, self.j4, self.j5
 
         T0 = Rotation.from_axis_and_angle(subtract_vectors(j0[1], j0[0]), q0, j0[1])
@@ -215,7 +215,8 @@ class UR(object):
                 tmodel.append(xtransform_function(m, T, copy=True))
         else:
             for m, T in zip(self.model, transformations):
-                mtxyz = transform_points(m.xyz, T)
+                xyz = [(a['x'], a['y'], a['z']) for k, a in m.vertices(True)]
+                mtxyz = transform_points(xyz, T)
                 faces = [m.face_vertices(fkey) for fkey in m.faces()]
                 tmodel.append(Mesh.from_vertices_and_faces(mtxyz, faces))
         return tmodel
@@ -224,7 +225,7 @@ class UR(object):
     	"""Get the transformed meshes of the robot and the tool model.
 
     	Args:
-            configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
+            configuration (:class:`Configuration`): the 6 joint angles in radians
             xtransform_function (function name, ): the name of the function
                 used to transform the model. Defaults to None.
 
@@ -259,13 +260,13 @@ class UR(object):
         """Forward kinematics function.
 
         Args:
-            configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
+            configuration (:class:`Configuration`): the 6 joint angles in radians
 
         Returns:
             frame (:class:`Frame`): The tool0 frame in robot coordinate system (RCS).
         """
 
-        return forward_kinematics(configuration.joint_values, self.params)
+        return forward_kinematics(configuration.values, self.params)
 
     def inverse_kinematics(self, tool0_frame_RCS):
         """Inverse kinematics function.
@@ -274,11 +275,11 @@ class UR(object):
                 coordinate system (RCS).
 
         Returns:
-            configurations (:obj:`list` of :class:`BaseConfiguration`): A list
+            configurations (:obj:`list` of :class:`Configuration`): A list
                 of possible configurations.
         """
         solutions = inverse_kinematics(tool0_frame_RCS, self.params)
         configurations = []
         for joint_values in solutions:
-            configurations.append(BaseConfiguration.from_joints(joint_values))
+            configurations.append(Configuration.from_revolute_values(joint_values))
         return configurations

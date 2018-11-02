@@ -4,7 +4,7 @@ import math
 
 from compas_fab import get_data
 
-from .robot import BaseConfiguration
+from compas_fab.robots import Configuration
 from .ur import UR
 
 
@@ -41,16 +41,16 @@ class UR5(UR):
         return get_data("robots/ur/ur5")
 
     def forward_kinematics(self, configuration):
-        q = configuration.joint_values[:]
+        q = configuration.values[:]
         q[5] += math.pi
-        return super(UR5, self).forward_kinematics(BaseConfiguration.from_joints(q))
+        return super(UR5, self).forward_kinematics(Configuration.from_revolute_values(q))
 
     def inverse_kinematics(self, tool0_frame_RCS):
         configurations = super(UR5, self).inverse_kinematics(tool0_frame_RCS)
         for q in configurations:
             print(q)
         for i in range(len(configurations)):
-            configurations[i].joint_values[5] -= math.pi
+            configurations[i].values[5] -= math.pi
         return configurations
 
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     ur = UR5()
 
     q = [-0.44244, -1.5318, 1.34588, -1.38512, -1.05009, -0.4495]
-    q = BaseConfiguration.from_joints(q)
+    q = Configuration.from_revolute_values(q)
     Ts = ur.get_forward_transformations(q)
     for T in Ts:
         print(T)
