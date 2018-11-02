@@ -1,9 +1,6 @@
-'''
-Created on 11.10.2017
-
-@author: rustr
-'''
 from __future__ import print_function
+from __future__ import absolute_import
+
 import time
 import sys
 
@@ -13,8 +10,8 @@ else:
     python_version = 2
 
 import ur_online_control.communication.container as container
-from ur_online_control.communication.msg_identifiers import *
-from ur_online_control.communication.states import *
+from .msg_identifiers import *
+from .states import *
 
 if python_version == 2:
     msg_identifier_names = {v: k for k, v in msg_identifier_dict.iteritems()}

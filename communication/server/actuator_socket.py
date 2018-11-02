@@ -344,8 +344,8 @@ class URSocket(ActuatorSocket):
         return current_digital_in
     
     def _format_current_analog_in(self, msg_len, raw_msg):
-        di_num = (msg_len - 4)/4
-        current_analog_in = struct.unpack_from(self.byteorder + "%ii" % (di_num), raw_msg)
+        ai_num = (msg_len - 4)/4
+        current_analog_in = struct.unpack_from(self.byteorder + "%ii" % (ai_num), raw_msg)
         # make number, value pairs
         current_analog_in = [[current_analog_in[i], current_analog_in[i+1] / self.MULT] for i in range(0, len(current_analog_in), 2)]
         return current_analog_in
