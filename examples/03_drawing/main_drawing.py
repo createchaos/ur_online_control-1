@@ -25,11 +25,11 @@ if len(sys.argv) > 1:
     ur_ip = sys.argv[3]
     print(sys.argv)
 else:
-    #server_address = "192.168.10.12"
-    server_address = "127.0.0.1"
+    server_address = "192.168.10.1"
+    #server_address = "127.0.0.1"
     server_port = 30003
-    #ur_ip = "192.168.10.11"
-    ur_ip = "127.0.0.1"
+    ur_ip = "192.168.10.10"
+    #ur_ip = "127.0.0.1"
 
 
 def main():
@@ -62,7 +62,8 @@ def main():
         print("We received %i commands." % len(commands))
 
         for cmd in commands:
-            x, y, z, ax, ay, az, acceleration, speed, radius = cmd
+            print(cmd)
+            x, y, z, ax, ay, az, speed, radius = cmd
             ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
             #ur.send_command_movel([x, y, z, ax, ay, az], v=speed, a=acceleration)
             
