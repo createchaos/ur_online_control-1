@@ -26,12 +26,12 @@ else:
     server = Server(server_address, server_port)
     server.start()
     server.client_ips.update({"UR": ur_ip})
-    
+
     ur = ClientWrapper("UR")
     ur.wait_for_connected()
 
-     for i in range(100):
-        
+    for i in range(100):
+
         analog_in = ur.wait_for_current_analog_in(1)
         print("analog_in", analog_in)
         # also working:
@@ -41,8 +41,8 @@ else:
         #print("current_pose_joint", current_pose_joint)
         #current_pose_cartesian = ur.wait_for_current_pose_cartesian()
         #print("current_pose_cartesian", current_pose_cartesian)
-         time.sleep(0.5)
-         print("============================================================")
+        time.sleep(0.5)
+        print("============================================================")
 
     ur.quit()
     server.close()
