@@ -1,8 +1,8 @@
 '''
 Created on 22.11.2016
-
 @author: rustr
 '''
+
 from __future__ import print_function
 import time
 import sys
@@ -18,6 +18,8 @@ import ur_online_control.communication.container as container
 from ur_online_control.communication.server import Server
 from ur_online_control.communication.client_wrapper import ClientWrapper
 from ur_online_control.communication.formatting import format_commands
+
+from linear_axis import siemens as s
 
 if len(sys.argv) > 1:
     server_address = sys.argv[1]
@@ -54,17 +56,6 @@ def main():
         print("continue_fabrication: %i" % continue_fabrication)
         if not continue_fabrication:
             break
-        # receive further information from gh
-        # e.g. send number of commands:
-        # number = gh.wait_for_int()
-        # commands = []
-        # for i in range(number):
-        #       cmd = gh.wait_for_float_list()
-        #       commands.append(cmd)
-
-
-        picking_pose_cmd = gh.wait_for_float_list()
-        savety_pose_cmd = gh.wait_for_float_list()
 
         len_command = gh.wait_for_int()
         commands_flattened = gh.wait_for_float_list()
@@ -72,62 +63,48 @@ def main():
         commands = format_commands(commands_flattened, len_command)
         print("We received %i commands." % len(commands))
 
-        # 1. move to savety pose
-        x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
-        ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
-        # 2. open gripper
-        ur.send_command_digital_out(2, True) # open tool
-        # 3. move to picking pose
-        x, y, z, ax, ay, az, acc, vel = picking_pose_cmd
-        ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
-        # 4. Close gripper
-        ur.send_command_digital_out(2, False) # close tool
-        # 5. move to savety pose
-        x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
-        ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+        safe_pt_toggle = gh.wait_for_int()
 
-        # placing path
-        for i in range(0, len(commands), 3):
+        if safe_pt_toggle:
+            print("Moving to safe point")
+            for i, cmd in enumerate(commands):
+                if i == 0:
+                    # Move to first point, toggle extruder and wait
+                    x, y, z, ax, ay, az, speed, radius = cmd
+                    ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+                    print("Toggling extruder")
+                    ur.send_command_digital_out(0, True)
 
-            savety_cmd1 = commands[i]
-            placing_cmd = commands[i+1]
-            savety_cmd2 = commands[i+2]
+                    print("Waiting for 60 seconds")
+                    ur.send_command_wait(60)
 
-            # 5. move to savety pose 1
-            x, y, z, ax, ay, az, speed, radius = savety_cmd1
-            ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-            # 6. move to placing pose
-            x, y, z, ax, ay, az, speed, radius = placing_cmd
-            ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-            # 7. wait
-            ur.send_command_wait(2.)
-            # 8. open gripper
-            ur.send_command_digital_out(2, True) # open tool
-            # 7. wait
-            ur.send_command_wait(1.)
-            # 9. move to savety pose 2
-            x, y, z, ax, ay, az, speed, radius = savety_cmd2
-            ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-
-            # 1. move to savety pose
-            x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
-            ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
-            # 2. open gripper
-            ur.send_command_digital_out(2, True) # open tool
-            # 3. move to picking pose
-            x, y, z, ax, ay, az, acc, vel = picking_pose_cmd
-            ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
-            # 4. Close gripper
-            ur.send_command_digital_out(2, False) # close tool
-            # 5. move to savety pose
-            x, y, z, ax, ay, az, acc, vel = savety_pose_cmd
-            ur.send_command_movel([x, y, z, ax, ay, az], a=acc, v=vel)
+                    # And move axis
+                    # p = s.SiemensPortal(1)
+                    # p.set_x(650)
+                    # p.set_z(850)
 
 
+                else:
+                    x, y, z, ax, ay, az, speed, radius = cmd
+                    ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+
+        else:
+            print("Skipping safe points")
+
+            for i, cmd in enumerate(commands[1:-1]):
+                    x, y, z, ax, ay, az, speed, radius = cmd
+                    ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+
+        # for i, cmd in enumerate(commands):
+        #     ur.wait_for_command_executed(i)
+        #     print("Executed command", i+1, "of", len(commands), "[", (i+1)*100/(len(commands)), "%]")
+        #     current_pose_cartesian = ur.get_current_pose_cartesian()
+        #     print(current_pose_cartesian)
+            
         ur.wait_for_ready()
+        ur.send_command_digital_out(0, False)
         gh.send_float_list(commands[0])
         print("============================================================")
-        break
         """
         ur.wait_for_ready()
         # wait for sensor value
