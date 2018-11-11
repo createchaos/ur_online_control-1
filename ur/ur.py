@@ -90,6 +90,14 @@ class UR(object):
         frame_RCS = frame_WCS.transformed(self.transformation_WCS_RCS)
         #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
+    
+    def get_pose_angle_axis_in_RCS(self, frame_WCS):
+        """Transform the frame in world coordinate system (WCS) into a frame in
+        robot coordinate system (RCS), which is defined by the robots' basis frame.
+        Returns the frame in the format pose angle-axis.
+        """
+        frame_RCS = self.get_frame_in_RCS(frame_WCS)
+        return list(frame_RCS.point) + frame_RCS.axis_angle_vector
 
     def get_frame_in_WCS(self, frame_RCS):
         """Transform the frame in robot coordinate system (RCS) into a frame in
