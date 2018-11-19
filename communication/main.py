@@ -14,12 +14,13 @@ parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
 sys.path.append(file_dir)
 sys.path.append(parent_dir)
 
+
 import ur_online_control.communication.container as container
 from ur_online_control.communication.server import Server
 from ur_online_control.communication.client_wrapper import ClientWrapper
 from ur_online_control.communication.formatting import format_commands
 
-from linear_axis import siemens as s
+from eggshell_bh.linear_axis import siemens as s
 
 if len(sys.argv) > 1:
     server_address = sys.argv[1]
@@ -65,6 +66,23 @@ def main():
 
         safe_pt_toggle = gh.wait_for_int()
 
+        linear_axis_toggle = gh.wait_for_int()
+
+        #if the ur required to start extruding always from the same start base
+        linear_axis_height = 850
+
+        if linear_axis_toggle:
+            # And move axis
+            p = s.SiemensPortal(1)
+            currentPos = p.get_z()
+            if currentPos != linear_axis_height:
+                p.set_z(linear_axis_height)
+                print ("linear axis is set to required height")
+                print("Waiting for 10 seconds")
+                ur.send_command_wait(10)
+            p.close()
+
+
         if safe_pt_toggle:
             print("Moving to safe point")
             for i, cmd in enumerate(commands):
@@ -78,29 +96,39 @@ def main():
                     print("Waiting for 60 seconds")
                     ur.send_command_wait(60)
 
-                    # And move axis
-                    # p = s.SiemensPortal(1)
-                    # p.set_x(650)
-                    # p.set_z(850)
-
-
                 else:
                     x, y, z, ax, ay, az, speed, radius = cmd
                     ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
 
         else:
             print("Skipping safe points")
-
             for i, cmd in enumerate(commands[1:-1]):
                     x, y, z, ax, ay, az, speed, radius = cmd
                     ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+
+        if linear_axis_toggle:
+            # And move axis
+            p = s.SiemensPortal(1)
+            print ("siemns protal opened")
+        for i, cmd in enumerate(commands[1:-1]):
+             if linear_axis_toggle : # == 1 and i+1 % 2 == 0:
+                 if i %4 == 0:
+                     linear_axis_move = linear_axis_height+i*5
+                     p.set_z(linear_axis_move)
+                     print ("linear axis moved %d mm"%linear_axis_move)
+             ur.wait_for_command_executed(i)
+             print("Executed command", i+1, "of", len(commands[1:-1]), "[", (i+1)*100/(len(commands[1:-1])), "%]")
+             #     current_pose_cartesian = ur.get_current_pose_cartesian()
+             #     print(current_pose_cartesian)
+        p.close()
+
 
         # for i, cmd in enumerate(commands):
         #     ur.wait_for_command_executed(i)
         #     print("Executed command", i+1, "of", len(commands), "[", (i+1)*100/(len(commands)), "%]")
         #     current_pose_cartesian = ur.get_current_pose_cartesian()
         #     print(current_pose_cartesian)
-            
+
         ur.wait_for_ready()
         ur.send_command_digital_out(0, False)
         gh.send_float_list(commands[0])
