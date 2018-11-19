@@ -74,14 +74,13 @@ def main():
         if linear_axis_toggle:
             # And move axis
             p = s.SiemensPortal(1)
+            print ("Siemens portal opened")
             currentPos = p.get_z()
             if currentPos != linear_axis_height:
                 p.set_z(linear_axis_height)
-                print ("linear axis is set to required height")
+                print ("Linear axis is set to required height")
                 print("Waiting for 10 seconds")
                 ur.send_command_wait(10)
-            p.close()
-
 
         if safe_pt_toggle:
             print("Moving to safe point")
@@ -94,7 +93,7 @@ def main():
                     ur.send_command_digital_out(0, True)
 
                     print("Waiting for 60 seconds")
-                    ur.send_command_wait(60)
+                    ur.send_command_wait(5)
 
                 else:
                     x, y, z, ax, ay, az, speed, radius = cmd
@@ -106,28 +105,23 @@ def main():
                     x, y, z, ax, ay, az, speed, radius = cmd
                     ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
 
-        if linear_axis_toggle:
-            # And move axis
-            p = s.SiemensPortal(1)
-            print ("siemns protal opened")
-        for i, cmd in enumerate(commands[1:-1]):
-             if linear_axis_toggle : # == 1 and i+1 % 2 == 0:
-                 if i %4 == 0:
-                     linear_axis_move = linear_axis_height+i*5
-                     p.set_z(linear_axis_move)
-                     print ("linear axis moved %d mm"%linear_axis_move)
-             ur.wait_for_command_executed(i)
-             print("Executed command", i+1, "of", len(commands[1:-1]), "[", (i+1)*100/(len(commands[1:-1])), "%]")
-             #     current_pose_cartesian = ur.get_current_pose_cartesian()
-             #     print(current_pose_cartesian)
-        p.close()
+        #move linear axis except start and end (at filament loading and unloading pos)
+        linear_axis_move = linear_axis_height
+        for i, cmd in enumerate(commands):
+            if i > 3:
+                ur.wait_for_command_executed(i)
+                print("Executed command", i+1, "of", len(commands), "[", (i+1)*100/(len(commands)), "%]")
+                if linear_axis_toggle : # == 1 and i+1 % 2 == 0:
+                    if (i-3) %16 == 0:
+                        linear_axis_move += 1
+                        p.set_z(linear_axis_move)
+                        print ("Linear axis moved to %d mm"%linear_axis_move)
+                        print (i)
+
+                 #     current_pose_cartesian = ur.get_current_pose_cartesian()
+                 #     print(current_pose_cartesian)
 
 
-        # for i, cmd in enumerate(commands):
-        #     ur.wait_for_command_executed(i)
-        #     print("Executed command", i+1, "of", len(commands), "[", (i+1)*100/(len(commands)), "%]")
-        #     current_pose_cartesian = ur.get_current_pose_cartesian()
-        #     print(current_pose_cartesian)
 
         ur.wait_for_ready()
         ur.send_command_digital_out(0, False)
@@ -144,6 +138,7 @@ def main():
         gh.send_float_list(current_pose_joint)
         gh.send_float_list(current_pose_cartesian)
         """
+    p.close()
     ur.quit()
     gh.quit()
     server.close()
