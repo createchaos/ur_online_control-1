@@ -64,6 +64,8 @@ def main():
         commands = format_commands(commands_flattened, len_command)
         print("We received %i commands." % len(commands))
 
+        axis_moving_pts_indices = gh.wait_for_float_list()
+
         safe_pt_toggle = gh.wait_for_int()
 
         linear_axis_toggle = gh.wait_for_int()
@@ -74,13 +76,14 @@ def main():
         if linear_axis_toggle:
             # And move axis
             p = s.SiemensPortal(1)
-            print ("Siemens portal opened")
-            currentPos = p.get_z()
-            if currentPos != linear_axis_height:
-                p.set_z(linear_axis_height)
-                print ("Linear axis is set to required height")
-                print("Waiting for 10 seconds")
-                ur.send_command_wait(10)
+            #lines below commented till linear axis get works
+            # print ("Siemens portal opened")
+            # currentPos = p.get_z()
+            # if currentPos != linear_axis_height:
+            #     p.set_z(linear_axis_height)
+            #     print ("Linear axis is set to required height")
+            #     print("Waiting for 10 seconds")
+            #     ur.send_command_wait(10)
 
         if safe_pt_toggle:
             print("Moving to safe point")
@@ -112,7 +115,7 @@ def main():
                 ur.wait_for_command_executed(i)
                 print("Executed command", i+1, "of", len(commands), "[", (i+1)*100/(len(commands)), "%]")
                 if linear_axis_toggle : # == 1 and i+1 % 2 == 0:
-                    if (i-3) %16 == 0:
+                    if i in axis_moving_pts_indices:
                         linear_axis_move += 1
                         p.set_z(linear_axis_move)
                         print ("Linear axis moved to %d mm"%linear_axis_move)
