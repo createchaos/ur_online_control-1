@@ -64,18 +64,19 @@ def main():
         commands = format_commands(commands_flattened, len_command)
         print("We received %i commands." % len(commands))
 
-        axis_moving_pts_indices = gh.wait_for_float_list()
-
         safe_pt_toggle = gh.wait_for_int()
 
         linear_axis_toggle = gh.wait_for_int()
 
+        if linear_axis_toggle:
+            axis_moving_pts_indices = gh.wait_for_float_list()
+
         #if the ur required to start extruding always from the same start base
-        linear_axis_height = 850
+        linear_axis_height = 500
 
         if linear_axis_toggle:
             # And move axis
-            p = s.SiemensPortal(1)
+            p = s.SiemensPortal(2)
             #lines below commented till linear axis get works
             # print ("Siemens portal opened")
             # currentPos = p.get_z()
@@ -110,6 +111,7 @@ def main():
 
         #move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move = linear_axis_height
+        
         for i, cmd in enumerate(commands):
             if i > 3:
                 ur.wait_for_command_executed(i)
