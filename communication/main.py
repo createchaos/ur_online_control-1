@@ -73,10 +73,14 @@ def main():
 
         #if the ur required to start extruding always from the same start base
         linear_axis_height = 500
+        linear_axis_x = 500
 
         if linear_axis_toggle:
             # And move axis
             p = s.SiemensPortal(2)
+            p.set_z(linear_axis_height)
+            p.set_x(linear_axis_x)
+
             #lines below commented till linear axis get works
             # print ("Siemens portal opened")
             # currentPos = p.get_z()
@@ -96,8 +100,8 @@ def main():
                     print("Toggling extruder")
                     ur.send_command_digital_out(0, True)
 
-                    print("Waiting for 60 seconds")
-                    ur.send_command_wait(5)
+                    print("Waiting for 30 seconds")
+                    ur.send_command_wait(30)
 
                 else:
                     x, y, z, ax, ay, az, speed, radius = cmd
@@ -121,8 +125,7 @@ def main():
                         linear_axis_move += 1
                         p.set_z(linear_axis_move)
                         print ("Linear axis moved to %d mm"%linear_axis_move)
-                        print (i)
-
+                        print ("Linear axis moved at point index %d"%i)
                  #     current_pose_cartesian = ur.get_current_pose_cartesian()
                  #     print(current_pose_cartesian)
 
