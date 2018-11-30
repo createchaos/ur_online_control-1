@@ -116,10 +116,15 @@ def main():
         #move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move = linear_axis_height
         
-        for i, cmd in enumerate(commands):
+        if safe_pt_toggle:
+        	itr_cmds = commands[1:-1]
+        else:
+        	itr_cmds = commands
+
+        for i, cmd in enumerate(itr_cmds):
             if i > 3:
                 ur.wait_for_command_executed(i)
-                print("Executed command", i+1, "of", len(commands), "[", (i+1)*100/(len(commands)), "%]")
+                print("Executed command", i+1, "of", len(itr_cmds), "[", (i+1)*100/(len(itr_cmds)), "%]")
                 if linear_axis_toggle : # == 1 and i+1 % 2 == 0:
                     if i in axis_moving_pts_indices:
                         linear_axis_move += 1
