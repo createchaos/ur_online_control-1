@@ -80,6 +80,7 @@ def main():
             p = s.SiemensPortal(2)
             p.set_z(linear_axis_height)
             p.set_x(linear_axis_x)
+            print ("Linear axis moved to %d mm Z and %d mm X "%(linear_axis_height,linear_axis_x))
 
             #lines below commented till linear axis get works
             # print ("Siemens portal opened")
