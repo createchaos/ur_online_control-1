@@ -22,6 +22,19 @@ from ur_online_control.communication.formatting import format_commands
 
 from eggshell_bh.linear_axis import siemens as s
 
+#create logger to debug the code and check the speed and time
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter("%(asctime)s:    %(levelname)s:  %(message)s")
+
+file_handler = logging.FileHandler("main.log")
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
 if len(sys.argv) > 1:
     server_address = sys.argv[1]
     server_port = int(sys.argv[2])
@@ -37,18 +50,26 @@ else:
 
 def main():
 
+    logger.info("\n\nlog started ,main is running\n")
+
     # start the server
     server = Server(server_address, server_port)
     server.start()
     server.client_ips.update({"UR": ur_ip})
 
+    logger.info("server started")
+
     # create client wrappers, that wrap the underlying communication to the sockets
     gh = ClientWrapper("GH")
     ur = ClientWrapper("UR")
 
+    logger.info("client wrappers created")
+
     # wait for the clients to be connected
     gh.wait_for_connected()
     ur.wait_for_connected()
+
+    logger.info("gh and ur are connected")
 
     # now enter fabrication loop
     while True: # and ur and gh connected
@@ -64,12 +85,16 @@ def main():
         commands = format_commands(commands_flattened, len_command)
         print("We received %i commands." % len(commands))
 
+        logger.info("{} float list of commands_flattened received".format(len_command))
+
         safe_pt_toggle = gh.wait_for_int()
 
         linear_axis_toggle = gh.wait_for_int()
 
         if linear_axis_toggle:
             axis_moving_pts_indices = gh.wait_for_float_list()
+
+        logger.info("{} float list of axis_moving_pts_indices received".format(len(axis_moving_pts_indices)))
 
         #if the ur required to start extruding always from the same start base
         linear_axis_height = 500
@@ -81,6 +106,7 @@ def main():
             p.set_z(linear_axis_height)
             p.set_x(linear_axis_x)
             print ("Linear axis moved to %d mm Z and %d mm X "%(linear_axis_height,linear_axis_x))
+            logger.info("siemens portal connected")
 
             #lines below commented till linear axis get works
             # print ("Siemens portal opened")
@@ -107,16 +133,20 @@ def main():
                 else:
                     x, y, z, ax, ay, az, speed, radius = cmd
                     ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+                    if i %2000 == 0:
+                        logger.info("command movel number {} is sent".format(i))
 
         else:
             print("Skipping safe points")
             for i, cmd in enumerate(commands[1:-1]):
                     x, y, z, ax, ay, az, speed, radius = cmd
                     ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+                    if i %2000 == 0:
+                        logger.info("command movel number {} is sent".format(i))
 
         #move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move = linear_axis_height
-        
+
         if safe_pt_toggle:
         	itr_cmds = commands[1:-1]
         else:
@@ -156,6 +186,8 @@ def main():
     ur.quit()
     gh.quit()
     server.close()
+
+    logger.info("siemens protal, gh, ur and server are closed")
 
     print("Please press a key to terminate the program.")
     junk = sys.stdin.readline()
