@@ -79,6 +79,13 @@ def main():
         if not continue_fabrication:
             break
 
+        safe_pt_toggle = gh.wait_for_int()
+
+        linear_axis_toggle = gh.wait_for_int()
+
+        if linear_axis_toggle:
+            axis_moving_pts_indices = gh.wait_for_float_list()
+
         len_command = gh.wait_for_int()
         commands_flattened = gh.wait_for_float_list()
         # the commands are formatted according to the sent length
@@ -86,13 +93,6 @@ def main():
         print("We received %i commands." % len(commands))
 
         logger.info("{} float list of commands_flattened received".format(len_command))
-
-        safe_pt_toggle = gh.wait_for_int()
-
-        linear_axis_toggle = gh.wait_for_int()
-
-        if linear_axis_toggle:
-            axis_moving_pts_indices = gh.wait_for_float_list()
 
         logger.info("{} float list of axis_moving_pts_indices received".format(len(axis_moving_pts_indices)))
 
