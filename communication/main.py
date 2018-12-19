@@ -80,19 +80,14 @@ def main():
             break
 
         safe_pt_toggle = gh.wait_for_int()
+        print("safe_pt_toggle: %i" % safe_pt_toggle)
 
         linear_axis_toggle = gh.wait_for_int()
+        print("linear_axis_toggle: %i" % linear_axis_toggle)
 
-        if linear_axis_toggle:
-            axis_moving_pts_indices = gh.wait_for_float_list()
-
-        len_command = gh.wait_for_int()
-        commands_flattened = gh.wait_for_float_list()
-        # the commands are formatted according to the sent length
-        commands = format_commands(commands_flattened, len_command)
-        print("We received %i commands." % len(commands))
-
-        logger.info("{} float list of commands_flattened received".format(len_command))
+        #if linear_axis_toggle:
+        axis_moving_pts_indices = gh.wait_for_float_list()
+        print("We received %i linear axis_moving_pts_indices" % len(axis_moving_pts_indices))
 
         logger.info("{} float list of axis_moving_pts_indices received".format(len(axis_moving_pts_indices)))
 
@@ -105,7 +100,7 @@ def main():
             p = s.SiemensPortal(2)
             p.set_z(linear_axis_height)
             p.set_x(linear_axis_x)
-            print ("Linear axis moved to %d mm Z and %d mm X "%(linear_axis_height,linear_axis_x))
+            print ("Linear axis moved to %d mm Z and %d mm X \n "%(linear_axis_height,linear_axis_x))
             logger.info("siemens portal connected")
 
             #lines below commented till linear axis get works
@@ -116,6 +111,16 @@ def main():
             #     print ("Linear axis is set to required height")
             #     print("Waiting for 10 seconds")
             #     ur.send_command_wait(10)
+
+        len_command = gh.wait_for_int()
+
+        commands_flattened = gh.wait_for_float_list()
+        # the commands are formatted according to the sent length
+        commands = format_commands(commands_flattened, len_command)
+        print("We received %i commands." % len(commands))
+        logger.info("{} float list of commands_flattened received".format(len_command))
+
+
 
         if safe_pt_toggle:
             print("Moving to safe point")
@@ -143,6 +148,9 @@ def main():
                     ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
                     if i %2000 == 0:
                         logger.info("command movel number {} is sent".format(i))
+
+        
+
 
         #move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move = linear_axis_height
