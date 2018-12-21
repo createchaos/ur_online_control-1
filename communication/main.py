@@ -113,83 +113,77 @@ def main():
             #     ur.send_command_wait(10)
 
         len_command = gh.wait_for_int()
+        print("len_command: %i" % len_command)
 
-        commands_flattened = gh.wait_for_float_list()
-        # the commands are formatted according to the sent length
-        commands = format_commands(commands_flattened, len_command)
-        print("We received %i commands." % len(commands))
-        logger.info("{} float list of commands_flattened received".format(len_command))
+        no_batches = gh.wait_for_int()
+        print("no_batches: %i" % no_batches)
 
+        commands_to_wait_flattened = []
 
+        for j in range(no_batches):
+            commands_flattened = gh.wait_for_float_list()
+            # create mew list for commands executed
+            commands_to_wait_flattened.extend(commands_flattened)
+            # the commands are formatted according to the sent length
+            commands = format_commands(commands_flattened, len_command)
+            print("We received %i commands." % len(commands))
+            logger.info("{} float list of commands_flattened received".format(len(commands)))
 
+            if safe_pt_toggle:
+            	commands_to_send = commands
+            else:
+            	commands_to_send = commands[1:-1]
+
+            for i, cmd in enumerate(commands_to_send):
+                 x, y, z, ax, ay, az, speed, radius = cmd
+                 ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
+                 if i %100 == 0:
+                     logger.info("command movel number {} is sent".format(i))
+
+                 if safe_pt_toggle and i == 0:
+                     # after Moving to first point, toggle extruder and wait
+                     print("Moved to safe point")
+                     print("Toggling extruder")
+                     ur.send_command_digital_out(0, True)
+                     print("Waiting for 30 seconds")
+                     ur.send_command_wait(30)
+
+            logger.info("batch number {} were sent".format(j))
+
+        logger.info("all batches were sent")
+
+        commands_2 = format_commands(commands_to_wait_flattened, len_command)
+        print("We received %i commands_to_wait." % len(commands_2))
         if safe_pt_toggle:
-            print("Moving to safe point")
-            for i, cmd in enumerate(commands):
-                if i == 0:
-                    # Move to first point, toggle extruder and wait
-                    x, y, z, ax, ay, az, speed, radius = cmd
-                    ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-                    print("Toggling extruder")
-                    ur.send_command_digital_out(0, True)
-
-                    print("Waiting for 30 seconds")
-                    ur.send_command_wait(30)
-
-                else:
-                    x, y, z, ax, ay, az, speed, radius = cmd
-                    ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-                    if i %2000 == 0:
-                        logger.info("command movel number {} is sent".format(i))
-
+        	commands_to_wait = commands_2
         else:
-            print("Skipping safe points")
-            for i, cmd in enumerate(commands[1:-1]):
-                    x, y, z, ax, ay, az, speed, radius = cmd
-                    ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-                    if i %2000 == 0:
-                        logger.info("command movel number {} is sent".format(i))
+        	commands_to_wait = commands_2[1:-1]
 
-        
-
-
-        #move linear axis except start and end (at filament loading and unloading pos)
+        # move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move = linear_axis_height
 
-        if safe_pt_toggle:
-        	itr_cmds = commands[1:-1]
-        else:
-        	itr_cmds = commands
-
-        for i, cmd in enumerate(itr_cmds):
-            if i > 3:
+        for i, cmd in enumerate(commands_to_wait):
+            if i > 3: #one for send to safe_pt, second for send_command_digital_out, third for send_command_wait
                 ur.wait_for_command_executed(i)
-                print("Executed command", i+1, "of", len(itr_cmds), "[", (i+1)*100/(len(itr_cmds)), "%]")
-                if linear_axis_toggle : # == 1 and i+1 % 2 == 0:
+                print("Executed command", i+1, "of", len(commands_to_wait), "[", (i+1)*100/(len(commands_to_wait)), "%]")
+                if linear_axis_toggle :
                     if i in axis_moving_pts_indices:
                         linear_axis_move += 1
                         p.set_z(linear_axis_move)
                         print ("Linear axis moved to %d mm"%linear_axis_move)
                         print ("Linear axis moved at point index %d"%i)
+                        logger.info("Linear axis moved to {} mm".format(linear_axis_move))
                  #     current_pose_cartesian = ur.get_current_pose_cartesian()
                  #     print(current_pose_cartesian)
 
 
-
+        logger.info("before wait_for_ready")
         ur.wait_for_ready()
+        logger.info("after wait_for_ready")
         ur.send_command_digital_out(0, False)
         gh.send_float_list(commands[0])
         print("============================================================")
-        """
-        ur.wait_for_ready()
-        # wait for sensor value
-        digital_in = ur.wait_for_digital_in(number)
-        current_pose_joint = ur.wait_for_current_pose_joint()
-        current_pose_cartesian = ur.get_current_pose_cartesian()
-        # send further to gh
-        gh.send_float_list(digital_in)
-        gh.send_float_list(current_pose_joint)
-        gh.send_float_list(current_pose_cartesian)
-        """
+
     p.close()
     ur.quit()
     gh.quit()
