@@ -148,7 +148,7 @@ def main():
                      print("Waiting for 30 seconds")
                      ur.send_command_wait(30)
 
-            logger.info("batch number {} were sent".format(j))
+            logger.info("batch number {} was sent".format(j))
 
         logger.info("all batches were sent")
 
