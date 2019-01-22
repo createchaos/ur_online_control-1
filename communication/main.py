@@ -92,25 +92,27 @@ def main():
         logger.info("{} float list of axis_moving_pts_indices received".format(len(axis_moving_pts_indices)))
 
         #if the ur required to start extruding always from the same start base
-        linear_axis_height = 500
         linear_axis_x = 500
+        linear_axis_z = 500
 
         if linear_axis_toggle:
             # And move axis
             p = s.SiemensPortal(2)
-            p.set_z(linear_axis_height)
-            p.set_x(linear_axis_x)
-            print ("Linear axis moved to %d mm Z and %d mm X \n "%(linear_axis_height,linear_axis_x))
             logger.info("siemens portal connected")
+            # p.set_z(linear_axis_z)
+            # p.set_x(linear_axis_x)
+            # print ("Linear axis moved to %d mm Z and %d mm X \n "%(linear_axis_z,linear_axis_x))
 
-            #lines below commented till linear axis get works
-            # print ("Siemens portal opened")
-            # currentPos = p.get_z()
-            # if currentPos != linear_axis_height:
-            #     p.set_z(linear_axis_height)
-            #     print ("Linear axis is set to required height")
-            #     print("Waiting for 10 seconds")
-            #     ur.send_command_wait(10)
+            # lines below commented till linear axis get works
+            print ("Siemens portal connected")
+            currentPosX = p.get_x()
+            currentPosZ = p.get_z()
+            if currentPosZ != linear_axis_z and currentPosX != linear_axis_x:
+                p.set_x(linear_axis_x)
+                p.set_z(linear_axis_z)
+                print ("Linear axis is set to default x and z value")
+                print("Waiting for 10 seconds")
+                ur.send_command_wait(10)
 
         len_command = gh.wait_for_int()
         print("len_command: %i" % len_command)
@@ -160,7 +162,7 @@ def main():
         	commands_to_wait = commands_2[1:-1]
 
         # move linear axis except start and end (at filament loading and unloading pos)
-        linear_axis_move = linear_axis_height
+        linear_axis_move = linear_axis_z
 
         for i, cmd in enumerate(commands_to_wait):
             if i > 3: #one for send to safe_pt, second for send_command_digital_out, third for send_command_wait
