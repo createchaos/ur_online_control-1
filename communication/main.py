@@ -79,8 +79,8 @@ def main():
         if not continue_fabrication:
             break
 
-        safe_pt_toggle = gh.wait_for_int()
-        print("safe_pt_toggle: %i" % safe_pt_toggle)
+        move_filament_loading_pt = gh.wait_for_int()
+        print("move_filament_loading_pt: %i" % move_filament_loading_pt)
 
         linear_axis_toggle = gh.wait_for_int()
         print("linear_axis_toggle: %i" % linear_axis_toggle)
@@ -99,11 +99,6 @@ def main():
             # And move axis
             p = s.SiemensPortal(2)
             logger.info("siemens portal connected")
-            # p.set_z(linear_axis_z)
-            # p.set_x(linear_axis_x)
-            # print ("Linear axis moved to %d mm Z and %d mm X \n "%(linear_axis_z,linear_axis_x))
-
-            # lines below commented till linear axis get works
             print ("Siemens portal connected")
             currentPosX = p.get_x()
             currentPosZ = p.get_z()
@@ -113,6 +108,7 @@ def main():
                 print ("Linear axis is set to default x and z value")
                 print("Waiting for 10 seconds")
                 ur.send_command_wait(10)
+            p.close()
 
         len_command = gh.wait_for_int()
         print("len_command: %i" % len_command)
@@ -131,7 +127,7 @@ def main():
             print("We received %i commands." % len(commands))
             logger.info("{} float list of commands_flattened received".format(len(commands)))
 
-            if safe_pt_toggle:
+            if move_filament_loading_pt:
             	commands_to_send = commands
             else:
             	commands_to_send = commands[1:-1]
@@ -142,7 +138,7 @@ def main():
                  if i %100 == 0:
                      logger.info("command movel number {} is sent".format(i))
 
-                 if safe_pt_toggle and i == 0:
+                 if move_filament_loading_pt and i == 0:
                      # after Moving to first point, toggle extruder and wait
                      print("Moved to safe point")
                      print("Toggling extruder")
@@ -156,14 +152,14 @@ def main():
 
         commands_2 = format_commands(commands_to_wait_flattened, len_command)
         print("We received %i commands_to_wait." % len(commands_2))
-        if safe_pt_toggle:
+        if move_filament_loading_pt:
         	commands_to_wait = commands_2
         else:
         	commands_to_wait = commands_2[1:-1]
 
         # move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move = linear_axis_z
-
+        p1 = s.SiemensPortal(2)
         for i, cmd in enumerate(commands_to_wait):
             if i > 3: #one for send to safe_pt, second for send_command_digital_out, third for send_command_wait
                 ur.wait_for_command_executed(i)
@@ -171,7 +167,7 @@ def main():
                 if linear_axis_toggle :
                     if i in axis_moving_pts_indices:
                         linear_axis_move += 1
-                        p.set_z(linear_axis_move)
+                        p1.set_z(linear_axis_move)
                         print ("Linear axis moved to %d mm"%linear_axis_move)
                         print ("Linear axis moved at point index %d"%i)
                         logger.info("Linear axis moved to {} mm".format(linear_axis_move))
@@ -186,7 +182,7 @@ def main():
         gh.send_float_list(commands[0])
         print("============================================================")
 
-    p.close()
+    p1.close()
     ur.quit()
     gh.quit()
     server.close()
