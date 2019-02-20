@@ -21,6 +21,7 @@ from ur_online_control.communication.client_wrapper import ClientWrapper
 from ur_online_control.communication.formatting import format_commands
 
 from eggshell_bh.linear_axis import siemens as s
+from ur_online_control.ur_direct import stop as stop_robot
 
 #create logger to debug the code and check the speed and time
 import logging
@@ -102,7 +103,7 @@ def main():
             print ("Siemens portal connected")
             currentPosX = p.get_x()
             currentPosZ = p.get_z()
-            if currentPosZ != linear_axis_z and currentPosX != linear_axis_x:
+            if currentPosZ != linear_axis_z or currentPosX != linear_axis_x:
                 p.set_x(linear_axis_x)
                 p.set_z(linear_axis_z)
                 print ("Linear axis is set to default x and z value")
@@ -135,10 +136,10 @@ def main():
             for i, cmd in enumerate(commands_to_send):
                  x, y, z, ax, ay, az, speed, radius = cmd
                  ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-                 if i %100 == 0:
-                     logger.info("command movel number {} is sent".format(i))
+                 # if i %100 == 0:
+                 #     logger.info("command movel number {} is sent".format(i))
 
-                 if move_filament_loading_pt and i == 0:
+                 if move_filament_loading_pt and i == 0 and j == 0:
                      # after Moving to first point, toggle extruder and wait
                      print("Moved to safe point")
                      print("Toggling extruder")
@@ -146,9 +147,9 @@ def main():
                      print("Waiting for 30 seconds")
                      ur.send_command_wait(30)
 
-            logger.info("batch number {} was sent".format(j))
+            logger.info("all commands in batch number {} were sent".format(j))
 
-        logger.info("all batches were sent")
+        logger.info("all {} batches were sent".format(no_batches))
 
         commands_2 = format_commands(commands_to_wait_flattened, len_command)
         print("We received %i commands_to_wait." % len(commands_2))
@@ -163,22 +164,43 @@ def main():
         for i, cmd in enumerate(commands_to_wait):
             if i > 3: #one for send to safe_pt, second for send_command_digital_out, third for send_command_wait
                 ur.wait_for_command_executed(i)
-                print("Executed command", i+1, "of", len(commands_to_wait), "[", (i+1)*100/(len(commands_to_wait)), "%]")
+                # print("Executed command", i+1, "of", len(commands_to_wait), "[", (i+1)*100/(len(commands_to_wait)), "%]")
+                print("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
                 if linear_axis_toggle :
                     if i in axis_moving_pts_indices:
                         linear_axis_move += 1
                         p1.set_z(linear_axis_move)
-                        print ("Linear axis moved to %d mm"%linear_axis_move)
-                        print ("Linear axis moved at point index %d"%i)
-                        logger.info("Linear axis moved to {} mm".format(linear_axis_move))
+                        print ("Linear axis is supposed to move to %d mm"%linear_axis_move)
+                        time.sleep(.5)
+                        linear_axis_currentPosZ = p1.get_z()
+                        if linear_axis_move == linear_axis_currentPosZ:
+                            print ("SUCCESS")
+                            print ("Linear axis moved to %d mm"%linear_axis_currentPosZ)
+                            print ("Linear axis moved at point index %d"%i)
+                            logger.info("SUCCESS")
+                            logger.info("Linear axis moved to {} mm".format(linear_axis_currentPosZ))
+                            logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
+                        else:
+                            print ("FAILED")
+                            print ("Linear axis still at %d mm"%linear_axis_currentPosZ)
+                            print ("Linear axis failed to move at point index %d"%i)
+                            logger.info("FAILED")
+                            logger.info("Linear axis still at {} mm".format(linear_axis_currentPosZ))
+                            logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
+                            ur.send_command_digital_out(0, False)
+                            logger.info("Nozzle Motor Stopped")
+                            print ("Nozzle Motor Stopped")
+                            ur.quit()
+                            logger.info("UR Stopped")
+                            print ("UR Stopped")
+                            break
                  #     current_pose_cartesian = ur.get_current_pose_cartesian()
                  #     print(current_pose_cartesian)
 
 
-        logger.info("before wait_for_ready")
         ur.wait_for_ready()
-        logger.info("after wait_for_ready")
         ur.send_command_digital_out(0, False)
+        logger.info("nozzle motor stopped")
         gh.send_float_list(commands[0])
         print("============================================================")
 
