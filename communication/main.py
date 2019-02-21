@@ -136,8 +136,6 @@ def main():
             for i, cmd in enumerate(commands_to_send):
                  x, y, z, ax, ay, az, speed, radius = cmd
                  ur.send_command_movel([x, y, z, ax, ay, az], v=speed, r=radius)
-                 # if i %100 == 0:
-                 #     logger.info("command movel number {} is sent".format(i))
 
                  if move_filament_loading_pt and i == 0 and j == 0:
                      # after Moving to first point, toggle extruder and wait
@@ -159,21 +157,23 @@ def main():
         	commands_to_wait = commands_2[1:-1]
 
         # move linear axis except start and end (at filament loading and unloading pos)
-        linear_axis_move = linear_axis_z
+        linear_axis_move_z = linear_axis_z
         p1 = s.SiemensPortal(2)
         for i, cmd in enumerate(commands_to_wait):
             if i > 3: #one for send to safe_pt, second for send_command_digital_out, third for send_command_wait
                 ur.wait_for_command_executed(i)
-                # print("Executed command", i+1, "of", len(commands_to_wait), "[", (i+1)*100/(len(commands_to_wait)), "%]")
                 print("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
                 if linear_axis_toggle :
                     if i in axis_moving_pts_indices:
-                        linear_axis_move += 1
-                        p1.set_z(linear_axis_move)
-                        print ("Linear axis is supposed to move to %d mm"%linear_axis_move)
-                        time.sleep(.5)
+                        linear_axis_move_z += 1
+                        p1.set_z(linear_axis_move_z)
+                        print ("Linear axis is supposed to move to %d mm"%linear_axis_move_z)
+                        ''' sleeping time depends on linear axis override speed
+                        for ex. 0.5 sec sleep is not enough to move 16mm in z
+                        '''
+                        time.sleep(.8)
                         linear_axis_currentPosZ = p1.get_z()
-                        if linear_axis_move == linear_axis_currentPosZ:
+                        if linear_axis_move_z == linear_axis_currentPosZ:
                             print ("SUCCESS")
                             print ("Linear axis moved to %d mm"%linear_axis_currentPosZ)
                             print ("Linear axis moved at point index %d"%i)
@@ -187,9 +187,18 @@ def main():
                             logger.info("FAILED")
                             logger.info("Linear axis still at {} mm".format(linear_axis_currentPosZ))
                             logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
+
+                            # move away robot problem: it still sends it at end
+                            # x1, y1, z1, ax1, ay1, az1, speed1, radius1 = commands_to_send[0]
+                            # ur.send_command_movel([x1, y1, z1, ax1, ay1, az1], v=speed1, r=radius1)
+                            # print("Moving robot to a safe point")
+                            # print("Waiting for 30 seconds")
+                            # time.sleep(10)
+
                             ur.send_command_digital_out(0, False)
                             logger.info("Nozzle Motor Stopped")
                             print ("Nozzle Motor Stopped")
+
                             ur.quit()
                             logger.info("UR Stopped")
                             print ("UR Stopped")
