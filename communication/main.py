@@ -195,21 +195,19 @@ def main():
                             # print("Waiting for 30 seconds")
                             # time.sleep(10)
 
-                            ur.send_command_digital_out(0, False)
-                            logger.info("Nozzle Motor Stopped")
-                            print ("Nozzle Motor Stopped")
+                            # ur.send_command_digital_out(0, False)
+                            # logger.info("Nozzle Motor Stopped")
+                            # print ("Nozzle Motor Stopped")
 
                             ur.quit()
                             logger.info("UR Stopped")
                             print ("UR Stopped")
                             break
-                 #     current_pose_cartesian = ur.get_current_pose_cartesian()
-                 #     print(current_pose_cartesian)
-
 
         ur.wait_for_ready()
         ur.send_command_digital_out(0, False)
         logger.info("nozzle motor stopped")
+        print ("Nozzle Motor Stopped")
         gh.send_float_list(commands[0])
         print("============================================================")
 
