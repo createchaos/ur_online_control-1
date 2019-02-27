@@ -136,5 +136,10 @@ class ClientWrapper(object):
     
     def send_popup(self):
         self.send(MSG_POPUP)
+    
+    def purge_commands(self):
+        """Purges all sent commands from the client stack.
+        """
+        self.send(MSG_PURGE)
         
         
