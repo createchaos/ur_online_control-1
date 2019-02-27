@@ -53,7 +53,7 @@ class ActuatorSocket(BaseClientSocket):
             container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
         else:
             self.stdout("reset_counters: state is not READY_TO_PROGRAM ")
-    
+
     def purge_commands(self):
         """Purges all commands from the stack.
         """
@@ -65,20 +65,22 @@ class ActuatorSocket(BaseClientSocket):
         params = [msg_snd_len, msg_id]
         buf = struct.pack(self.byteorder + "2i", *params)
         self._send(buf, msg_id)
-        time.sleep(0.5)
+        time.sleep(1.5)
         self.empty_stack()
         self.stack_counter = 0
         self.command_counter = 0
+        self.command_counter_executed = 0
         self.handle_stack(msg_counter=0)
 
     def update(self):
+        print("update", self.state)
         container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
 
     def send_command(self, msg_id, msg):
         """ Puts the message on the stack and calls handle_stack """
         self.stack.append([msg_id, msg])
         self.handle_stack()
-    
+
     def _send_command(self, cmd):
         msg_id, msg = cmd
         buf = self._format_command(msg_id, msg)
@@ -157,7 +159,7 @@ class ActuatorSocket(BaseClientSocket):
         elif msg_id == MSG_CURRENT_DIGITAL_IN:
             current_digital_in = self._format_current_digital_in(msg_len, raw_msg)
             self._process_current_digital_in(current_digital_in)
-        
+
         elif msg_id == MSG_CURRENT_ANALOG_IN:
             current_analog_in = self._format_current_analog_in(msg_len, raw_msg)
             self._process_current_analog_in(current_analog_in)
@@ -172,6 +174,7 @@ class ActuatorSocket(BaseClientSocket):
         #self.handle_stack()
 
     def _process_msg_cmd_executed(self, msg_counter):
+        print("msg_cmd_executed", msg_counter, self.command_counter)
         self.command_counter_executed = msg_counter
         self.update()
         self.handle_stack(msg_counter)
@@ -187,7 +190,7 @@ class ActuatorSocket(BaseClientSocket):
             msg_snd_len = 4 + 4
             params = [msg_snd_len, msg_id, int(msg)]
             buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
-        
+
         elif msg_id == MSG_ANALOG_IN:
             msg_snd_len = 4 + 4
             params = [msg_snd_len, msg_id, int(msg)]
@@ -198,10 +201,10 @@ class ActuatorSocket(BaseClientSocket):
 
         elif msg_id == MSG_SPEED:
             buf = self._format_speed(msg_id, msg)
-        
+
         elif msg_id == MSG_TCP:
             buf = self._format_tcp(msg_id, msg)
-            
+
         elif msg_id == MSG_POPUP:
             msg_snd_len = 4
             params = [msg_snd_len, msg_id]
@@ -209,9 +212,9 @@ class ActuatorSocket(BaseClientSocket):
         else:
             buf = None
         return buf
-    
+
     def _send_other_messages(self, msg_id, msg=None):
-        
+
         if msg_id == MSG_PURGE:
             self.purge_commands()
         else:
@@ -220,7 +223,7 @@ class ActuatorSocket(BaseClientSocket):
                 self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, msg))
                 return
             self._send(buf, msg_id)
-            
+
     def _format_current_pose_cartesian(self, raw_msg):
         pass
 
@@ -235,7 +238,7 @@ class ActuatorSocket(BaseClientSocket):
 
     def _format_speed(self, msg_id, msg):
         pass
-    
+
     def _format_tcp(self, msg_id, msg):
         pass
 
@@ -273,7 +276,7 @@ class ActuatorSocket(BaseClientSocket):
 
     def get_current_digital_in(self):
         return self.get_from_queue(self.current_digital_in_queue)
-    
+
     def get_current_analog_in(self):
         return self.get_from_queue(self.current_analog_in_queue)
 
@@ -287,12 +290,12 @@ class URSocket(ActuatorSocket):
 
         self.stack_size = 5
         self.byteorder = "!"
-    
+
     def update(self):
         """This method is called on READY_TO_PROGRAM and MSG_COUNTER_EXECUTED.
         """
         super(URSocket, self).update()
-        
+
 
     def _format_command(self, msg_id, msg):
         """
@@ -307,13 +310,13 @@ class URSocket(ActuatorSocket):
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
-        
+
         elif command_id == COMMAND_ID_MOVEC:
             raise NotImplementedError("")
-        
+
         elif command_id == COMMAND_ID_MOVEP:
             raise NotImplementedError("")
-        
+
         elif command_id == COMMAND_ID_DIGITAL_OUT:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
@@ -322,16 +325,16 @@ class URSocket(ActuatorSocket):
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1)
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
-        
+
         elif command_id == COMMAND_ID_TCP:
             msg_command_length = 4 * (len(cmd) + 1 + 1 + 1)
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
-            
+
         elif command_id == COMMAND_ID_POPUP:
             msg_command_length = 4 * (1 + 1 + 1)
             params = [msg_command_length, msg_id, command_id, self.command_counter]
-        
+
         else:
             raise("command_id unknown.")
 
@@ -344,7 +347,7 @@ class URSocket(ActuatorSocket):
         params = [msg_command_length, msg_id, speed]
         buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
         return buf
-    
+
     def _format_tcp(self, msg_id, msg):
         msg_command_length = 4 * (len(msg) + 1)
         msg = [c * self.MULT for c in msg]
@@ -370,7 +373,7 @@ class URSocket(ActuatorSocket):
         # make number, value pairs
         current_digital_in = [[current_digital_in[i], current_digital_in[i+1]] for i in range(0, len(current_digital_in), 2)]
         return current_digital_in
-    
+
     def _format_current_analog_in(self, msg_len, raw_msg):
         di_num = (msg_len - 4)/4
         current_analog_in = struct.unpack_from(self.byteorder + "%ii" % (di_num), raw_msg)
@@ -386,6 +389,6 @@ class URSocket(ActuatorSocket):
 
     def _process_current_digital_in(self, current_digital_in):
         self.current_digital_in_queue.put(current_digital_in)
-    
+
     def _process_current_analog_in(self, current_analog_in):
         self.current_analog_in_queue.put(current_analog_in)

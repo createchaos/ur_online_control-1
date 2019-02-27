@@ -11,10 +11,12 @@ if success:
 
 	# the main loop
 	while RUNNING == True:
-		leave = read_and_identify()
-		if leave:
-			RUNNING = False
-			break
+		if BUFFER_LENGTH < MAX_BUFFER_SIZE:
+			leave = read_and_identify()
+			if leave:
+				RUNNING = False
+				break
+			end
 		end
 		sync()
 	end
