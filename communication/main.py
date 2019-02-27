@@ -188,16 +188,21 @@ def main():
                             logger.info("Linear axis still at {} mm".format(linear_axis_currentPosZ))
                             logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
 
+                            ur.purge_commands()
+                            print("waiting for ready")
+                            ur.wait_for_ready()
+                            print("send new commands")
+                            # toggle extruder, turn off motor
+                            ur.send_command_digital_out(0, False)
+                            logger.info("Nozzle Motor Stopped")
+                            print ("Nozzle Motor Stopped")
                             # move away robot problem: it still sends it at end
-                            # x1, y1, z1, ax1, ay1, az1, speed1, radius1 = commands_to_send[0]
-                            # ur.send_command_movel([x1, y1, z1, ax1, ay1, az1], v=speed1, r=radius1)
-                            # print("Moving robot to a safe point")
-                            # print("Waiting for 30 seconds")
-                            # time.sleep(10)
-
-                            # ur.send_command_digital_out(0, False)
-                            # logger.info("Nozzle Motor Stopped")
-                            # print ("Nozzle Motor Stopped")
+                            x1, y1, z1, ax1, ay1, az1, speed1, radius1 = commands_to_wait[0]
+                            ur.send_command_movel([x1, y1, z1, ax1, ay1, az1], v=speed1, r=radius1)
+                            print("Moving robot to a safe point")
+                            print("Waiting for 10 seconds")
+                            time.sleep(10)
+                            # ur.wait_for_ready()
 
                             ur.quit()
                             logger.info("UR Stopped")
