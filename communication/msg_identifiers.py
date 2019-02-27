@@ -26,6 +26,7 @@ MSG_INT = 17
 MSG_TCP = 18
 MSG_POPUP = 19
 # attention 20 is set!
+MSG_PURGE = 21
 
 COMMAND_ID_MOVEL = 1 
 COMMAND_ID_MOVEJ = 2
@@ -56,7 +57,8 @@ msg_identifier_dict = {'MSG_IDENTIFIER': 1,
                        'MSG_QUIT': 16,
                        'MSG_INT': 17,
                        'MSG_TCP': 18,
-                       'MSG_POPUP': 19
+                       'MSG_POPUP': 19,
+                       'MSG_PURGE': 21
                        }
 
 # different command identifiers are sent after msg_id MSG_COMMAND

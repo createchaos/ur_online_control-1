@@ -51,6 +51,8 @@ class URClient(BaseClient):
             self.send_command_received(counter)
             time.sleep(0.5)
             self.send_command_executed(counter)
+        elif msg_id == MSG_PURGE:
+            print("received PURGE")
         else:
             self.stdout("Message identifier unknown: %d, message: %s" % (msg_id, raw_msg))
 
