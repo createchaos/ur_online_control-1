@@ -53,6 +53,23 @@ class ActuatorSocket(BaseClientSocket):
             container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
         else:
             self.stdout("reset_counters: state is not READY_TO_PROGRAM ")
+    
+    def purge_commands(self):
+        """Purges all commands from the stack.
+        """
+        # empty all commands from stack
+        self.empty_stack()
+        # empty all commands from robot
+        msg_id = MSG_PURGE
+        msg_snd_len = 4
+        params = [msg_snd_len, msg_id]
+        buf = struct.pack(self.byteorder + "2i", *params)
+        self._send(buf, msg_id)
+        time.sleep(0.5)
+        self.empty_stack()
+        self.stack_counter = 0
+        self.command_counter = 0
+        self.handle_stack(msg_counter=0)
 
     def update(self):
         container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
@@ -159,8 +176,7 @@ class ActuatorSocket(BaseClientSocket):
         self.update()
         self.handle_stack(msg_counter)
 
-    def _format_other_messages(self, msg_id, msg):
-        buf = None
+    def _format_other_messages(self, msg_id, msg=None):
 
         if msg_id in [MSG_CURRENT_POSE_CARTESIAN, MSG_CURRENT_POSE_JOINT]:
             msg_snd_len = 4
@@ -190,9 +206,21 @@ class ActuatorSocket(BaseClientSocket):
             msg_snd_len = 4
             params = [msg_snd_len, msg_id]
             buf = struct.pack(self.byteorder + "2i", *params)
-
+        else:
+            buf = None
         return buf
-
+    
+    def _send_other_messages(self, msg_id, msg=None):
+        
+        if msg_id == MSG_PURGE:
+            self.purge_commands()
+        else:
+            buf = self._format_other_messages(msg_id, msg)
+            if not buf:
+                self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, msg))
+                return
+            self._send(buf, msg_id)
+            
     def _format_current_pose_cartesian(self, raw_msg):
         pass
 
