@@ -111,7 +111,7 @@ class BaseClientSocket(object):
         self.stdout("msg_id %d" % msg_id)
         self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
     
-    def _format_other_messages(self, msg_id, msg):
+    def _send_other_messages(self, msg_id, msg):
         pass
 
     def process(self, msg_len, msg_id, raw_msg):
@@ -177,13 +177,11 @@ class BaseClientSocket(object):
         elif msg_id == MSG_COMMAND:
             self.send_command(msg_id, msg)
             return
-
+        
         else:
-            buf = self._format_other_messages(msg_id, msg)
-            if not buf:
-                self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, msg))
-                return
+            self._send_other_messages(msg_id, msg)
 
+    def _send(self, buf, msg_id):
         try:
             self.socket.send(buf)
             self.stdout("Sent message %i." % msg_id)
