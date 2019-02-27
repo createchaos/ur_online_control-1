@@ -108,6 +108,9 @@ def read_and_identify():
 		msg_length = rcv[1]
 		msg_id = rcv[2]
 		if msg_id == MSG_COMMAND:
+			while BUFFER_LENGTH < MAX_BUFFER_SIZE:
+				sleep(0.0001)
+			end
 			rcv2 = socket_read_binary_integer(2)
 			msg_command_id = rcv2[1]
 			command_counter = rcv2[2]
@@ -169,6 +172,10 @@ def read_and_identify():
 			textmsg("Set GLOBAL_SPEED")
 		elif msg_id == MSG_QUIT:
 			textmsg("Received QUIT")
+			return True
+		elif msg_id == MSG_PURGE:
+			textmsg("Received PURGE")
+			clear_buffer()
 			return True
 		else:
 			textmsg("Received unknown message type")
