@@ -21,7 +21,6 @@ from ur_online_control.communication.client_wrapper import ClientWrapper
 from ur_online_control.communication.formatting import format_commands
 
 from eggshell_bh.linear_axis import siemens as s
-from ur_online_control.ur_direct import stop as stop_robot
 
 #create logger to debug the code and check the speed and time
 import logging
@@ -171,7 +170,7 @@ def main():
                         ''' sleeping time depends on linear axis override speed
                         for ex. 0.5 sec sleep is not enough to move 16mm in z
                         '''
-                        time.sleep(.8)
+                        time.sleep(.7)
                         linear_axis_currentPosZ = p1.get_z()
                         if linear_axis_move_z == linear_axis_currentPosZ:
                             print ("SUCCESS")
