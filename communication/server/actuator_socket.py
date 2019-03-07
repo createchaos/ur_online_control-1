@@ -171,12 +171,14 @@ class ActuatorSocket(BaseClientSocket):
     def _process_msg_cmd_received(self, msg_counter):
         self.state = READY_TO_RECEIVE
         self.stack_counter += 1
+        print("_process_msg_cmd_received", msg_counter, self.stack_counter)
         #self.handle_stack()
 
     def _process_msg_cmd_executed(self, msg_counter):
         # print("msg_cmd_executed", msg_counter, self.command_counter)
         self.command_counter_executed = msg_counter
         self.update()
+        print("_process_msg_cmd_received", msg_counter, self.stack_counter)
         self.handle_stack(msg_counter)
 
     def _format_other_messages(self, msg_id, msg=None):
