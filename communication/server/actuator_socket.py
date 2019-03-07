@@ -73,7 +73,7 @@ class ActuatorSocket(BaseClientSocket):
         self.handle_stack(msg_counter=0)
 
     def update(self):
-        print("update", self.state)
+        # print("update", self.state)
         container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
 
     def send_command(self, msg_id, msg):
@@ -174,7 +174,7 @@ class ActuatorSocket(BaseClientSocket):
         #self.handle_stack()
 
     def _process_msg_cmd_executed(self, msg_counter):
-        print("msg_cmd_executed", msg_counter, self.command_counter)
+        # print("msg_cmd_executed", msg_counter, self.command_counter)
         self.command_counter_executed = msg_counter
         self.update()
         self.handle_stack(msg_counter)

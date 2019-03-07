@@ -188,8 +188,9 @@ def main():
                             logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
 
                             ur.purge_commands()
-                            print("waiting for ready")
-                            ur.wait_for_ready()
+                            # print("waiting for ready")
+                            time.sleep(1.5)
+                            # ur.wait_for_ready()
                             print("send new commands")
                             # toggle extruder, turn off motor
                             ur.send_command_digital_out(0, False)
