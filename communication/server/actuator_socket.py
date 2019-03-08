@@ -71,10 +71,11 @@ class ActuatorSocket(BaseClientSocket):
         self.command_counter = 0
         self.command_counter_executed = 0
         self.handle_stack(msg_counter=0)
+        # print("PURGE DONE")
 
     def update(self):
         # print("update", self.state)
-        print("Calling update", self.identifier, self.state, self.command_counter_executed)
+        # print("Calling update", self.identifier, self.state, self.command_counter_executed)
         container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
 
     def send_command(self, msg_id, msg):
@@ -86,12 +87,13 @@ class ActuatorSocket(BaseClientSocket):
         msg_id, msg = cmd
         buf = self._format_command(msg_id, msg)
         self.socket.send(buf)
+        # print("SENT COMMAND")
 
     def _format_command(self, msg_id, msg):
         pass
 
     def empty_stack(self):
-        self.stack = []
+        del(self.stack[:])
 
     def get_stack_length(self):
         return len(self.stack)
@@ -173,14 +175,14 @@ class ActuatorSocket(BaseClientSocket):
         self.state = READY_TO_RECEIVE
         self.stack_counter += 1
         self.stack_counter = min(0, self.stack_counter)
-        print("_process_msg_cmd_received", msg_counter, self.stack_counter)
+        # print("_process_msg_cmd_received", msg_counter, self.stack_counter)
         #self.handle_stack()
 
     def _process_msg_cmd_executed(self, msg_counter):
         # print("msg_cmd_executed", msg_counter, self.command_counter)
         self.command_counter_executed = msg_counter
         self.update()
-        print("_process_msg_cmd_received", msg_counter, self.stack_counter)
+        # print("_process_msg_cmd_executed", msg_counter, self.stack_counter)
         self.handle_stack(msg_counter)
 
     def _format_other_messages(self, msg_id, msg=None):

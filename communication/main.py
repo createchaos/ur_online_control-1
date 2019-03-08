@@ -1,6 +1,9 @@
 '''
 Created on 22.11.2016
 @author: rustr
+
+modified on 07.03.2019
+@author: nizar taha
 '''
 
 from __future__ import print_function
@@ -75,23 +78,28 @@ def main():
     while True: # and ur and gh connected
         # let gh control if we should continue
         continue_fabrication = gh.wait_for_int()
+        print("============================================================")
         print("continue_fabrication: %i" % continue_fabrication)
+        logger.info("continue_fabrication: {}".format(continue_fabrication))
+
         if not continue_fabrication:
             break
 
         move_filament_loading_pt = gh.wait_for_int()
         print("move_filament_loading_pt: %i" % move_filament_loading_pt)
+        logger.info("move_filament_loading_pt: {}".format(move_filament_loading_pt))
 
         linear_axis_toggle = gh.wait_for_int()
         print("linear_axis_toggle: %i" % linear_axis_toggle)
+        logger.info("linear_axis_toggle: {}".format(linear_axis_toggle))
 
         #if linear_axis_toggle:
         axis_moving_pts_indices = gh.wait_for_float_list()
         print("We received %i linear axis_moving_pts_indices" % len(axis_moving_pts_indices))
-
         logger.info("{} float list of axis_moving_pts_indices received".format(len(axis_moving_pts_indices)))
 
         #if the ur required to start extruding always from the same start base
+        print("============================================================")
         linear_axis_x = 500
         linear_axis_z = 500
 
@@ -99,30 +107,31 @@ def main():
             # And move axis
             p = s.SiemensPortal(2)
             logger.info("siemens portal connected")
-            print ("Siemens portal connected")
             currentPosX = p.get_x()
             currentPosZ = p.get_z()
             if currentPosZ != linear_axis_z or currentPosX != linear_axis_x:
                 p.set_x(linear_axis_x)
                 p.set_z(linear_axis_z)
                 print ("Linear axis is set to default x and z value")
-                print("Waiting for 10 seconds")
-                ur.send_command_wait(10)
+                p.wait_ext_axis()
             p.close()
 
+        print("============================================================")
         len_command = gh.wait_for_int()
         print("len_command: %i" % len_command)
 
-        no_batches = gh.wait_for_int()
-        print("no_batches: %i" % no_batches)
+        batches_number = gh.wait_for_int()
+        print("batches_number: %i" % batches_number)
 
+        # create a list to store commands and use it for commands executed loop
         commands_to_wait_flattened = []
-
-        for j in range(no_batches):
+        print("============================================================")
+        # loop through all commands batches
+        for j in range(batches_number):
             commands_flattened = gh.wait_for_float_list()
             # create mew list for commands executed
             commands_to_wait_flattened.extend(commands_flattened)
-            # the commands are formatted according to the sent length
+            # the flattened commands are formatted according to the sent list length
             commands = format_commands(commands_flattened, len_command)
             print("We received %i commands." % len(commands))
             logger.info("{} float list of commands_flattened received".format(len(commands)))
@@ -144,9 +153,11 @@ def main():
                      print("Waiting for 30 seconds")
                      ur.send_command_wait(30)
 
+            print("all commands in batch number %i were sent." %j)
             logger.info("all commands in batch number {} were sent".format(j))
 
-        logger.info("all {} batches were sent".format(no_batches))
+        print("all %i batches were sent." %batches_number)
+        logger.info("all {} batches were sent".format(batches_number))
 
         commands_2 = format_commands(commands_to_wait_flattened, len_command)
         print("We received %i commands_to_wait." % len(commands_2))
@@ -157,6 +168,8 @@ def main():
 
         # move linear axis except start and end (at filament loading and unloading pos)
         linear_axis_move_z = linear_axis_z
+        linear_axis_failed = False
+        print("============================================================")
         p1 = s.SiemensPortal(2)
         for i, cmd in enumerate(commands_to_wait):
             if i > 3: #one for send to safe_pt, second for send_command_digital_out, third for send_command_wait
@@ -180,6 +193,7 @@ def main():
                             logger.info("Linear axis moved to {} mm".format(linear_axis_currentPosZ))
                             logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
                         else:
+                            print("============================================================")
                             print ("FAILED")
                             print ("Linear axis still at %d mm"%linear_axis_currentPosZ)
                             print ("Linear axis failed to move at point index %d"%i)
@@ -188,39 +202,51 @@ def main():
                             logger.info("Executed command {} of {} [{}%]".format(i+1, len(commands_to_wait), (i+1)*100/(len(commands_to_wait)) ))
 
                             ur.purge_commands()
-                            # print("waiting for ready")
-                            time.sleep(1.5)
-                            # ur.wait_for_ready()
-                            print("send new commands")
+                            print("00_purge done")
+                            print("waiting for ready ......... ")
+                            ur.wait_for_ready()
+                            print("01_send new commands")
                             # toggle extruder, turn off motor
                             ur.send_command_digital_out(0, False)
-                            logger.info("Nozzle Motor Stopped")
-                            print ("Nozzle Motor Stopped")
+                            logger.info("02_Nozzle Motor Stopped")
+                            print ("02_Nozzle Motor Stopped")
                             # move away robot problem: it still sends it at end
                             x1, y1, z1, ax1, ay1, az1, speed1, radius1 = commands_to_wait[0]
                             ur.send_command_movel([x1, y1, z1, ax1, ay1, az1], v=speed1, r=radius1)
-                            print("Moving robot to a safe point")
-                            print("Waiting for 10 seconds")
-                            time.sleep(10)
-                            # ur.wait_for_ready()
-
+                            print("03_Moving robot to a safe point")
+                            logger.info("03_Moving robot to a safe point")
+                            print("waiting for ready ......... ")
+                            ur.wait_for_ready()
+                            linear_axis_failed = True
                             ur.quit()
-                            logger.info("UR Stopped")
-                            print ("UR Stopped")
+                            print("04_ur quit")
+                            logger.info("04_ur quit")
                             break
 
-        ur.wait_for_ready()
-        ur.send_command_digital_out(0, False)
-        logger.info("nozzle motor stopped")
-        print ("Nozzle Motor Stopped")
-        gh.send_float_list(commands[0])
-        print("============================================================")
+        if linear_axis_failed:
+            gh.quit()
+            print("============================================================")
+            break
+        else:
+            print("============================================================")
+            ur.wait_for_ready()
+            print("waiting for ready")
+            ur.send_command_digital_out(0, False)
+            logger.info("nozzle motor stopped")
+            print ("Nozzle Motor Stopped")
+            gh.send_float_list(commands[0])
+            ur.wait_for_ready()
+            logger.info("all commands were successfully executed")
+            print ("all commands were successfully executed")
+            print("============================================================")
+            ur.quit()
+            gh.quit()
+            break
 
     p1.close()
-    ur.quit()
-    gh.quit()
+    time.sleep(1)
     server.close()
-
+    print("siemens protal, gh, ur and server are closed")
     logger.info("siemens protal, gh, ur and server are closed")
 
     print("Please press a key to terminate the program.")

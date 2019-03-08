@@ -110,7 +110,7 @@ class BaseClientSocket(object):
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
         self.stdout("msg_id %d" % msg_id)
         self.stdout("Message identifier unknown:  %d, message: %s" % (msg_id, raw_msg))
-    
+
     def _send_other_messages(self, msg_id, msg):
         pass
 
@@ -137,6 +137,7 @@ class BaseClientSocket(object):
             self._process_msg_int(msg)
 
         elif msg_id == MSG_QUIT:
+            elf.stdout("sending QUIT")
             self.close()
         else:
             self._process_other_messages(msg_len, msg_id, raw_msg)
@@ -153,7 +154,7 @@ class BaseClientSocket(object):
 
     def close(self):
         self.running = False
-    
+
     def send_command(self, command_id, msg):
         pass
 
@@ -164,20 +165,23 @@ class BaseClientSocket(object):
         buf = None
 
         if msg_id == MSG_QUIT:
+            # print("formatting quit")
             msg_snd_len = 4
             params = [msg_snd_len, msg_id]
             buf = struct.pack(self.byteorder + "2i", *params)
+            self._send(buf, msg_id)
 
         elif msg_id == MSG_FLOAT_LIST:
             msg_snd_len = struct.calcsize(str(len(msg)) + "f") + 4
             msg = [float(item) for item in msg] # change tuple to list
             params = [msg_snd_len, msg_id] + msg
             buf = struct.pack(self.byteorder + "2i" + str(len(msg)) +  "f", *params)
-        
+            self._send(buf, msg_id)
+
         elif msg_id == MSG_COMMAND:
             self.send_command(msg_id, msg)
             return
-        
+
         else:
             self._send_other_messages(msg_id, msg)
 

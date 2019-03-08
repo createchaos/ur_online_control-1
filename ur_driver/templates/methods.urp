@@ -224,6 +224,7 @@ end
 def execute_from_buffer():
 	msg_command_id = BUFFER_COMMAND[READ_PTR]
 	command_counter = BUFFER_COMMAND_COUNTER[READ_PTR]
+	textmsg("executing from buffer")
 	if msg_command_id == COMMAND_ID_MOVEL:
 		pose = BUFFER_POSE[READ_PTR]
 		params = BUFFER_PARAMS[READ_PTR]

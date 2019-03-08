@@ -76,19 +76,19 @@ class ClientWrapper(object):
             time.sleep(0.1)
             state, number = container.CONNECTED_CLIENTS.get(self.identifier)
         return state
-    
+
     def wait_for_command_executed(self, number):
         state, numex = container.CONNECTED_CLIENTS.get(self.identifier)
         while numex <= number:
             time.sleep(0.1)
             state, numex = container.CONNECTED_CLIENTS.get(self.identifier)
         return numex
-    
+
     def wait_for_digital_in(self, number):
         msg = self.wait_for_message(MSG_DIGITAL_IN)
         print(msg)
         return msg[number] # TODO:CHECK!!
-    
+
     def wait_for_analog_in(self, number):
         msg = self.wait_for_message(MSG_ANALOG_IN)
         print(msg)
@@ -103,16 +103,16 @@ class ClientWrapper(object):
 
     def send_command(self, cmd_id, msg):
         self.send(MSG_COMMAND, [cmd_id, msg])
-        
+
     def send_command_movel(self, pose_cartesian, a=0, v=0, r=0, t=0):
         self.send_command(COMMAND_ID_MOVEL, pose_cartesian + [a, v, r, t])
 
     def send_command_movej(self, pose_joints, a=0, v=0, r=0, t=0):
         self.send_command(COMMAND_ID_MOVEJ, pose_joints + [a, v, r, t])
-    
+
     #def send_command_movec(self, pose_joints, a=0, v=0, r=0, t=0):
     #    self.send_command(COMMAND_ID_MOVEC, pose_joints + [a, v, r, t])
-    
+
     #def send_command_movep(self, pose_joints, a=0, v=0, r=0, t=0):
     #    self.send_command(COMMAND_ID_MOVEP, pose_joints + [a, v, r, t])
 
@@ -121,25 +121,29 @@ class ClientWrapper(object):
 
     def send_command_wait(self, time_to_wait_in_seconds):
         self.send_command(COMMAND_ID_WAIT, [time_to_wait_in_seconds])
-    
+
     def send_command_tcp(self, tcp):
         self.send_command(COMMAND_ID_TCP, tcp)
-    
+
     def send_command_popup(self):
         self.send_command(COMMAND_ID_POPUP, None)
-    
+
     def quit(self):
+        # print("wrapper sending quit")
         self.send(MSG_QUIT)
-    
+
     def send_tcp(self, tcp):
         self.send(MSG_TCP, tcp)
-    
+
     def send_popup(self):
         self.send(MSG_POPUP)
-    
+
+    def empty_send_queue(self):
+        while not self.snd_queue.empty():
+            self.snd_queue.pop()
+
     def purge_commands(self):
         """Purges all sent commands from the client stack.
         """
+        self.empty_send_queue()
         self.send(MSG_PURGE)
-        
-        
