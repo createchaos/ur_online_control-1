@@ -101,7 +101,7 @@ def main():
         #if the ur required to start extruding always from the same start base
         print("============================================================")
         linear_axis_x = 500
-        linear_axis_z = 500
+        linear_axis_z = 800
 
         if linear_axis_toggle:
             # And move axis
@@ -150,8 +150,8 @@ def main():
                      print("Moved to safe point")
                      print("Toggling extruder")
                      ur.send_command_digital_out(0, True)
-                     print("Waiting for 30 seconds")
-                     ur.send_command_wait(30)
+                     print("Waiting for 50 seconds")
+                     ur.send_command_wait(50)
 
             print("all commands in batch number %i were sent." %j)
             logger.info("all commands in batch number {} were sent".format(j))

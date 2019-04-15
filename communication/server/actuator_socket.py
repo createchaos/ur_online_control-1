@@ -75,7 +75,7 @@ class ActuatorSocket(BaseClientSocket):
 
     def update(self):
         # print("update", self.state)
-        # print("Calling update", self.identifier, self.state, self.command_counter_executed)
+        print("Calling update", self.identifier, self.state, self.command_counter_executed)
         container.CONNECTED_CLIENTS.put(self.identifier, [self.state, self.command_counter_executed])
 
     def send_command(self, msg_id, msg):
