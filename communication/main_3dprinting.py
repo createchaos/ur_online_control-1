@@ -9,10 +9,9 @@ import json
 UR_SERVER_PORT = 30002
 
 # set the paths to find library
-file_dir = os.path.dirname( __file__)
-parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
-sys.path.append(file_dir)
-sys.path.append(parent_dir)
+path = os.path.dirname(__file__)
+lib_dir = os.path.abspath(os.path.join(path, "..", ".."))
+sys.path.append(lib_dir)
 
 from ur_online_control.communication.formatting import format_commands
 from ur_online_control.communication.server import SimpleServer
@@ -25,17 +24,16 @@ from ur_online_control.ur_driver import URDriver_3Dprint
 
 # GLOBALS 
 # ===============================================================
-#server_address = "192.168.10.2"
-server_address = "127.0.0.1"
+server_address = "192.168.10.2"
+#server_address = "127.0.0.1"
 server_port = 30003
-#ur_ip = "192.168.10.13"
-ur_ip = "127.0.0.1"
+ur_ip = "192.168.10.13"
+#ur_ip = "127.0.0.1"
 tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # ===============================================================
 
 # COMMANDS
 # ===============================================================
-path = os.path.dirname(os.path.join(__file__))
 filename = os.path.join(path, "..", "commands.json")
 with open(filename, 'r') as f:
     data = json.load(f)
@@ -50,9 +48,6 @@ print("We have %d commands to send" % len(commands))
 # ===============================================================
 
 def main(commands):
-    step = 5
-
-    move_filament_loading_pt = False
 
     if move_filament_loading_pt:
         first_command = commands[0]
@@ -62,19 +57,20 @@ def main(commands):
         time.sleep(60)
     
     commands = commands[1:-1]
-    commands = commands[:10]
+    #commands = commands[:10]
 
     # start server
     server = SimpleServer(server_address, server_port)
     server.start()
     
     # send driver to connect
-    #ur_driver = URDriver_3Dprint(server_address, server_port, tool_angle_axis, ur_ip)
-    #ur_driver.send()
+    ur_driver = URDriver_3Dprint(server_address, server_port, tool_angle_axis, ur_ip)
+    ur_driver.send()
 
     # wait until connected
     while not len(server.clients):
-        time.sleep(0.5) 
+        time.sleep(0.5)
+    print("UR is connected.")
 
     ur_socket = server.clients[0]
 
