@@ -1,5 +1,13 @@
-from SocketServer import TCPServer, BaseRequestHandler
-from utilities import send_script, is_available
+from __future__ import print_function
+import sys
+is_py3 = True if sys.version_info[0] >= 3 else False
+
+if is_py3:
+    from socketserver import TCPServer, BaseRequestHandler
+else:
+    from SocketServer import TCPServer, BaseRequestHandler
+
+from .utilities import send_script, is_available
 
 script = ""
 script += "def program():\n"
@@ -40,7 +48,7 @@ def get_current_pose_joints(server_ip, server_port, ur_ip, tool_angle_axis):
     script = script.replace("{PORT}", str(server_port))
     script = script.replace("{TCP}", str([tool_angle_axis[i] if i >= 3 else tool_angle_axis[i]/1000. for i in range(len(tool_angle_axis))]))
 
-    print script
+    print(script)
 
     ur_available = is_available(ur_ip)
 
@@ -63,4 +71,4 @@ if __name__ == "__main__":
 
     pose = get_current_pose_joints(server_ip, server_port, ur_ip, tool_angle_axis)
 
-    print "pose", pose
+    print("pose", pose)

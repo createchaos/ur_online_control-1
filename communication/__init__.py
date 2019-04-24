@@ -1,3 +1,3 @@
-from msg_identifiers import *
-from states import *
-from utilities import *
+from __future__ import absolute_import
+from .msg_identifiers import *
+from .states import *

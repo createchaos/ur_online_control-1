@@ -1,4 +1,5 @@
-from utilities import send_script, is_available
+from __future__ import print_function
+from .utilities import send_script, is_available
 
 script = ""
 script += "def program():\n"
@@ -10,7 +11,7 @@ script += "program()\n\n\n"
 def stop(ur_ip):
 
     global script
-    print script
+    print(script)
 
     ur_available = is_available(ur_ip)
 
