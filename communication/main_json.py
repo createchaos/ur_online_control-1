@@ -8,6 +8,7 @@ modified on 07.03.2019
 
 # to send: copy in terminal:
 # python C:\Users\nizart\Documents\Projects\ur_online_control\communication\main_json.py
+# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_json.py
 
 from __future__ import print_function
 import time
@@ -139,11 +140,14 @@ def main():
             print("Toggling extruder")
             ur.send_command_digital_out(0, True)
             command_counter += 1
-            print("Waiting for 45 seconds")
-            ur.send_command_wait(45)
+            print("Waiting for 40 seconds")
+            ur.send_command_wait(40)
             command_counter += 1
 
-        print("Executed command {} of {}".format(i, len(commands)))
+        # ur.wait_for_command_executed(i)
+        # print("Executed command {} of {}".format(i, len(commands)))
+        # current_coordinates = ur.get_current_pose_cartesian()
+        # print("Coordinates of command:", current_coordinates)
 
     if linear_axis_toggle:
         if i in axis_moving_pts_indices:

@@ -3,6 +3,7 @@ Created on 22.11.2016
 
 @author: rustr
 '''
+from __future__ import print_function
 
 import sys
 import os
@@ -15,6 +16,7 @@ print(parent_dir)
 
 import socket
 
+is_py3 = True if sys.version_info[0] >= 3 else False
 
 
 from ur_online_control.communication import msg_identifier_dict, command_identifier_dict
@@ -50,8 +52,10 @@ def generate_ur_program():
     main_str = "\t".join(main_list)
 
     # globals
-    msg_identifier_str = "\n\t".join(["%s = %i" % (k, v) for k, v in msg_identifier_dict.iteritems()])
-    command_identifier_str = "\n\t".join(["%s = %i" % (k, v) for k, v in command_identifier_dict.iteritems()])
+    iteritems = msg_identifier_dict.items() if is_py3 else msg_identifier_dict.iteritems()
+    msg_identifier_str = "\n\t".join(["%s = %i" % (k, v) for k, v in iteritems])
+    iteritems = command_identifier_dict.items() if is_py3 else command_identifier_dict.iteritems()
+    command_identifier_str = "\n\t".join(["%s = %i" % (k, v) for k, v in iteritems])
 
     globals_str = globals_str.replace("{MESSAGE_IDENTIFIERS}", msg_identifier_str)
     globals_str = globals_str.replace("{COMMAND_IDENTIFIERS}", command_identifier_str)
@@ -71,10 +75,10 @@ def send_script(ur_ip, script):
     try:
         s = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
         s.send(script)
-        print "Script sent to %s on port %i" % (ur_ip, UR_SERVER_PORT)
+        print("Script sent to %s on port %i" % (ur_ip, UR_SERVER_PORT))
         s.close()
     except socket.timeout:
-        print "UR with ip %s not available on port %i" % (ur_ip, UR_SERVER_PORT)
+        print("UR with ip %s not available on port %i" % (ur_ip, UR_SERVER_PORT))
         raise
 
 class URDriver(object):
@@ -107,6 +111,38 @@ class URDriver(object):
         return self.program
 
 
+
+class URDriver_3Dprint(object):
+
+    def __init__(self, server_ip, server_port, tool_angle_axis = [0,0,0,0,0,0], ip = "127.0.0.1"):
+
+        path = os.path.join(os.path.dirname(__file__), "templates") # the path of the template files
+        filename = os.path.join(path, "ur_3dprinting_driver.urp")
+        with open(filename, 'r') as f:
+            program = f.read()
+
+        tool_angle_axis_str = self._format_pose(tool_angle_axis)
+
+        program = program.replace('{TOOL}', tool_angle_axis_str)
+        program = program.replace('{SERVER_ADDRESS}', server_ip)
+        program = program.replace('{PORT}', str(server_port))
+
+        self.program = program
+        self.ip = ip
+
+    def _format_pose(self, pose):
+        mm2m = 1000.
+        x, y, z, ax, ay, az = pose
+        return "p[%.6f, %.6f, %.6f, %.4f, %.4f, %.4f]" % (x/mm2m, y/mm2m, z/mm2m, ax, ay, az)
+
+    def send(self):
+        send_script(self.ip, self.program)
+
+    def __repr__(self):
+        return self.program
+
+
+
 if __name__ == "__main__":
 
     server_ip = "192.168.10.2"
@@ -116,6 +152,7 @@ if __name__ == "__main__":
     name = "UR"
     ur_ip = "192.168.10.13"
 
-    ur_driver = URDriver(server_ip, server_port, tool_angle_axis, ur_ip, name)
-    print ur_driver
-    ur_driver.send()
+    #ur_driver = URDriver(server_ip, server_port, tool_angle_axis, ur_ip, name)
+    ur_driver = URDriver_3Dprint(server_ip, server_port, tool_angle_axis, ur_ip)
+    print(ur_driver)
+    #ur_driver.send()

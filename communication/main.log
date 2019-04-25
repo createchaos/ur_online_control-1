@@ -5157,3 +5157,12 @@ log started ,main is running
 2019-04-15 17:58:10,138:    INFO:  linear_axis_toggle: False
 2019-04-15 17:58:10,140:    INFO:  599 float list of axis_moving_pts_indices received
 2019-04-15 17:58:11,174:    INFO:  196474 float list of commands_flattened received
+2019-04-15 22:21:07,648:    INFO:  
+
+log started ,main is running
+
+2019-04-15 22:21:07,651:    INFO:  server started
+2019-04-15 22:21:08,595:    INFO:  move_filament_loading_pt: True
+2019-04-15 22:21:08,595:    INFO:  linear_axis_toggle: False
+2019-04-15 22:21:08,596:    INFO:  699 float list of axis_moving_pts_indices received
+2019-04-15 22:21:09,000:    INFO:  229274 float list of commands_flattened received
