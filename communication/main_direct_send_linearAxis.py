@@ -22,14 +22,15 @@ from eggshell_bh.linear_axis import siemens as s
 
 from SocketServer import TCPServer, BaseRequestHandler
 
-# GLOBALS 
+# GLOBALS
 # ===============================================================
 server_address = "192.168.10.2"
 server_port = 30003
 ur_ip = "192.168.10.13"
 tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
+linearAxis_base = 1000
 linearAxis_move_z = 100
-json_files = 2
+json_files = 3
 # ===============================================================
 
 # COMMANDS
@@ -38,7 +39,7 @@ path = os.path.dirname(os.path.join(__file__))
 all_commands = []
 # loop through all json commands files
 for i in range(json_files):
-    name_json = "commands_%d"%i + ".json"
+    name_json = "commands_0%d"%i + ".json"
     filename = os.path.join(path, "..", name_json)
     print (filename)
     with open(filename, 'r') as f:
@@ -97,11 +98,23 @@ def stop_extruder(tcp, movel_command):
     script += "program()\n\n\n"
     return script
 # ===============================================================
+# def move_linearAxis_z(z_value):
+#     p = s.SiemensPortal(2)
+#     try:
+#         zcoo = p.get_z()
+#         print("current linearAxis z coordinate =",zcoo)
+#         p.set_z(z_value)
+#         # p. wait_ext_axis()
+#         pass
+#     except KeyboardInterrupt:
+#         print("stopping")
+#     finally:
+#         if p:
+#             p.close()
+# ===============================================================
 
 def main(commands):
     step = 5
-
-    print (len(all_commands),(len(all_commands[0])))
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -112,7 +125,7 @@ def main(commands):
         script = start_extruder(tool_angle_axis, first_command)
         send_socket.send(script)
         time.sleep(60)
-    
+
     for j in range(json_files):
         commands = all_commands[j][1:-1]
 
@@ -125,7 +138,7 @@ def main(commands):
 
             # send file
             send_socket.send(script)
-            
+
             # make server
             recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -140,17 +153,33 @@ def main(commands):
             recv_socket.close()
 
         # move linear axis
-        p = s.SiemensPortal(2)
-        linearAxis_move_amount = linearAxis_move_z*(j+1)
-        p.set_z(linearAxis_move_amount)
-        p. wait_ext_axis()
-        p.close()
-    
+        linearAxis_move_amount = linearAxis_base + linearAxis_move_z*(j+1)
+        if linear_axis_toggle:
+            if j != json_files-1:
+                # ur move to safe_pt
+                script = movel_commands(server_address, server_port, tool_angle_axis, last_command)
+                print("Moving linear axis and sending ur to safe point")
+                send_socket.send(script)
+                # if move linear axis function used
+                # move_linearAxis_z(linearAxis_move_amount)
+                p = s.SiemensPortal(2)
+                try:
+                    zcoo = p.get_z()
+                    print("current linearAxis z coordinate =",zcoo)
+                    p.set_z(linearAxis_move_amount)
+                    # p. wait_ext_axis()
+                    pass
+                except KeyboardInterrupt:
+                    print("stopping")
+                finally:
+                    if p:
+                        p.close()
+
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
         send_socket.send(script)
         time.sleep(1)
-    
+
     send_socket.close()
 
 
