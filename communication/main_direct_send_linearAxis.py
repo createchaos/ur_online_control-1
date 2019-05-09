@@ -28,9 +28,12 @@ server_address = "192.168.10.2"
 server_port = 30003
 ur_ip = "192.168.10.13"
 tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
-linearAxis_base = 1000
-linearAxis_move_z = 100
-json_files = 3
+
+# VARIABLES
+# ===============================================================
+linearAxis_base = 800
+linearAxis_move_z = 10
+json_files = 2
 # ===============================================================
 
 # COMMANDS
@@ -72,6 +75,20 @@ def movel_commands(server_address, port, tcp, commands):
     script += "program()\n\n\n"
     return script
 # ===============================================================
+def movel_command(server_address, port, tcp, command):
+    script = ""
+    script += "def program():\n"
+    x, y, z, ax, ay, az = tcp
+    script += "\tset_tcp(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f])\n" % (x/1000., y/1000., z/1000., ax, ay, az)
+    x, y, z, ax, ay, az, speed, radius = command
+    script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
+    script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
+    script += "\tsocket_send_string(\"c\")\n"
+    script += "\tsocket_close()\n"
+    script += "end\n"
+    script += "program()\n\n\n"
+    return script
+# ===============================================================
 def start_extruder(tcp, movel_command):
     script = ""
     script += "def program():\n"
@@ -98,19 +115,20 @@ def stop_extruder(tcp, movel_command):
     script += "program()\n\n\n"
     return script
 # ===============================================================
-# def move_linearAxis_z(z_value):
-#     p = s.SiemensPortal(2)
-#     try:
-#         zcoo = p.get_z()
-#         print("current linearAxis z coordinate =",zcoo)
-#         p.set_z(z_value)
-#         # p. wait_ext_axis()
-#         pass
-#     except KeyboardInterrupt:
-#         print("stopping")
-#     finally:
-#         if p:
-#             p.close()
+def move_linearAxis_z(z_value):
+    p = s.SiemensPortal(2)
+    try:
+        zcoo = p.get_z()
+        print("current linearAxis z coordinate =",zcoo)
+        p.set_z(z_value)
+        print("moving to =",z_value)
+        # p. wait_ext_axis()
+        pass
+    except KeyboardInterrupt:
+        print("stopping")
+    finally:
+        if p:
+            p.close()
 # ===============================================================
 
 def main(commands):
@@ -119,10 +137,14 @@ def main(commands):
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
+    if linear_axis_toggle:
+        move_linearAxis_z(linearAxis_base)
+
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
         script = start_extruder(tool_angle_axis, first_command)
+        print("sending ur to safe point")
         send_socket.send(script)
         time.sleep(60)
 
@@ -157,23 +179,14 @@ def main(commands):
         if linear_axis_toggle:
             if j != json_files-1:
                 # ur move to safe_pt
-                script = movel_commands(server_address, server_port, tool_angle_axis, last_command)
+                script = movel_command(server_address, server_port, tool_angle_axis, last_command)
                 print("Moving linear axis and sending ur to safe point")
                 send_socket.send(script)
                 # if move linear axis function used
-                # move_linearAxis_z(linearAxis_move_amount)
-                p = s.SiemensPortal(2)
-                try:
-                    zcoo = p.get_z()
-                    print("current linearAxis z coordinate =",zcoo)
-                    p.set_z(linearAxis_move_amount)
-                    # p. wait_ext_axis()
-                    pass
-                except KeyboardInterrupt:
-                    print("stopping")
-                finally:
-                    if p:
-                        p.close()
+                move_linearAxis_z(linearAxis_move_amount)
+                time.sleep(10)
+
+
 
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
