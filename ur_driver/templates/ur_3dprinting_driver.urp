@@ -10,6 +10,8 @@ def program():
     PORT = {PORT}
     RUNNING = True
 
+
+
     MM2M = 1000.0 # mm to m
     MULT = 100000.0
 
@@ -46,11 +48,9 @@ def program():
             msg_length = rcv[1]
             msg_id = rcv[2]
             if msg_id == MSG_MOVEL:
-
                 params = socket_read_binary_integer(6 + 4)
                 BUFFER_POSE[WRITE_PTR] = p[params[1]/(MM2M*MULT), params[2]/(MM2M*MULT), params[3]/(MM2M*MULT), params[4]/MULT, params[5]/MULT, params[6]/MULT]
                 BUFFER_PARAMS[WRITE_PTR] = p[params[7]/(MM2M*MULT), params[8]/(MM2M*MULT), params[9]/(MM2M*MULT), params[10]/MULT, 0, 0]
-
                 enter_critical
                 while LOCK == 1:
                     sleep(0.0001)
@@ -60,13 +60,13 @@ def program():
                 WRITE_PTR = (WRITE_PTR + 1) % MAX_BUFFER_SIZE
                 LOCK = 0
                 exit_critical
-
             elif msg_id == MSG_QUIT:
                 textmsg("Received QUIT")
                 return True
             else:
                 textmsg("Received unknown message type")
             end
+        end
         return False
     end
 
