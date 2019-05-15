@@ -75,19 +75,19 @@ def movel_commands(server_address, port, tcp, commands):
     script += "program()\n\n\n"
     return script
 # ===============================================================
-def movel_command(server_address, port, tcp, command):
-    script = ""
-    script += "def program():\n"
-    x, y, z, ax, ay, az = tcp
-    script += "\tset_tcp(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f])\n" % (x/1000., y/1000., z/1000., ax, ay, az)
-    x, y, z, ax, ay, az, speed, radius = command
-    script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
-    script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
-    script += "\tsocket_send_string(\"c\")\n"
-    script += "\tsocket_close()\n"
-    script += "end\n"
-    script += "program()\n\n\n"
-    return script
+# def movel_command(server_address, port, tcp, command):
+#     script = ""
+#     script += "def program():\n"
+#     x, y, z, ax, ay, az = tcp
+#     script += "\tset_tcp(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f])\n" % (x/1000., y/1000., z/1000., ax, ay, az)
+#     x, y, z, ax, ay, az, speed, radius = command
+#     script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
+#     script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
+#     script += "\tsocket_send_string(\"c\")\n"
+#     script += "\tsocket_close()\n"
+#     script += "end\n"
+#     script += "program()\n\n\n"
+#     return script
 # ===============================================================
 def start_extruder(tcp, movel_command):
     script = ""
@@ -177,9 +177,10 @@ def main(commands):
         # move linear axis
         linearAxis_move_amount = linearAxis_base + linearAxis_move_z*(j+1)
         if linear_axis_toggle:
+            # dont move linear axis at the last segment
             if j != json_files-1:
                 # ur move to safe_pt
-                script = movel_command(server_address, server_port, tool_angle_axis, last_command)
+                script = movel_commands(server_address, server_port, tool_angle_axis, [last_command])
                 print("Moving linear axis and sending ur to safe point")
                 send_socket.send(script)
                 # if move linear axis function used
