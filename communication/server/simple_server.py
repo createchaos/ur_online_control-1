@@ -10,7 +10,7 @@ from Queue import Queue
 
 MSG_QUIT = 16
 MSG_MOVEL = 2
-MSG_MOVEL_EXECUTED = 4
+MSG_MOVEL_EXECUTED = 5
 
 class SimpleServer(object):
     """
@@ -64,6 +64,7 @@ class SimpleServer(object):
                 elif s == sys.stdin: # close on key input
                     # handle standard input
                     junk = sys.stdin.readline()
+                    print(junk)
                     break
         self.server.close()
     
@@ -115,28 +116,38 @@ class SimpleClient(object):
         self.msg_rcv += self.socket.recv(msg_length)
         if len(self.msg_rcv) < (msg_length + 4):
             return
+        
+        while len(self.msg_rcv) >= 8:
 
-        # 3. message identifier
-        msg_id = struct.unpack_from(self.byteorder + "i", self.msg_rcv[4:8], 0)[0]
-        #MSG_MOVEL_EXECUTED
+            # 3. message identifier
+            msg_id = struct.unpack_from(self.byteorder + "i", self.msg_rcv[4:8], 0)[0]
 
-        #self.stdout("Received %i ==>" % msg_id)
+            #print("Received %i ==>" % msg_length)
+            #print("Received %i ==>" % msg_id)
 
-        # 4. rest of message, according to msg_length
-        raw_msg = self.msg_rcv[8:(8 + msg_length - 4)]
+            # 4. rest of message, according to msg_length
+            raw_msg = self.msg_rcv[8:(8 + msg_length - 4)]
 
-        # 5. set self.msg_rcv to the rest
-        self.msg_rcv = self.msg_rcv[(8 + msg_length - 4):]
+            # 5. set self.msg_rcv to the rest
+            self.msg_rcv = self.msg_rcv[(8 + msg_length - 4):]
 
-        # 4. pass message id and raw message to process method
-        if msg_id == MSG_MOVEL_EXECUTED:
-            self.counter += 1
-            # try sending next
-            if not self.snd_queue.empty():
-                msg_id, cmd = self.snd_queue.get()
-                self.send(MSG_MOVEL, cmd)
-        else:
-            print("msg_id %d not recognized" % msg_id)
+            #print("raw_msg", len(raw_msg))
+            #print("self.msg_rcv", len(self.msg_rcv))
+
+            # 4. pass message id and raw message to process method
+            if msg_id == MSG_MOVEL_EXECUTED:
+                self.counter += 1
+                # try sending next
+                if not self.snd_queue.empty():
+                    msg_id, cmd = self.snd_queue.get()
+                    #print("Commands to go:", self.snd_queue.qsize())
+                    self.send(MSG_MOVEL, cmd)
+            else:
+                print("msg_id %d not recognized" % msg_id)
+                print(raw_msg)
+        
+       
+
 
     def send(self, msg_id, msg = None):
         # The transmission protocol for send messages is
@@ -153,6 +164,7 @@ class SimpleClient(object):
         elif msg_id == MSG_MOVEL:
             # UR: [x, y, z, ax, ay, az, acc, speed, radius, time]
             cmd = msg
+            print("Sending", cmd)
             msg_command_length = 4 * (len(cmd) + 1) # + msg_id
             cmd = [c * self.MULT for c in cmd]
             params = [msg_command_length, msg_id] + cmd

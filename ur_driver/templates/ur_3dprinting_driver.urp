@@ -18,7 +18,7 @@ def program():
     # message identifiers
     MSG_QUIT = 16
     MSG_MOVEL = 2
-    MSG_MOVEL_EXECUTED = 4
+    MSG_MOVEL_EXECUTED = 5
 
     # buffer
     MAX_BUFFER_SIZE = 5
@@ -36,7 +36,8 @@ def program():
     # --> METHODS
     def send_command_executed():
         enter_critical
-        msg_length = 4 + 4
+        #msg_length = 4 + 4
+        msg_length = 4
         socket_send_int(msg_length)
         socket_send_int(MSG_MOVEL_EXECUTED)
         exit_critical
@@ -71,6 +72,7 @@ def program():
     end
 
     def my_movel(pose, acc, vel, rad, time):
+        #textmsg(pose)
         if vel != 0:
             if rad != 0:
                 movel(pose, v=vel, r=rad)
@@ -91,7 +93,7 @@ def program():
     end
 
     def execute_from_buffer():
-        textmsg("executing from buffer")
+        #textmsg("executing from buffer")
         pose = BUFFER_POSE[READ_PTR]
         params = BUFFER_PARAMS[READ_PTR]
         acc = params[0]

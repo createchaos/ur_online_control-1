@@ -57,7 +57,7 @@ def main(commands):
         time.sleep(60)
     
     commands = commands[1:-1]
-    #commands = commands[:10]
+    #commands = commands[:20]
 
     # start server
     server = SimpleServer(server_address, server_port)
@@ -75,7 +75,11 @@ def main(commands):
     ur_socket = server.clients[0]
 
     # put all cmds on the snd queue
+    acc = 0
+    t = 0
     for cmd in commands:
+        x, y, z, ax, ay, az, speed, radius = cmd
+        cmd = [x, y, z, ax, ay, az, acc, speed, radius, t]
         ur_socket.snd_queue.put((MSG_MOVEL, cmd))
     
     # first send 5 commands, the rest is handled by the client
@@ -92,7 +96,9 @@ def main(commands):
         if current_counter != ur_socket.counter:
             current_counter = ur_socket.counter
             print("Waiting... executed %d of %d" % (current_counter, len(commands)))
-
+        #if current_counter >= len(commands) - 1000:
+        #    # send email
+    
     print("Done.")
 
     # Terminate ur and server
@@ -103,6 +109,12 @@ def main(commands):
         script = stop_extruder_script(tool_angle_axis, last_command)
         send_script(ur_ip, script)
         time.sleep(1)
+
+
+def only_send_driver():
+    # send driver to connect
+    ur_driver = URDriver_3Dprint(server_address, server_port, tool_angle_axis, ur_ip)
+    ur_driver.send()
 
 if __name__ == "__main__":
     main(commands)
