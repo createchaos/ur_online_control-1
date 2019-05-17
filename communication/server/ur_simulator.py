@@ -1,12 +1,19 @@
-'''
-Created on 21.10.2017
+from __future__ import print_function
+from __future__ import absolute_import
 
-@author: rustr
-'''
-from base_client import BaseClient
-from ur_online_control.communication.msg_identifiers import *
+import sys
+import os
 import time
 import struct
+
+# set the paths to find library
+file_dir = os.path.dirname( __file__)
+lib_dir = os.path.abspath(os.path.join(file_dir, "..", "..", ".."))
+sys.path.append(lib_dir)
+
+from ur_online_control.communication.server.base_client import BaseClient
+from ur_online_control.communication.msg_identifiers import *
+
 
 class URClient(BaseClient):
     
@@ -20,14 +27,19 @@ class URClient(BaseClient):
     def send_command_received(self, counter):
         self._send(MSG_COMMAND_RECEIVED, counter)
             
-    def send_command_executed(self, counter):
-        self._send(MSG_COMMAND_EXECUTED, counter)
+    def send_command_executed(self):
+        self._send(MSG_COMMAND_EXECUTED)
         
     def _format_other_messages(self, msg_id, msg = None):
-        if msg_id == MSG_COMMAND_RECEIVED or msg_id == MSG_COMMAND_EXECUTED:
+        if msg_id == MSG_COMMAND_RECEIVED:
             msg_snd_len = 4 + 4
             params = [msg_snd_len, msg_id, msg]
             buf = struct.pack(self.byteorder + "3i", *params)
+            return buf
+        elif msg_id == MSG_COMMAND_EXECUTED:
+            msg_snd_len = 4
+            params = [msg_snd_len, msg_id]
+            buf = struct.pack(self.byteorder + "2i", *params)
             return buf
     
     def _process_other_messages(self, msg_len, msg_id, raw_msg):
@@ -45,12 +57,10 @@ class URClient(BaseClient):
             """
             self.stdout("Received MSG_COMMAND")
             msg = struct.unpack_from(self.byteorder + "%ii" % int((msg_len-4)/4), raw_msg)
-            cmd_id = msg[0]
-            counter = msg[1]
-            print(counter)
-            self.send_command_received(counter)
+            print(msg)
+            #self.send_command_received(counter)
             time.sleep(0.5)
-            self.send_command_executed(counter)
+            self.send_command_executed()
         elif msg_id == MSG_PURGE:
             print("received PURGE")
         else:
