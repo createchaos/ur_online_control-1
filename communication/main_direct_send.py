@@ -90,7 +90,7 @@ def stop_extruder(tcp, movel_command):
 # ===============================================================
 
 def main(commands):
-    step = 5
+    step = 37
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
