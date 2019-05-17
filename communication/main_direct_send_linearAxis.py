@@ -20,6 +20,8 @@ sys.path.append(parent_dir)
 from ur_online_control.communication.formatting import format_commands
 from eggshell_bh.linear_axis import siemens as s
 
+# from eggshell_bh.phone import twilioComm as t
+
 from SocketServer import TCPServer, BaseRequestHandler
 
 # GLOBALS
@@ -185,7 +187,7 @@ def main(commands):
                 send_socket.send(script)
                 # if move linear axis function used
                 move_linearAxis_z(linearAxis_move_amount)
-                time.sleep(10)
+                time.sleep(15)
 
 
 
