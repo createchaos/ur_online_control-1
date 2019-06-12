@@ -20,7 +20,7 @@ sys.path.append(parent_dir)
 from ur_online_control.communication.formatting import format_commands
 from eggshell_bh.linear_axis import siemens as s
 
-# from eggshell_bh.phone import twilioComm as t
+from eggshell_bh.phone import twilioComm as phoneAlert
 
 from SocketServer import TCPServer, BaseRequestHandler
 
@@ -77,6 +77,7 @@ def movel_commands(server_address, port, tcp, commands):
     script += "program()\n\n\n"
     return script
 # ===============================================================
+## delete if code on line 185 work ! if code in line 71 could unpack the command basically ![last_command]
 # def movel_command(server_address, port, tcp, command):
 #     script = ""
 #     script += "def program():\n"
@@ -176,7 +177,12 @@ def main(commands):
                 break
             recv_socket.close()
 
-        # move linear axis
+        # alert before the print is finished
+        # if i == len(commands)-1000:
+        #     alert01 = phoneAlert.PhoneContact()
+        #     alert01.sendSms()
+
+        # move linear axis, set base and z value in variables above
         linearAxis_move_amount = linearAxis_base + linearAxis_move_z*(j+1)
         if linear_axis_toggle:
             # dont move linear axis at the last segment
@@ -185,10 +191,9 @@ def main(commands):
                 script = movel_commands(server_address, server_port, tool_angle_axis, [last_command])
                 print("Moving linear axis and sending ur to safe point")
                 send_socket.send(script)
-                # if move linear axis function used
+                # if move linear axis function used, if not comment below line, increase sleep time and move it manually
                 move_linearAxis_z(linearAxis_move_amount)
                 time.sleep(15)
-
 
 
     if move_filament_loading_pt:
