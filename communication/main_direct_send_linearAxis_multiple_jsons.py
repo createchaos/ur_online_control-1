@@ -1,6 +1,4 @@
 from __future__ import print_function
-from __future__ import absolute_import
-
 import time
 import sys
 import os
@@ -8,6 +6,7 @@ import json
 
 import socket
 import os
+import glob
 
 UR_SERVER_PORT = 30002
 
@@ -21,6 +20,8 @@ sys.path.append(parent_dir)
 from ur_online_control.communication.formatting import format_commands
 from eggshell_bh.linear_axis import siemens as s
 
+from eggshell_bh.phone import twilioComm as phoneAlert
+
 from SocketServer import TCPServer, BaseRequestHandler
 
 # GLOBALS
@@ -29,26 +30,34 @@ server_address = "192.168.10.2"
 server_port = 30003
 ur_ip = "192.168.10.13"
 tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
-# ===============================================================
+
 # VARIABLES
 # ===============================================================
-linearAxis_base = 800 # mm
-linearAxis_move_z = 1 # 1.0 mm
+linearAxis_base = 800
+linearAxis_move_z = 10
+json_files = 2
 # ===============================================================
+
 # COMMANDS
 # ===============================================================
 path = os.path.dirname(os.path.join(__file__))
-filename = os.path.join(path, "..", "commands.json")
-with open(filename, 'r') as f:
-    data = json.load(f)
-# load the commands from the json dictionary
-move_filament_loading_pt = data['move_filament_loading_pt']
-linear_axis_toggle = data['move_linear_axis']
-axis_moving_pts_indices = data['axis_moving_pts_indices']
-len_command = data['len_command']
-gh_commands = data['gh_commands']
-commands = format_commands(gh_commands, len_command)
-print("We have %d commands to send" % len(commands))
+all_commands = []
+# loop through all json commands files
+for i in range(json_files):
+    name_json = "commands_0%d"%i + ".json"
+    filename = os.path.join(path, "..", name_json)
+    print (filename)
+    with open(filename, 'r') as f:
+        data = json.load(f)
+    # load the commands from the json dictionary
+    move_filament_loading_pt = data['move_filament_loading_pt']
+    linear_axis_toggle = data['move_linear_axis']
+    # axis_moving_pts_indices = data['axis_moving_pts_indices']
+    len_command = data['len_command']
+    gh_commands = data['gh_commands']
+    commands = format_commands(gh_commands, len_command)
+    print("We have %d commands to send" % len(commands))
+    all_commands.append(commands)
 # ===============================================================
 
 # UR SCRIPT
@@ -67,6 +76,21 @@ def movel_commands(server_address, port, tcp, commands):
     script += "end\n"
     script += "program()\n\n\n"
     return script
+# ===============================================================
+## delete if code on line 185 work ! if code in line 71 could unpack the command basically ![last_command]
+# def movel_command(server_address, port, tcp, command):
+#     script = ""
+#     script += "def program():\n"
+#     x, y, z, ax, ay, az = tcp
+#     script += "\tset_tcp(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f])\n" % (x/1000., y/1000., z/1000., ax, ay, az)
+#     x, y, z, ax, ay, az, speed, radius = command
+#     script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
+#     script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
+#     script += "\tsocket_send_string(\"c\")\n"
+#     script += "\tsocket_close()\n"
+#     script += "end\n"
+#     script += "program()\n\n\n"
+#     return script
 # ===============================================================
 def start_extruder(tcp, movel_command):
     script = ""
@@ -109,27 +133,13 @@ def move_linearAxis_z(z_value):
         if p:
             p.close()
 # ===============================================================
-def get_linearAxis_z():
-    p = s.SiemensPortal(2)
-    try:
-        zcoo = p.get_z()
-        print("current linearAxis z coordinate =",zcoo)
-        pass
-    except KeyboardInterrupt:
-        print("stopping")
-    finally:
-        if p:
-            p.close()
-# ===============================================================
 
 def main(commands):
-    # layer pts length
-    step = 232
+    step = 5
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    # move linear axis to initial base position
     if linear_axis_toggle:
         move_linearAxis_z(linearAxis_base)
 
@@ -137,45 +147,54 @@ def main(commands):
         first_command = commands[0]
         last_command = commands[-1]
         script = start_extruder(tool_angle_axis, first_command)
+        print("sending ur to safe point")
         send_socket.send(script)
         time.sleep(60)
 
-    commands = commands[1:-1]
+    for j in range(json_files):
+        commands = all_commands[j][1:-1]
 
-    for i in range(0, len(commands), step):
-        # get batch
-        sub_commands = commands[i:i+step]
-        script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
+        for i in range(0, len(commands), step):
+            # get batch
+            sub_commands = commands[i:i+step]
+            script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
 
-        print("Sending commands %d to %d of %d in total." % (i + 1, i + step + 1, len(commands)))
+            print("Sending commands %d to %d of %d in total." % (i + 1, i + step + 1, len(commands)))
 
-        # send file
-        send_socket.send(script)
+            # send file
+            send_socket.send(script)
 
-        # make server
-        recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # Bind the socket to the port
-        recv_socket.bind((server_address, server_port))
-        # Listen for incoming connections
-        recv_socket.listen(1)
-        while True:
-            connection, client_address = recv_socket.accept()
-            print("client_address", client_address)
-            if linear_axis_toggle:
-                linearAxis_move_amount = linearAxis_base + (i/step)
+            # make server
+            recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            # Bind the socket to the port
+            recv_socket.bind((server_address, server_port))
+            # Listen for incoming connections
+            recv_socket.listen(1)
+            while True:
+                connection, client_address = recv_socket.accept()
+                print("client_address", client_address)
+                break
+            recv_socket.close()
+
+        # alert before the print is finished
+        if i == len(commands)-1000:
+            alert01 = phoneAlert.PhoneContact()
+            alert01.sendSms()
+
+        # move linear axis, set base and z value in variables above
+        linearAxis_move_amount = linearAxis_base + linearAxis_move_z*(j+1)
+        if linear_axis_toggle:
+            # dont move linear axis at the last segment
+            if j != json_files-1:
+                # ur move to safe_pt
+                script = movel_commands(server_address, server_port, tool_angle_axis, [last_command])
+                print("Moving linear axis and sending ur to safe point")
+                send_socket.send(script)
+                # if move linear axis function used, if not comment below line, increase sleep time and move it manually
                 move_linearAxis_z(linearAxis_move_amount)
-                # maybe sleep can be deleted
-                time.sleep(.2)
-                linear_axis_current_z = get_linearAxis_z()
-                if linearAxis_move_amount == linear_axis_current_z:
-                    print ("SUCCESS, Linear axis moved to layer {}".format(i/step))
-                else:
-                    print ("FAILED, Linear axis didn't move to layer {}".format(i/step))
-                    # maybe commands to be purged, but romana need to write direct purge
-                    # ur.purge_commands()
-            break
-        recv_socket.close()
+                time.sleep(15)
+
 
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
