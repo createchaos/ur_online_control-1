@@ -11,7 +11,7 @@ import os
 
 UR_SERVER_PORT = 30002
 
-
+# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_direct_send_linearAxis.py
 # set the paths to find library
 file_dir = os.path.dirname( __file__)
 parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
@@ -32,13 +32,12 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # ===============================================================
 # VARIABLES
 # ===============================================================
-linearAxis_base = 800 # mm
-linearAxis_move_z = 1 # 1.0 mm
+linearAxis_base = 1100 # mm
 # ===============================================================
 # COMMANDS
 # ===============================================================
 path = os.path.dirname(os.path.join(__file__))
-filename = os.path.join(path, "..", "commands.json")
+filename = os.path.join(path, "..", "commands_linear_axis.json")
 with open(filename, 'r') as f:
     data = json.load(f)
 # load the commands from the json dictionary
@@ -120,10 +119,11 @@ def get_linearAxis_z():
     finally:
         if p:
             p.close()
+    return zcoo
 # ===============================================================
 
 def main(commands):
-    # layer pts length
+    # VERY IMPORTANT layer pts length
     step = 232
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
@@ -132,6 +132,9 @@ def main(commands):
     # move linear axis to initial base position
     if linear_axis_toggle:
         move_linearAxis_z(linearAxis_base)
+        print ("waiting for linear axis ...")
+        time.sleep(10)
+
 
     if move_filament_loading_pt:
         first_command = commands[0]
@@ -163,15 +166,15 @@ def main(commands):
             connection, client_address = recv_socket.accept()
             print("client_address", client_address)
             if linear_axis_toggle:
-                linearAxis_move_amount = linearAxis_base + (i/step)
+                linearAxis_move_amount = linearAxis_base + ((i+step)/step)
                 move_linearAxis_z(linearAxis_move_amount)
-                # maybe sleep can be deleted
+                # sleep .2 enough for the linear axis to get z then move 1mm at 2% speed
                 time.sleep(.2)
                 linear_axis_current_z = get_linearAxis_z()
                 if linearAxis_move_amount == linear_axis_current_z:
-                    print ("SUCCESS, Linear axis moved to layer {}".format(i/step))
+                    print ("SUCCESS! Linear axis moved to layer number {}".format(((i+step)/step)))
                 else:
-                    print ("FAILED, Linear axis didn't move to layer {}".format(i/step))
+                    print ("FAILED! Linear axis didn't move to layer number {}".format(((i+step)/step)))
                     # maybe commands to be purged, but romana need to write direct purge
                     # ur.purge_commands()
             break
