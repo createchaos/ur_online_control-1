@@ -22,7 +22,7 @@ from ur_online_control.communication.formatting import format_commands
 from eggshell_bh.linear_axis import siemens as s
 
 from SocketServer import TCPServer, BaseRequestHandler
-
+# ===============================================================
 # GLOBALS
 # ===============================================================
 server_address = "192.168.10.2"
@@ -32,12 +32,12 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # ===============================================================
 # VARIABLES
 # ===============================================================
-linearAxis_base = 1100 # mm
+linearAxis_base = 900 # mm
 # ===============================================================
 # COMMANDS
 # ===============================================================
 path = os.path.dirname(os.path.join(__file__))
-filename = os.path.join(path, "..", "commands_linear_axis.json")
+filename = os.path.join(path, "..", "commands.json")
 with open(filename, 'r') as f:
     data = json.load(f)
 # load the commands from the json dictionary
@@ -49,7 +49,6 @@ gh_commands = data['gh_commands']
 commands = format_commands(gh_commands, len_command)
 print("We have %d commands to send" % len(commands))
 # ===============================================================
-
 # UR SCRIPT
 # ===============================================================
 def movel_commands(server_address, port, tcp, commands):
@@ -96,8 +95,8 @@ def stop_extruder(tcp, movel_command):
 def move_linearAxis_z(z_value):
     p = s.SiemensPortal(2)
     try:
-        zcoo = p.get_z()
-        print("current linearAxis z coordinate =",zcoo)
+        #zcoo = p.get_z()
+        #print("current linearAxis z coordinate =",zcoo)
         p.set_z(z_value)
         print("moving to =",z_value)
         # p. wait_ext_axis()
@@ -123,8 +122,11 @@ def get_linearAxis_z():
 # ===============================================================
 
 def main(commands):
-    # VERY IMPORTANT layer pts length
-    step = 232
+    # number of points per layer
+    points_per_layer = 232
+    # amount of batches to divide one layer in (no. of seams)
+    number_of_seams_per_layer = 8
+    step = points_per_layer / number_of_seams_per_layer
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -162,23 +164,32 @@ def main(commands):
         recv_socket.bind((server_address, server_port))
         # Listen for incoming connections
         recv_socket.listen(1)
+        failed = 0
+        #print("i before while %d" %i)
         while True:
             connection, client_address = recv_socket.accept()
             print("client_address", client_address)
-            if linear_axis_toggle:
-                linearAxis_move_amount = linearAxis_base + ((i+step)/step)
+            if linear_axis_toggle and (i+step) % points_per_layer == 0 and i!=0:
+                printed_layers = (i / step / number_of_seams_per_layer)+1
+                print("Printed layers %d" %printed_layers)
+                #print("i after while %d" %i)
+                #print("MOVING ........")
+
+                linearAxis_move_amount = linearAxis_base + printed_layers
                 move_linearAxis_z(linearAxis_move_amount)
                 # sleep .2 enough for the linear axis to get z then move 1mm at 2% speed
                 time.sleep(.2)
                 linear_axis_current_z = get_linearAxis_z()
                 if linearAxis_move_amount == linear_axis_current_z:
-                    print ("SUCCESS! Linear axis moved to layer number {}".format(((i+step)/step)))
+                    print ("SUCCESS! Linear axis moved to layer number {}".format(printed_layers))
                 else:
-                    print ("FAILED! Linear axis didn't move to layer number {}".format(((i+step)/step)))
-                    # maybe commands to be purged, but romana need to write direct purge
-                    # ur.purge_commands()
+                    print ("FAILED! Linear axis didn't move to layer number {}".format(printed_layers))
+                    failed = 1
+
             break
         recv_socket.close()
+        if failed:
+            break
 
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
