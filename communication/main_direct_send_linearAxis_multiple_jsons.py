@@ -10,7 +10,7 @@ import glob
 
 UR_SERVER_PORT = 30002
 
-
+# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_direct_send_linearAxis_multiple_jsons.py
 # set the paths to find library
 file_dir = os.path.dirname( __file__)
 parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
@@ -33,8 +33,8 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 
 # VARIABLES
 # ===============================================================
-linearAxis_base = 800
-linearAxis_move_z = 10
+linearAxis_base = 600
+linearAxis_move_z = 5
 json_files = 2
 # ===============================================================
 
@@ -77,21 +77,6 @@ def movel_commands(server_address, port, tcp, commands):
     script += "program()\n\n\n"
     return script
 # ===============================================================
-## delete if code on line 185 work ! if code in line 71 could unpack the command basically ![last_command]
-# def movel_command(server_address, port, tcp, command):
-#     script = ""
-#     script += "def program():\n"
-#     x, y, z, ax, ay, az = tcp
-#     script += "\tset_tcp(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f])\n" % (x/1000., y/1000., z/1000., ax, ay, az)
-#     x, y, z, ax, ay, az, speed, radius = command
-#     script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
-#     script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
-#     script += "\tsocket_send_string(\"c\")\n"
-#     script += "\tsocket_close()\n"
-#     script += "end\n"
-#     script += "program()\n\n\n"
-#     return script
-# ===============================================================
 def start_extruder(tcp, movel_command):
     script = ""
     script += "def program():\n"
@@ -121,8 +106,6 @@ def stop_extruder(tcp, movel_command):
 def move_linearAxis_z(z_value):
     p = s.SiemensPortal(2)
     try:
-        zcoo = p.get_z()
-        print("current linearAxis z coordinate =",zcoo)
         p.set_z(z_value)
         print("moving to =",z_value)
         # p. wait_ext_axis()
@@ -133,6 +116,19 @@ def move_linearAxis_z(z_value):
         if p:
             p.close()
 # ===============================================================
+def get_linearAxis_z():
+    p = s.SiemensPortal(2)
+    try:
+        zcoo = p.get_z()
+        print("current linearAxis z coordinate =",zcoo)
+        pass
+    except KeyboardInterrupt:
+        print("stopping")
+    finally:
+        if p:
+            p.close()
+    return zcoo
+# ===============================================================
 
 def main(commands):
     step = 5
@@ -142,6 +138,8 @@ def main(commands):
 
     if linear_axis_toggle:
         move_linearAxis_z(linearAxis_base)
+        print ("moving linear axis to base ...")
+        time.sleep(5)
 
     if move_filament_loading_pt:
         first_command = commands[0]
@@ -178,9 +176,9 @@ def main(commands):
             recv_socket.close()
 
         # alert before the print is finished
-        if i == len(commands)-1000:
+        """ if i == len(commands)-1000:
             alert01 = phoneAlert.PhoneContact()
-            alert01.sendSms()
+            alert01.sendSms() """
 
         # move linear axis, set base and z value in variables above
         linearAxis_move_amount = linearAxis_base + linearAxis_move_z*(j+1)
@@ -193,7 +191,8 @@ def main(commands):
                 send_socket.send(script)
                 # if move linear axis function used, if not comment below line, increase sleep time and move it manually
                 move_linearAxis_z(linearAxis_move_amount)
-                time.sleep(15)
+                # sleep depends on how many mm the linear axis is moving 3sec is enough for 5mm
+                time.sleep(5)
 
 
     if move_filament_loading_pt:
