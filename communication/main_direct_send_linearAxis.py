@@ -9,6 +9,18 @@ import json
 import socket
 import os
 
+# ===============================================================
+#create logger to debug the code and check the speed and time
+#file saved in C:\Users\dfab
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s:    %(levelname)s:  %(message)s")
+file_handler = logging.FileHandler("main_direct_send_linearAxis.log")
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+# ===============================================================
 UR_SERVER_PORT = 30002
 
 # python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_direct_send_linearAxis.py
@@ -95,8 +107,6 @@ def stop_extruder(tcp, movel_command):
 def move_linearAxis_z(z_value):
     p = s.SiemensPortal(2)
     try:
-        #zcoo = p.get_z()
-        #print("current linearAxis z coordinate =",zcoo)
         p.set_z(z_value)
         print("moving to =",z_value)
         # p. wait_ext_axis()
@@ -122,10 +132,11 @@ def get_linearAxis_z():
 # ===============================================================
 
 def main(commands):
+    logger.info("=================main")
     # number of points per layer
     points_per_layer = 232
     # amount of batches to divide one layer in (no. of seams)
-    number_of_seams_per_layer = 8
+    number_of_seams_per_layer = 1
     step = points_per_layer / number_of_seams_per_layer
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
@@ -133,9 +144,11 @@ def main(commands):
 
     # move linear axis to initial base position
     if linear_axis_toggle:
+        logger.info("before moving linear axis to base")
         move_linearAxis_z(linearAxis_base)
-        print ("waiting for linear axis ...")
-        time.sleep(10)
+        logger.info("sleep 1 and after moving linear axis to base")
+        print ("moving linear axis to base ...")
+        time.sleep(1)
 
 
     if move_filament_loading_pt:
@@ -148,6 +161,7 @@ def main(commands):
     commands = commands[1:-1]
 
     for i in range(0, len(commands), step):
+        logger.info("start loop , i = {} ".format(i))
         # get batch
         sub_commands = commands[i:i+step]
         script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
@@ -162,34 +176,37 @@ def main(commands):
         recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # Bind the socket to the port
         recv_socket.bind((server_address, server_port))
+        logger.info("receive socket opened")
         # Listen for incoming connections
         recv_socket.listen(1)
-        failed = 0
-        #print("i before while %d" %i)
         while True:
             connection, client_address = recv_socket.accept()
             print("client_address", client_address)
-            if linear_axis_toggle and (i+step) % points_per_layer == 0 and i!=0:
-                printed_layers = (i / step / number_of_seams_per_layer)+1
-                print("Printed layers %d" %printed_layers)
-                #print("i after while %d" %i)
-                #print("MOVING ........")
-
-                linearAxis_move_amount = linearAxis_base + printed_layers
-                move_linearAxis_z(linearAxis_move_amount)
-                # sleep .2 enough for the linear axis to get z then move 1mm at 2% speed
-                time.sleep(.2)
-                linear_axis_current_z = get_linearAxis_z()
-                if linearAxis_move_amount == linear_axis_current_z:
-                    print ("SUCCESS! Linear axis moved to layer number {}".format(printed_layers))
-                else:
-                    print ("FAILED! Linear axis didn't move to layer number {}".format(printed_layers))
-                    failed = 1
-
             break
         recv_socket.close()
-        if failed:
-            break
+        logger.info("receive socket closed")
+        
+        failed = 0
+        if linear_axis_toggle and (i+step) % points_per_layer == 0 and i!=0:
+            printed_layers = (i / step / number_of_seams_per_layer)+1
+            print("Printed layers %d" %printed_layers)
+            logger.info("........before moving linear axis in z")
+            linearAxis_move_amount = linearAxis_base + printed_layers
+            move_linearAxis_z(linearAxis_move_amount)
+            logger.info("........after moving linear axis in z")
+            """ # sleep .2 enough for the linear axis to get z then move 1mm at 2% speed
+            time.sleep(.2)
+            logger.info("........sleep .2 and before getting linear axis z")
+            linear_axis_current_z = get_linearAxis_z()
+            logger.info("........after getting linear axis z")
+            if linearAxis_move_amount == linear_axis_current_z:
+                print ("SUCCESS! Linear axis moved to layer number {}".format(printed_layers))
+            else:
+                print ("FAILED! Linear axis didn't move to layer number {}".format(printed_layers))
+                failed = 1 """
+
+        """ if failed:
+            break """
 
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
