@@ -32,7 +32,8 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # ===============================================================
 # VARIABLES
 # ===============================================================
-linearAxis_base = 600 # mm
+linearAxis_base_x = 500 # mm
+linearAxis_base_z = 900 # mm
 layers_to_move_linear_axis = 10
 # ===============================================================
 # COMMANDS
@@ -93,12 +94,14 @@ def stop_extruder(tcp, movel_command):
     script += "program()\n\n\n"
     return script
 # ===============================================================
-def move_linearAxis_z(z_value):
+def move_linearAxis(x_value,z_value):
     p = s.SiemensPortal(2)
     try:
         p.set_z(z_value)
-        print("moving to =",z_value)
-        #p. wait_ext_axis()
+        p.set_x(x_value)
+        print("moving to Z =",z_value)
+        print("moving to X =",x_value)
+        p. wait_ext_axis()
         pass
     except KeyboardInterrupt:
         print("stopping")
@@ -133,10 +136,8 @@ def main(commands):
 
     # move linear axis to initial base position
     if linear_axis_toggle:
-        move_linearAxis_z(linearAxis_base)
         print ("moving linear axis to base ...")
-        time.sleep(5)
-
+        move_linearAxis(linearAxis_base_x, linearAxis_base_z)
 
     if move_filament_loading_pt:
         first_command = commands[0]
@@ -169,7 +170,7 @@ def main(commands):
             print("client_address", client_address)
             break
         recv_socket.close()
-        print("i before axis = {}".format(i))
+
         failed = 0
         if linear_axis_toggle and i % step == 0: #i % (layers_to_move_linear_axis*points_per_layer) == 0 and i!=0
             if move_filament_loading_pt:
@@ -181,9 +182,9 @@ def main(commands):
             printed_layers = (i/points_per_layer)
             print("Printed layers %d" %printed_layers)
             linearAxis_move_amount = linearAxis_base + ((i/step)+1)*layers_to_move_linear_axis
-            move_linearAxis_z(linearAxis_move_amount)
-            # sleep .2 enough for the linear axis to get z then move 1mm at 2% speed
-            time.sleep(3)
+            move_linearAxis(linearAxis_base_x,linearAxis_move_amount)
+            # sleep time for the ur to move away till linear axis is positioned
+            time.sleep(1)
             linear_axis_current_z = get_linearAxis_z()
             if linearAxis_move_amount == linear_axis_current_z:
                 print ("SUCCESS! Linear axis moved to layer number {}".format(printed_layers))
