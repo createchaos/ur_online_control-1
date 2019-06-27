@@ -142,9 +142,9 @@ def main(commands):
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
-        script = start_extruder(tool_angle_axis, first_command)
-        send_socket.send(script)
-        time.sleep(60)
+        #script = start_extruder(tool_angle_axis, first_command)
+        #send_socket.send(script)
+        time.sleep(6)
 
     commands = commands[1:-1]
 
@@ -172,24 +172,25 @@ def main(commands):
         recv_socket.close()
 
         failed = 0
-        if linear_axis_toggle and i % step == 0: #i % (layers_to_move_linear_axis*points_per_layer) == 0 and i!=0
+        if linear_axis_toggle and i % step == 0:
             if move_filament_loading_pt:
                 # ur move to safe_pt
                 script = movel_commands(server_address, server_port, tool_angle_axis, [first_command])
                 print("Moving linear axis and sending ur to safe point")
                 send_socket.send(script)
 
-            printed_layers = (i/points_per_layer)
-            print("Printed layers %d" %printed_layers)
-            linearAxis_move_amount = linearAxis_base + ((i/step)+1)*layers_to_move_linear_axis
+            amount_z = ((i/step)+1)*layers_to_move_linear_axis
+            linearAxis_move_amount = linearAxis_base_z + amount_z
             move_linearAxis(linearAxis_base_x,linearAxis_move_amount)
             # sleep time for the ur to move away till linear axis is positioned
             time.sleep(1)
             linear_axis_current_z = get_linearAxis_z()
             if linearAxis_move_amount == linear_axis_current_z:
-                print ("SUCCESS! Linear axis moved to layer number {}".format(printed_layers))
+                print ("SUCCESS! Linear axis moved to layer number {}".format(amount_z))
+                print("===========================================")
             else:
-                print ("FAILED! Linear axis didn't move to layer number {}".format(printed_layers))
+                print ("FAILED! Linear axis didn't move to layer number {}".format(amount_z))
+                print("===========================================")
                 failed = 1
 
         if failed:
