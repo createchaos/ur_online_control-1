@@ -20,6 +20,7 @@ sys.path.append(parent_dir)
 
 from ur_online_control.communication.formatting import format_commands
 from eggshell_bh.linear_axis import siemens as s
+#from eggshell_bh.phone import twilioComm as phoneAlert
 
 from SocketServer import TCPServer, BaseRequestHandler
 # ===============================================================
@@ -33,8 +34,8 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # VARIABLES
 # ===============================================================
 linearAxis_base_x = 500 # mm
-linearAxis_base_z = 900 # mm
-layers_to_move_linear_axis = 10
+linearAxis_base_z = 2200 # mm
+layers_to_move_linear_axis = 20
 # ===============================================================
 # COMMANDS
 # ===============================================================
@@ -45,7 +46,6 @@ with open(filename, 'r') as f:
 # load the commands from the json dictionary
 move_filament_loading_pt = data['move_filament_loading_pt']
 linear_axis_toggle = data['move_linear_axis']
-axis_moving_pts_indices = data['axis_moving_pts_indices']
 len_command = data['len_command']
 gh_commands = data['gh_commands']
 commands = format_commands(gh_commands, len_command)
@@ -61,6 +61,7 @@ def movel_commands(server_address, port, tcp, commands):
     for i in range(len(commands)):
         x, y, z, ax, ay, az, speed, radius = commands[i]
         script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
+        script += "\ttextmsg(\"sending command number %d\")\n" % (i) 
     script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
     script += "\tsocket_send_string(\"c\")\n"
     script += "\tsocket_close()\n"
@@ -101,7 +102,7 @@ def move_linearAxis(x_value,z_value):
         p.set_x(x_value)
         print("moving to Z =",z_value)
         print("moving to X =",x_value)
-        p. wait_ext_axis()
+        #p. wait_ext_axis()
         pass
     except KeyboardInterrupt:
         print("stopping")
@@ -125,10 +126,7 @@ def get_linearAxis_z():
 
 def main(commands):
     # number of points per layer
-    points_per_layer = 232
-    # amount of batches to divide one layer in (no. of seams)
-    #number_of_seams_per_layer = 8
-    #step = points_per_layer / number_of_seams_per_layer
+    points_per_layer = 264
     step = points_per_layer * layers_to_move_linear_axis
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
@@ -138,13 +136,14 @@ def main(commands):
     if linear_axis_toggle:
         print ("moving linear axis to base ...")
         move_linearAxis(linearAxis_base_x, linearAxis_base_z)
+        time.sleep(2)
 
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
-        #script = start_extruder(tool_angle_axis, first_command)
-        #send_socket.send(script)
-        time.sleep(6)
+        script = start_extruder(tool_angle_axis, first_command)
+        send_socket.send(script)
+        time.sleep(60)
 
     commands = commands[1:-1]
 
@@ -183,7 +182,7 @@ def main(commands):
             linearAxis_move_amount = linearAxis_base_z + amount_z
             move_linearAxis(linearAxis_base_x,linearAxis_move_amount)
             # sleep time for the ur to move away till linear axis is positioned
-            time.sleep(1)
+            time.sleep(2)
             linear_axis_current_z = get_linearAxis_z()
             if linearAxis_move_amount == linear_axis_current_z:
                 print ("SUCCESS! Linear axis moved to layer number {}".format(amount_z))
@@ -191,6 +190,12 @@ def main(commands):
             else:
                 print ("FAILED! Linear axis didn't move to layer number {}".format(amount_z))
                 print("===========================================")
+                print("the print failed habibi. action: remove the filament, check latest command on ur panel, change gh layer selection end, export json, change base from python and resend ur ... Thanks for your attention")
+                """ # alert if the print failed. action: check commands on panel, change gh layer selection end and resend ur
+                numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
+                alert01 = PhoneContact()
+                for key, value in numbers.items():
+                    alert01.sendSms(value) """
                 failed = 1
 
         if failed:
