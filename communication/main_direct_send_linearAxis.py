@@ -8,6 +8,7 @@ import json
 
 import socket
 import os
+import datetime
 
 UR_SERVER_PORT = 30002
 
@@ -34,7 +35,9 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # VARIABLES
 # ===============================================================
 linearAxis_base_x = 500 # mm
-linearAxis_base_z = 2200 # mm
+#linearAxis_base_z = 2200 # mm
+#linearAxis_base_z = 1020 # mm
+linearAxis_base_z = 1580 # mm
 layers_to_move_linear_axis = 20
 # ===============================================================
 # COMMANDS
@@ -136,20 +139,22 @@ def main(commands):
     if linear_axis_toggle:
         print ("moving linear axis to base ...")
         move_linearAxis(linearAxis_base_x, linearAxis_base_z)
+        print("===========================================")
         time.sleep(2)
 
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
-        script = start_extruder(tool_angle_axis, first_command)
-        send_socket.send(script)
-        time.sleep(60)
+        #script = start_extruder(tool_angle_axis, first_command)
+        #send_socket.send(script)
+        #time.sleep(60)
 
     commands = commands[1:-1]
 
     for i in range(0, len(commands), step):
         # get batch
         sub_commands = commands[i:i+step]
+        print("length sub_commands %d " % (len(sub_commands)))
         script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
 
         print("Sending commands %d to %d of %d in total." % (i + 1, i + step + 1, len(commands)))
@@ -164,11 +169,16 @@ def main(commands):
         recv_socket.bind((server_address, server_port))
         # Listen for incoming connections
         recv_socket.listen(1)
+
+        print(datetime.datetime.now().time())
+        
         while True:
             connection, client_address = recv_socket.accept()
             print("client_address", client_address)
             break
         recv_socket.close()
+        
+        print(datetime.datetime.now().time())
 
         failed = 0
         if linear_axis_toggle and i % step == 0:
