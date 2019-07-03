@@ -11,9 +11,12 @@ create a new environment in Anaconda
 2. conda create -n myenv python=2.7.16 (replace myenv by name of your choice, e.g. ur_online_control)
 
 install compas_fab 0.2.1 -->
+
 3. conda activate myenv (e.g. conda activate ur_online_control)
 4. conda install -c conda-forge compas_fab=0.2.1
+
 install compas_fab for rhino
+
 5. python -m compas_fab.rhino.uninstall 6.0
 6. python -m compas_fab.rhino.install 6.0
 
