@@ -8,6 +8,7 @@ import json
 
 UR_SERVER_PORT = 30002
 
+# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_3dprinting.py
 # set the paths to find library
 path = os.path.dirname(__file__)
 lib_dir = os.path.abspath(os.path.join(path, "..", ".."))

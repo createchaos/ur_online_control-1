@@ -11,7 +11,7 @@ import os
 
 UR_SERVER_PORT = 30002
 
-
+# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_direct_send.py
 # set the paths to find library
 file_dir = os.path.dirname( __file__)
 parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
@@ -20,6 +20,9 @@ sys.path.append(parent_dir)
 
 from ur_online_control.communication.formatting import format_commands
 from eggshell_bh.linear_axis import siemens as s
+from random import randint
+
+from eggshell_bh.phone import twilioComm as phoneAlert
 
 from SocketServer import TCPServer, BaseRequestHandler
 
@@ -92,7 +95,8 @@ def stop_extruder(tcp, movel_command):
 # ===============================================================
 
 def main(commands):
-    step = 37
+    # step equals to layer length / 8
+    step = 29
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -108,6 +112,12 @@ def main(commands):
 
     for i in range(0, len(commands), step):
         # get batch
+        # try below to move seam away from rib
+        #if i==0:
+        #    step = int(step/2)
+        #else:
+        #    step = 29
+            #step = randint(step:step-3)
         sub_commands = commands[i:i+step]
         script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
 
@@ -129,6 +139,11 @@ def main(commands):
             break
         recv_socket.close()
     
+        # alert before the print is finished. for call yourClass.makeCall
+        #if i == 10: # len(commands)-1000:
+        #     alert01 = phoneAlert.PhoneContact()
+        #     alert01.sendSms()
+        
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
         send_socket.send(script)
