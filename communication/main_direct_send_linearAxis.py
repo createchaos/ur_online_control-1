@@ -37,18 +37,24 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 linearAxis_base_x = 500 # mm
 #linearAxis_base_z = 2200 # mm
 #linearAxis_base_z = 1020 # mm
-linearAxis_base_z = 1580 # mm
+#linearAxis_base_z = 1602 # mm
+#linearAxis_base_z = 1610 # mm
+#linearAxis_base_z = 1615 # mm
+linearAxis_base_z = 1620 # mm
+#linearAxis_base_z = 1625 # mm
 layers_to_move_linear_axis = 20
 # ===============================================================
 # COMMANDS
 # ===============================================================
 path = os.path.dirname(os.path.join(__file__))
-filename = os.path.join(path, "..", "commands.json")
+filename = os.path.join(path, "..", "commands_1600_at_20.json")
 with open(filename, 'r') as f:
     data = json.load(f)
 # load the commands from the json dictionary
 move_filament_loading_pt = data['move_filament_loading_pt']
 linear_axis_toggle = data['move_linear_axis']
+#points_per_layer = data['points_per_layer']
+#layers_to_move_linear_axis = data['layers_to_move_linear_axis']
 len_command = data['len_command']
 gh_commands = data['gh_commands']
 commands = format_commands(gh_commands, len_command)
