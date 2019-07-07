@@ -42,7 +42,7 @@ linearAxis_base_x = 500 # mm
 #linearAxis_base_z = 1615 # mm
 linearAxis_base_z = 1620 # mm
 #linearAxis_base_z = 1625 # mm
-layers_to_move_linear_axis = 20
+layers_to_move_linear_axis = 15
 # ===============================================================
 # COMMANDS
 # ===============================================================
