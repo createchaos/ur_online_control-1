@@ -157,9 +157,9 @@ def main(commands):
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
-        #script = start_extruder(tool_angle_axis, first_command)
-        #send_socket.send(script)
-        #time.sleep(60)
+        script = start_extruder(tool_angle_axis, first_command)
+        send_socket.send(script)
+        time.sleep(60)
 
     commands = commands[1:-1]
 
