@@ -43,7 +43,8 @@ with open(filename, 'r') as f:
 # load the commands from the json dictionary
 move_filament_loading_pt = data['move_filament_loading_pt']
 linear_axis_toggle = data['move_linear_axis']
-axis_moving_pts_indices = data['axis_moving_pts_indices']
+points_per_layer = data['points_per_layer']
+layers_to_move_linear_axis = data['layers_to_move_linear_axis']
 len_command = data['len_command']
 gh_commands = data['gh_commands']
 commands = format_commands(gh_commands, len_command)
@@ -60,6 +61,7 @@ def movel_commands(server_address, port, tcp, commands):
     for i in range(len(commands)):
         x, y, z, ax, ay, az, speed, radius = commands[i]
         script += "\tmovel(p[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f], v=%f, r=%f)\n" % (x/1000., y/1000., z/1000., ax, ay, az, speed/1000., radius/1000.)
+        script += "\ttextmsg(\"sending command number %d\")\n" % (i)
     script += "\tsocket_open(\"%s\", %d)\n" % (server_address, port)
     script += "\tsocket_send_string(\"c\")\n"
     script += "\tsocket_close()\n"
@@ -96,7 +98,7 @@ def stop_extruder(tcp, movel_command):
 
 def main(commands):
     # step equals to layer length / 8
-    step = 29
+    step = points_per_layer/8
 
     send_socket = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
     send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -112,12 +114,6 @@ def main(commands):
 
     for i in range(0, len(commands), step):
         # get batch
-        # try below to move seam away from rib
-        #if i==0:
-        #    step = int(step/2)
-        #else:
-        #    step = 29
-            #step = randint(step:step-3)
         sub_commands = commands[i:i+step]
         script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
 
@@ -139,10 +135,6 @@ def main(commands):
             break
         recv_socket.close()
     
-        # alert before the print is finished. for call yourClass.makeCall
-        #if i == 10: # len(commands)-1000:
-        #     alert01 = phoneAlert.PhoneContact()
-        #     alert01.sendSms()
         
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
