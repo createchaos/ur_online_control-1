@@ -141,6 +141,8 @@ def get_linearAxis_z():
 
 def main(commands):
     logger.info("\n\nStarted main")
+    # print total time start
+    start_print_time = datetime.datetime.now()
     # step +1 to accomodate for the extra point added when the linear axis moves
     step = (points_per_layer * layers_to_move_linear_axis) +1
 
@@ -275,6 +277,12 @@ def main(commands):
     send_socket.close()
     print("program Done!")
     logger.info("program Done!")
+    # print total time
+    end_print_time = datetime.datetime.now()
+    print_time_in_minutes = abs( ( (end_print_time.hour*60)+end_print_time.minute ) - ( (start_print_time.hour*60)+start_print_time.minute ) )
+    print("................................")
+    print("print total time = {} minutes".format(print_time_in_minutes))
+    print("................................")
 
 
 if __name__ == "__main__":
