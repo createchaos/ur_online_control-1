@@ -224,13 +224,7 @@ def main(commands):
         else:
             print ("FAILED! sub commands werent executed")
             logger.info("FAILED! sub commands werent executed")
-            # alert if the print failed. action: check commands on panel, change gh layer selection end and resend ur
-            numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
-            alert00 = a.PhoneContact()
-            for key, value in numbers.items():
-                alert00.sendSms(value)
             failed = 1
-            logger.info("SMS sent")
         
 
         if linear_axis_toggle and i % step == 0:
@@ -257,14 +251,8 @@ def main(commands):
                 print("===========================================")
                 logger.info("FAILED! Linear axis didn't move to layer number {}".format(amount_z))
                 logger.info("============================")
-                print("the print failed habibi. action: remove the filament, check latest command on ur panel, change gh layer selection end, export json, change base from python and resend ur ... Thanks for your attention")
-                # alert if the print failed. action: check commands on panel, change gh layer selection end and resend ur
-                numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
-                alert01 = a.PhoneContact()
-                for key, value in numbers.items():
-                    alert01.sendSms(value)
                 failed = 1
-                logger.info("SMS sent")
+
 
         if failed:
             break
@@ -273,6 +261,15 @@ def main(commands):
         script = stop_extruder(tool_angle_axis, last_command)
         send_socket.send(script)
         time.sleep(1)
+
+    if failed:
+        print("the print failed habibi. action: remove the filament, check latest command on ur panel, change gh layer selection end, export json, change base from python and resend ur ... Thanks for your attention")
+        # alert if the print failed. action: check commands on panel, change gh layer selection end and resend ur
+        numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
+        alert01 = a.PhoneContact()
+        for key, value in numbers.items():
+            alert01.sendSms(value)
+        logger.info("SMS sent")
 
     send_socket.close()
     print("program Done!")
