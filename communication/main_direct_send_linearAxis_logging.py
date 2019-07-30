@@ -178,6 +178,7 @@ def main(commands):
 
         # send file
         send_socket.send(script)
+        time.sleep(1)
 
         # make server
         recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
