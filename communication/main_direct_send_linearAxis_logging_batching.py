@@ -25,7 +25,7 @@ logger.addHandler(file_handler)
 
 UR_SERVER_PORT = 30002
 
-# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_direct_send_linearAxis_logging.py
+# python C:\Users\dfab\Documents\projects\ur_online_control\communication\main_direct_send_linearAxis_logging_batching.py
 # set the paths to find library
 file_dir = os.path.dirname( __file__)
 parent_dir = os.path.abspath(os.path.join(file_dir, "..", ".."))
@@ -48,7 +48,7 @@ tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
 # VARIABLES
 # ===============================================================
 linearAxis_base_x = 500 # mm
-linearAxis_base_z = 500 # mm
+linearAxis_base_z = 800 # mm
 # ===============================================================
 # COMMANDS
 # ===============================================================
@@ -159,9 +159,9 @@ def main(commands):
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
-        script = start_extruder(tool_angle_axis, first_command)
-        send_socket.send(script)
-        time.sleep(60)
+        # script = start_extruder(tool_angle_axis, first_command)
+        # send_socket.send(script)
+        # time.sleep(60)
 
     commands = commands[1:-1]
 
@@ -174,58 +174,72 @@ def main(commands):
 
         script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
 
-        print("Sending commands %d to %d of %d in total." % (i + 1, i + step + 1, len(commands)))
-
-        # send file
-        send_socket.send(script)
-        time.sleep(1)
-
-        # make server
-        recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # Bind the socket to the port
-        recv_socket.bind((server_address, server_port))
-        # Listen for incoming connections
-        recv_socket.listen(1)
-
-        # calulate time for executing the sub_commands
-        # start time
-        start_receive_time = datetime.datetime.now()
-        print(start_receive_time)
-        logger.info(start_receive_time)
-        
-        # receiving executed commands
-        while True:
-            connection, client_address = recv_socket.accept()
-            print("client_address", client_address)
-            logger.info("client address {}".format(client_address))
-            break
-        recv_socket.close()
-        
-        # end time
-        end_receive_time = datetime.datetime.now()
-        print(end_receive_time)
-        logger.info(end_receive_time)
-        
-
-        # elapsed time
-        elapsed_time_in_minutes = abs( ( (end_receive_time.hour*60)+end_receive_time.minute ) - ( (start_receive_time.hour*60)+start_receive_time.minute ) )
-        print("................................")
-        print("commands execution elapsed time = {} minutes".format(elapsed_time_in_minutes))
-        print("................................")
-        logger.info("................................")
-        logger.info("commands execution elapsed time = {} minutes".format(elapsed_time_in_minutes))
-        logger.info("................................")
 
         failed = 0
-        # if execution time is less than 1 minute it has failed
-        if 1 < elapsed_time_in_minutes:
-            print ("SUCCESS! sub commands were executed")
-            logger.info("SUCCESS! sub commands were executed")
-        else:
-            print ("FAILED! sub commands werent executed")
-            logger.info("FAILED! sub commands werent executed")
-            failed = 1
+        count = 0
+        
+        while True:
+            count +=1
+            
+            print("Sending commands %d to %d of %d in total." % (i + 1, i + step + 1, len(commands)))
+            print("sending the commands %d time\s "%(count))
+            logger.info("sending the commands {} time\s".format(count))
+
+            try:
+                # make server
+                recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                # Bind the socket to the port
+                recv_socket.bind((server_address, server_port))
+
+                # Listen for incoming connections
+                recv_socket.listen(1)
+
+                # send file
+                send_socket.send(script)
+                time.sleep(1)
+                
+                # calulate time for executing the sub_commands
+                # start time
+                start_receive_time = datetime.datetime.now()
+                print(start_receive_time)
+                logger.info(start_receive_time)
+                
+                # receiving executed commands
+                while True:
+                    connection, client_address = recv_socket.accept()
+                    print("client_address", client_address)
+                    logger.info("client address {}".format(client_address))
+                    break
+    
+            finally:
+                if recv_socket:
+                    recv_socket.close()
+            
+            # end time
+            end_receive_time = datetime.datetime.now()
+            print(end_receive_time)
+            logger.info(end_receive_time)
+            
+
+            # elapsed time
+            elapsed_time_in_minutes = abs( ( (end_receive_time.hour*60)+end_receive_time.minute ) - ( (start_receive_time.hour*60)+start_receive_time.minute ) )
+            print("................................")
+            print("commands execution elapsed time = {} minutes".format(elapsed_time_in_minutes))
+            print("................................")
+            logger.info("................................")
+            logger.info("commands execution elapsed time = {} minutes".format(elapsed_time_in_minutes))
+            logger.info("................................")
+
+            if elapsed_time_in_minutes > 1:
+                break
+
+            # avoid endless while loop
+            if count > 50:
+                print ("FAILED AGAIN! timeout, sub commands werent executed")
+                logger.info("FAILED AGAIN! timeout, sub commands werent executed")
+                failed = 1
+                raise Exception("All trials to resend the batch failed")
         
         # move linear axis
         if linear_axis_toggle and i % step == 0:
@@ -257,21 +271,22 @@ def main(commands):
 
         if failed:
             break
-
+    # move ur after fail to avoid material accomulation
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
         send_socket.send(script)
         time.sleep(1)
 
     if failed:
-        print("the print failed habibi. action: remove the filament, check latest command on ur panel, change gh layer selection end, export json, change base from python and resend ur ... Thanks for your attention")
+        print("the print failed habibi. action: remove the filament, check latest linear axis z value, change base_z from python then change gh layer selection end (z value-500), export json, and resend ur ... Thanks for your attention")
         # alert if the print failed. action: check commands on panel, change gh layer selection end and resend ur
-        numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
-        alert01 = a.PhoneContact()
-        for key, value in numbers.items():
-            alert01.sendSms(value)
-        logger.info("SMS sent")
+        #numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
+        #alert01 = a.PhoneContact()
+        #for key, value in numbers.items():
+            #alert01.sendSms(value)
+        #logger.info("SMS sent")
 
+    
     send_socket.close()
     print("program Done!")
     logger.info("program Done!")
