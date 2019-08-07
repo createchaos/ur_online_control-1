@@ -10,11 +10,13 @@ import socket
 import os
 import datetime
 
+import logging
+
+# ===============================================================
+# LOGGING
 # ===============================================================
 #create logger to debug the code and check the speed and time
 #file saved in C:\Users\dfab
-import logging
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s:    %(levelname)s:  %(message)s")
@@ -33,6 +35,7 @@ sys.path.append(file_dir)
 sys.path.append(parent_dir)
 
 from ur_online_control.communication.formatting import format_commands
+from ur_online_control.communication.client_wrapper import ClientWrapper
 from eggshell_bh.linear_axis import siemens as s
 from eggshell_bh.phone import twilioComm as a
 
@@ -44,6 +47,7 @@ server_address = "192.168.10.2"
 server_port = 30003
 ur_ip = "192.168.10.13"
 tool_angle_axis = [-68.7916, -1.0706, 264.9818, 3.1416, 0.0, 0.0]
+ur = ClientWrapper("UR")
 # ===============================================================
 # VARIABLES
 # ===============================================================
@@ -53,7 +57,7 @@ linearAxis_base_z = 800 # mm
 # COMMANDS
 # ===============================================================
 path = os.path.dirname(os.path.join(__file__))
-filename = os.path.join(path, "..", "commands.json")
+filename = os.path.join(path, "..", "commands_test.json")
 with open(filename, 'r') as f:
     data = json.load(f)
 # load the commands from the json dictionary
@@ -110,6 +114,8 @@ def stop_extruder(tcp, movel_command):
     script += "program()\n\n\n"
     return script
 # ===============================================================
+# LINEAR AXIS
+# ===============================================================
 def move_linearAxis(x_value,z_value):
     p = s.SiemensPortal(2)
     try:
@@ -137,8 +143,34 @@ def get_linearAxis_z():
         if p:
             p.close()
     return zcoo
-# ===============================================================
 
+def prepare_confirmation_socket(server_address, server_port):
+    # make server
+    recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # Bind the socket to the port
+    recv_socket.bind((server_address, server_port))
+
+    # Listen for incoming connections
+    recv_socket.listen(1)
+
+    return recv_socket
+
+
+def wait_confirmation_socket(recv_socket):
+    # receiving executed commands confirmation
+    connection, client_address = recv_socket.accept()
+    print("client_address", client_address)
+    logger.info("client address {}".format(client_address))
+        
+    bytes_recv = connection.recv(1)
+
+    if bytes_recv != 'c':
+        raise Exception('Socket received unknown result={}'.format(bytes_recv))
+
+# ===============================================================
+# MAIN FUNCTION
+# ===============================================================
 def main(commands):
     logger.info("\n\nStarted main")
     # print total time start
@@ -159,9 +191,9 @@ def main(commands):
     if move_filament_loading_pt:
         first_command = commands[0]
         last_command = commands[-1]
-        # script = start_extruder(tool_angle_axis, first_command)
-        # send_socket.send(script)
-        # time.sleep(60)
+        script = start_extruder(tool_angle_axis, first_command)
+        send_socket.send(script)
+        time.sleep(1)
 
     commands = commands[1:-1]
 
@@ -174,65 +206,55 @@ def main(commands):
 
         script = movel_commands(server_address, server_port, tool_angle_axis, sub_commands)
 
-
         failed = 0
         count = 0
-        
+
         while True:
             count +=1
             
-            print("Sending commands %d to %d of %d in total." % (i + 1, i + step + 1, len(commands)))
-            print("sending the commands %d time\s "%(count))
-            logger.info("sending the commands {} time\s".format(count))
+            print("Sending commands %d to %d of %d in total, try #%d" % (i + 1, i + step + 1, len(commands), count))
+            logger.info("Sending the commands: try #{}".format(count))
 
             try:
-                # make server
-                recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                # Bind the socket to the port
-                recv_socket.bind((server_address, server_port))
-
-                # Listen for incoming connections
-                recv_socket.listen(1)
-
+                # prepare receive socket for confirmation
+                recv_socket = prepare_confirmation_socket(server_address, server_port)
+                
                 # send file
-                send_socket.send(script)
+                bytes_sent = send_socket.send(script)
                 time.sleep(1)
+                print("Sent {} out of {} bytes".format(bytes_sent, len(script)))
                 
-                # calulate time for executing the sub_commands
-                # start time
-                start_receive_time = datetime.datetime.now()
-                print(start_receive_time)
-                logger.info(start_receive_time)
+                # get start time
+                start_time = time.time()
                 
-                # receiving executed commands
-                while True:
-                    connection, client_address = recv_socket.accept()
-                    print("client_address", client_address)
-                    logger.info("client address {}".format(client_address))
-                    break
-    
+                # wait executed commands confirmation
+                wait_confirmation_socket(recv_socket)
             finally:
                 if recv_socket:
                     recv_socket.close()
-            
-            # end time
-            end_receive_time = datetime.datetime.now()
-            print(end_receive_time)
-            logger.info(end_receive_time)
-            
 
-            # elapsed time
-            elapsed_time_in_minutes = abs( ( (end_receive_time.hour*60)+end_receive_time.minute ) - ( (start_receive_time.hour*60)+start_receive_time.minute ) )
+            # get end time and print elapsed time
+            end_time = time.time()
+            elapsed_time_seconds = end_time - start_time
+            elapsed_time_minutes = elapsed_time_seconds / 60
             print("................................")
-            print("commands execution elapsed time = {} minutes".format(elapsed_time_in_minutes))
+            print("Commands executed in seconds: %d sec" % elapsed_time_seconds)
+            print("Commands executed in minutes: %d min" % elapsed_time_minutes)
             print("................................")
+            
+            # time logging
             logger.info("................................")
-            logger.info("commands execution elapsed time = {} minutes".format(elapsed_time_in_minutes))
+            logger.info("Commands executed in seconds: {} sec".format(elapsed_time_seconds))
+            logger.info("Commands executed in minutes {} min".format(elapsed_time_minutes))
             logger.info("................................")
 
-            if elapsed_time_in_minutes > 1:
+            # check if the time for commands executed is more than 2 minutes
+            if elapsed_time_minutes > 1:
                 break
+            else:
+                print('Waiting 60sec...')
+                time.sleep(60)
+                print('Will continue')
 
             # avoid endless while loop
             if count > 50:
@@ -244,15 +266,21 @@ def main(commands):
         # move linear axis
         if linear_axis_toggle and i % step == 0:
             if move_filament_loading_pt:
-                # ur move to safe_pt
+                # prepare receive socket for confirmation
+                recv_socket = prepare_confirmation_socket(server_address, server_port)
+
+                # move the ur to the safe point
                 script = movel_commands(server_address, server_port, tool_angle_axis, [first_command])
                 print("Moving linear axis and sending ur to safe point")
                 logger.info("Moving linear axis and sending ur to safe point")
                 send_socket.send(script)
 
+                wait_confirmation_socket(recv_socket)
+
             amount_z = ((i/step)+1)*layers_to_move_linear_axis
             linearAxis_move_amount = linearAxis_base_z + amount_z
             move_linearAxis(linearAxis_base_x,linearAxis_move_amount)
+
             # sleep time for the ur to move away till linear axis is positioned
             time.sleep(1.5)
             linear_axis_current_z = get_linearAxis_z()
@@ -268,9 +296,9 @@ def main(commands):
                 logger.info("============================")
                 failed = 1
 
-
         if failed:
             break
+
     # move ur after fail to avoid material accomulation
     if move_filament_loading_pt:
         script = stop_extruder(tool_angle_axis, last_command)
@@ -280,23 +308,15 @@ def main(commands):
     if failed:
         print("the print failed habibi. action: remove the filament, check latest linear axis z value, change base_z from python then change gh layer selection end (z value-500), export json, and resend ur ... Thanks for your attention")
         # alert if the print failed. action: check commands on panel, change gh layer selection end and resend ur
-        #numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
-        #alert01 = a.PhoneContact()
-        #for key, value in numbers.items():
-            #alert01.sendSms(value)
-        #logger.info("SMS sent")
+        numbers = {"nizar":"'+41768284582'", "joris":"'+41765135693'"}
+        alert01 = a.PhoneContact()
+        for key, value in numbers.items():
+            alert01.sendSms(value)
+        logger.info("SMS sent")
 
-    
     send_socket.close()
     print("program Done!")
     logger.info("program Done!")
-    # print total time
-    end_print_time = datetime.datetime.now()
-    print_time_in_minutes = abs( ( (end_print_time.hour*60)+end_print_time.minute ) - ( (start_print_time.hour*60)+start_print_time.minute ) )
-    print("................................")
-    print("print total time = {} minutes".format(print_time_in_minutes))
-    print("................................")
-
 
 if __name__ == "__main__":
     main(commands)
