@@ -23,3 +23,5 @@ install compas_fab for rhino
 clone current version of ur_online_control repository
 set path in rhino to parent folder or ur_online_control repository
 (e.g. if your folder is here: .../Desktop/stuff/ur_online_control, set a path in the rhino edit python script editor to: .../Desktop/stuff)
+
+Ironpython: https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9
