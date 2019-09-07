@@ -32,6 +32,7 @@ GLOBAL_SPEED = 1.0
 # unfortunately URScript does not allow 2D arrays, however does allow pose-types within a array
 BUFFER_POSE = [p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0]]
 BUFFER_JOINT = [p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0]]
+BUFFER_POSE2 = [p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0]]
 # parameters for the commands
 # movel and movej use 0: acc, 1: vel, 2: rad, 3: time, digital_out uses 0: number, 1: value
 BUFFER_PARAMS = [p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0], p[0,0,0,0,0,0]]

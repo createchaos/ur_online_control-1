@@ -281,7 +281,10 @@ class URSocket(ActuatorSocket):
             params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
         
         elif command_id == COMMAND_ID_MOVEC:
-            raise NotImplementedError("")
+            msg_command_length = 4 * (len(cmd) + 1 + 1 + 1) # + msg_id, command_id, command_counter
+            cmd = [c * self.MULT for c in cmd]
+            params = [msg_command_length, msg_id, command_id, self.command_counter] + cmd
+            #raise NotImplementedError("")
         
         elif command_id == COMMAND_ID_MOVEP:
             raise NotImplementedError("")

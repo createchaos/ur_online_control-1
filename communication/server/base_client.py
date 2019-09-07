@@ -100,6 +100,7 @@ class BaseClient(object):
             self.socket.settimeout(self.timeout)
             self.socket.setblocking(0)
             self.send_id()
+            print("teeeeeeeeest", self.host, self.port)
             self.stdout("Successfully connected to server %s on port %d." % (self.host, self.port))
             self.running = True
             return True

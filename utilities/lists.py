@@ -10,5 +10,6 @@ def flatten_list(array):
  
 def divide_list_by_number(array, number):
     if len(array) % number != 0:
+        print("teeeest", len(array), number)
         raise Exception("len(array) % number != 0")
     return [array[x:x+number] for x in range(0, len(array), number)]

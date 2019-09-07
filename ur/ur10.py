@@ -2,7 +2,8 @@ from __future__ import print_function
 
 import math
 
-from compas_fab import get_data
+# from compas_fab import get_data
+from compas_fab import get
 
 from compas_fab.robots import Configuration
 from .ur import UR
