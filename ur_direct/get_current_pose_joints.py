@@ -28,7 +28,7 @@ class MyTCPHandler(BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         pose = ""
         while pose.find("]") == -1:
-            pose += self.request.recv(1024).strip() #self.request.recv(1024)
+            pose += self.request.recv(1024) #self.request.recv(1024).strip() #
         self.server.rcv_msg = pose
         self.server.server_close() # this throws an exception
 
