@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+#from __future__ import absolute_import
 
 import math
 import os
@@ -160,7 +160,7 @@ class UR(object):
             transformations (:obj:`list` of :class:`Transformation`): The
                 transformations for each link.
         """
-        q0, q1, q2, q3, q4, q5 = configuration.joint_values
+        q0, q1, q2, q3, q4, q5 = configuration.joint_values #configuration.joint_values
         j0, j1, j2, j3, j4, j5 = self.j0, self.j1, self.j2, self.j3, self.j4, self.j5
 
         T0 = Rotation.from_axis_and_angle(subtract_vectors(j0[1], j0[0]), q0, j0[1])

@@ -1,4 +1,4 @@
-from socketserver import TCPServer, BaseRequestHandler
+from SocketServer import TCPServer, BaseRequestHandler
 from utilities import send_script, is_available
 
 script = ""

@@ -1,14 +1,12 @@
-from __future__ import print_function
+#from __future__ import print_function
 
 import math
-
-from compas_fab import get_data
 
 from .robot import BaseConfiguration
 from .ur import UR
 
 
-class UR10(UR):
+class UR10e(UR):
     """The UR 10 robot class.
 
     Manual link:
@@ -34,18 +32,18 @@ class UR10(UR):
     working_area_cylinder_diameter = 190.
 
     def __init__(self):
-        super(UR10, self).__init__()
+        super(UR10e, self).__init__()
 
     def get_model_path(self):
-        return get_data("robots/ur/ur10")
+        return "ur_e_description/ur10e"
 
     def forward_kinematics(self, configuration):
         q = configuration.joint_values[:]
         q[5] += math.pi
-        return super(UR10, self).forward_kinematics(BaseConfiguration.from_joints(q))
+        return super(UR10e, self).forward_kinematics(BaseConfiguration.from_joints(q))
 
     def inverse_kinematics(self, tool0_frame_RCS):
-        configurations = super(UR10, self).inverse_kinematics(tool0_frame_RCS)
+        configurations = super(UR10e, self).inverse_kinematics(tool0_frame_RCS)
         for q in configurations:
             print(q)
         for i in range(len(configurations)):
@@ -54,7 +52,7 @@ class UR10(UR):
 
 
 def main():
-    ur10 = UR10()
+    ur10 = UR10e()
     q = [-0.4817717618752444, 2.900620189456401, 4.466606474692679, 3.6283476234151966, 1.5707963267948974, 5.194160742259934]
     q = [0, 0, 0, 0, 0, 0]
     R0, R1, R2, R3, R4, R5 = ur10.get_forward_transformations(q)
@@ -67,7 +65,7 @@ if __name__ == "__main__":
     from compas.geometry import Frame
     from .kinematics.path_calculation import smallest_joint_pose
 
-    ur = UR10()
+    ur = UR10e()
 
     q = [4.6733, -3.39529, 1.5404, -2.90962, -1.58137, 1.59137]
     pose = [-206.258, -865.946, 606.26, 0.037001, -0.044931, 1.55344]
