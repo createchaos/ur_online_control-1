@@ -10,7 +10,7 @@ script += "program()\n\n\n"
 def stop(ur_ip):
 
     global script
-    print script
+    print(script)
 
     ur_available = is_available(ur_ip)
 

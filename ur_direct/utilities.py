@@ -16,8 +16,8 @@ def send_script(ur_ip, script):
     try:
         s = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
         s.send(script)
-        print "Script sent to %s on port %i" % (ur_ip, UR_SERVER_PORT)
+        print("Script sent to %s on port %i" % (ur_ip, UR_SERVER_PORT))
         s.close()
     except socket.timeout:
-        print "UR with ip %s not available on port %i" % (ur_ip, UR_SERVER_PORT)
+        print("UR with ip %s not available on port %i" % (ur_ip, UR_SERVER_PORT))
         raise

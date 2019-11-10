@@ -1,4 +1,4 @@
-from SocketServer import TCPServer, BaseRequestHandler
+from socketserver import TCPServer, BaseRequestHandler
 from utilities import send_script, is_available
 
 script = ""
@@ -28,7 +28,7 @@ class MyTCPHandler(BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         pose = ""
         while pose.find("]") == -1:
-            pose += self.request.recv(1024)
+            pose += self.request.recv(1024).strip() #self.request.recv(1024)
         self.server.rcv_msg = pose
         self.server.server_close() # this throws an exception
 
@@ -40,7 +40,7 @@ def get_current_pose_joints(server_ip, server_port, ur_ip, tool_angle_axis):
     script = script.replace("{PORT}", str(server_port))
     script = script.replace("{TCP}", str([tool_angle_axis[i] if i >= 3 else tool_angle_axis[i]/1000. for i in range(len(tool_angle_axis))]))
 
-    print script
+    print(script)
 
     ur_available = is_available(ur_ip)
 
@@ -63,4 +63,4 @@ if __name__ == "__main__":
 
     pose = get_current_pose_joints(server_ip, server_port, ur_ip, tool_angle_axis)
 
-    print "pose", pose
+    print("pose", pose)
