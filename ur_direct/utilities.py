@@ -11,8 +11,8 @@ def is_available(ur_ip):
     else:
         return False
 
-def send_script(ur_ip, script):
-    global UR_SERVER_PORT
+def send_script(ur_ip, script, port=UR_SERVER_PORT):
+    #global UR_SERVER_PORT
     try:
         s = socket.create_connection((ur_ip, UR_SERVER_PORT), timeout=2)
         s.send(script)
