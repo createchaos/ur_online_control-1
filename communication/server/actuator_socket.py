@@ -3,17 +3,19 @@ Created on 22.09.2016
 
 @author: rustr
 '''
-
+from __future__ import print_function
 import struct
-import sys
-from .base_client_socket import *
+from sys import version_info
 
-if (sys.version_info > (3, 0)):
-    from queue import LifoQueue
-else:
+if version_info[0] < 3:   
     from Queue import LifoQueue
+    print("Python 2.x")
+else:
+    from queue import LifoQueue
+    print("Python 3.x")
 
-from ur_online_control.communication.states import *
+from ur_online_control_py3.communication.states import *
+from .base_client_socket import *
 
 class ActuatorSocket(BaseClientSocket):
 
@@ -307,21 +309,23 @@ class URSocket(ActuatorSocket):
         else:
             raise("command_id unknown.")
 
-        buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
+        #params = [int(param) for param in params]
+        buf = struct.pack(self.byteorder + "%ii" % int(len(params)), *params)
         return buf
 
     def _format_speed(self, msg_id, speed):
         msg_command_length = 4 * 2
         speed *= self.MULT
         params = [msg_command_length, msg_id, speed]
-        buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
+        params = [int(param) for param in params]
+        buf = struct.pack(self.byteorder + "%ii" % int(len(params)), *params)
         return buf
     
     def _format_tcp(self, msg_id, msg):
         msg_command_length = 4 * (len(msg) + 1)
         msg = [c * self.MULT for c in msg]
         params = [msg_command_length, msg_id] + msg
-        buf = struct.pack(self.byteorder + "%ii" % len(params), *params)
+        buf = struct.pack(self.byteorder + "%ii" % int(len(params)), *params)
         return buf
 
     def _format_current_pose_cartesian(self, raw_msg):

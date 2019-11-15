@@ -5,8 +5,8 @@ Created on 22.11.2016
 '''
 import os
 import socket
-from ur_online_control.communication import msg_identifier_dict, command_identifier_dict
-from ur_online_control.utilities import read_file_to_string, read_file_to_list
+from ur_online_control_py3.communication import msg_identifier_dict, command_identifier_dict
+from ur_online_control_py3.utilities import read_file_to_string, read_file_to_list
 
 # https://www.universal-robots.com/how-tos-and-faqs/how-to/ur-how-tos/remote-control-via-tcpip-16496/
 UR_SERVER_PORT = 30002

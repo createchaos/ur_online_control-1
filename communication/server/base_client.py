@@ -16,7 +16,7 @@ else:
     from Queue import Queue
 
 
-from ur_online_control.communication.msg_identifiers import *
+from ur_online_control_py3.communication.msg_identifiers import *
 
 class BaseClient(object):
 
@@ -29,7 +29,11 @@ class BaseClient(object):
         self.port = port
         self.byteorder = "!" # "!" network, ">" big-endian, "<" for little-endian, see http://docs.python.org/2/library/struct.html
 
-        self.msg_rcv = ""
+        #self.msg_rcv = ""
+        if (sys.version_info > (3, 0)):
+            self.msg_rcv = b""
+        else:
+            self.msg_rcv = ""
 
         self.snd_queue = Queue()
         self.rcv_queue = Queue()
@@ -97,9 +101,11 @@ class BaseClient(object):
 
         try:
             self.socket = socket.create_connection((self.host, self.port), timeout=self.timeout)
+            
             self.socket.settimeout(self.timeout)
             self.socket.setblocking(0)
             self.send_id()
+            
             self.stdout("Successfully connected to server %s on port %d." % (self.host, self.port))
             self.running = True
             return True
@@ -135,6 +141,8 @@ class BaseClient(object):
         """ send message according to message id """
 
         buf = None
+        
+
 
         if msg_id == MSG_FLOAT_LIST:
             msg_snd_len = struct.calcsize(str(len(msg)) + "f") + 4 # float array: length of message in bytes: len*4
@@ -142,11 +150,15 @@ class BaseClient(object):
             buf = struct.pack(self.byteorder + "2i" + str(len(msg)) +  "f", *params)
 
         elif msg_id == MSG_IDENTIFIER:
+            if (sys.version_info > (3, 0)):
+                msg=bytes(msg, 'utf-8')
             msg_snd_len = len(msg) + 4
             params = [msg_snd_len, msg_id, msg]
             buf = struct.pack(self.byteorder + "2i" + str(len(msg)) +  "s", *params)
 
         elif msg_id == MSG_STRING:
+            if (sys.version_info > (3, 0)):
+                msg=bytes(msg, 'utf-8')
             msg_snd_len = len(msg) + 4
             params = [msg_snd_len, msg_id, msg]
             buf = struct.pack(self.byteorder + "2i" + str(len(msg)) +  "s", *params)
@@ -167,6 +179,9 @@ class BaseClient(object):
                 self.stdout("Message identifier unknown: %d, message: %s" % (msg_id, msg))
                 return
 
+        
+        print("sending")
+        print(buf)
         self.socket.send(buf)
         self.stdout("Sent message %i with length %i." % (msg_id, len(buf)))
 
@@ -177,6 +192,7 @@ class BaseClient(object):
         out according to msg identifier] """
 
         # read msg length
+        #print("reading")
         self.msg_rcv += self.socket.recv(4)
         if len(self.msg_rcv) < 4:
             return

@@ -1,5 +1,7 @@
 # connect to server
+textmsg(">> Opening socket.")
 success = socket_open(SERVER_ADDRESS, PORT)
+textmsg(">> Socket open.")
 if success:
 	send_id_message()
 	textmsg("Successfully established connection to the server.")

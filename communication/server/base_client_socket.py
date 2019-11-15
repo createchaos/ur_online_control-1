@@ -10,9 +10,9 @@ import socket
 import time
 import sys
 
-from ur_online_control.communication.msg_identifiers import *
-from ur_online_control.communication.states import *
-import ur_online_control.communication.container as container
+from ur_online_control_py3.communication.msg_identifiers import *
+from ur_online_control_py3.communication.states import *
+import ur_online_control_py3.communication.container as container
 
 
 class BaseClientSocket(object):
@@ -27,7 +27,11 @@ class BaseClientSocket(object):
         self.parent = parent
 
         #self.msg_rcv = b""
-        self.msg_rcv = ""
+        if (sys.version_info > (3, 0)):
+            self.msg_rcv = b""
+        else:
+            self.msg_rcv = ""
+
         self.byteorder = "!" # "!" network, ">" big-endian, "<" for little-endian, see http://docs.python.org/2/library/struct.html
         #self.byteorder = "<"
 
@@ -93,7 +97,10 @@ class BaseClientSocket(object):
     def get_msg_float_list(self, msg_len, raw_msg):
 
         #msg_float_tuple = struct.unpack_from(self.byteorder + str((msg_len-4)/4) + "f", raw_msg.decode(encoding='UTF-8'))
-        msg_float_tuple = struct.unpack_from(self.byteorder + str((msg_len-4)/4) + "f", raw_msg)
+        if (sys.version_info > (3, 0)):
+            msg_float_tuple = struct.unpack_from(self.byteorder + str(int((msg_len-4)/4)) + "f", raw_msg)
+        else:
+            msg_float_tuple = struct.unpack_from(self.byteorder + str((msg_len-4)/4) + "f", raw_msg)
         msg_float_list = [item for item in msg_float_tuple]
         return msg_float_list
 
@@ -119,7 +126,10 @@ class BaseClientSocket(object):
         if msg_id == MSG_IDENTIFIER:
             #message_ids = str(raw_msg).split(" ")
             #identifier = raw_msg.decode(encoding='UTF-8')
-            self.identifier = str(raw_msg)
+            if (sys.version_info > (3, 0)):
+                self.identifier = raw_msg.decode(encoding='UTF-8')
+            else:
+                self.identifier = str(raw_msg)
             self.stdout("Received identifier.")
             self.publish_queues()
             self.publish_client()
@@ -129,7 +139,11 @@ class BaseClientSocket(object):
             self._process_msg_float_list(msg_float_list)
 
         elif msg_id == MSG_STRING:
-            msg = str(raw_msg)
+            if (sys.version_info > (3, 0)):
+                msg = raw_msg.decode(encoding='UTF-8')
+            else:
+                msg = str(raw_msg)
+            #msg = str(raw_msg)
             self._process_msg_string(msg)
 
         elif msg_id == MSG_INT:

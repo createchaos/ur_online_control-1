@@ -12,6 +12,9 @@ from compas.geometry import transform_points
 from compas.geometry.xforms import Rotation
 from compas.geometry.xforms import Transformation
 
+from compas_ghpython.geometry.xforms import xform_from_transformation
+from compas_ghpython.geometry.xforms import xtransformed
+
 from .kinematics import forward_kinematics
 from .kinematics import inverse_kinematics
 from .robot import BaseConfiguration
@@ -35,6 +38,7 @@ class UR(object):
         super(UR, self).__init__()
 
         self.model = []  # a list of meshes
+        self.model_breps = []
         self.basis_frame = None
         # move to UR !!!!
         self.transformation_RCS_WCS = None
@@ -196,7 +200,97 @@ class UR(object):
         tcp_frame = Frame.from_transformation(T * self.transformation_tcp_tool0)
         return tool0_frame, tcp_frame
 
-    def get_transformed_model(self, transformations, xtransform_function=None):
+    def get_transformed_model(self, transformations):
+        """Get the transformed meshes of the robot model.
+        Args:
+            transformations (:obj:`list` of :class:`Transformation`): A list of
+                transformations to apply on each of the links
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        tmodel = []
+        for m, T in zip(self.model, transformations):
+            tmodel.append(xtransformed(m, T))
+        return tmodel
+    
+    def get_transformed_tool_model(self, T5, xtransform_function=None):
+        """Get the transformed meshes of the tool model.
+
+        Args:
+            T5 (:class:`Transformation`): The transformation of the robot's
+                last joint.
+            xtransform_function (function name, ): the name of the function
+                used to transform the model. Defaults to None.
+
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        T = self.get_tool0_transformation(T5)
+        return self.tool.get_transformed_model(T)
+
+    def xdraw(self, configuration):
+        """Get the transformed meshes of the robot and the tool model.
+
+    	Args:
+            configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+    	"""
+        transformations = self.get_forward_transformations(configuration)
+        tmodel = self.get_transformed_model(transformations)
+        if self.tool:
+        	tmodel.append(self.get_transformed_tool_model(transformations[5]))
+        return tmodel
+    
+    def get_transformed_model_brep(self, transformations):
+        """Get the transformed meshes of the robot model.
+        Args:
+            transformations (:obj:`list` of :class:`Transformation`): A list of
+                transformations to apply on each of the links
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        tmodel = []
+        for m, T in zip(self.model_breps, transformations):
+            tmodel.append(xtransformed(m, T))
+        return tmodel
+    
+    def get_transformed_tool_model_brep(self, T5, xtransform_function=None):
+        """Get the transformed meshes of the tool model.
+
+        Args:
+            T5 (:class:`Transformation`): The transformation of the robot's
+                last joint.
+            xtransform_function (function name, ): the name of the function
+                used to transform the model. Defaults to None.
+
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        T = self.get_tool0_transformation(T5)
+        return self.tool.get_transformed_model_brep(T)
+
+    def xdraw_brep(self, configuration):
+        """Get the transformed meshes of the robot and the tool model.
+
+    	Args:
+            configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+    	"""
+        transformations = self.get_forward_transformations(configuration)
+        tmodel = self.get_transformed_model_brep(transformations)
+        if self.tool:
+        	tmodel.append(self.get_transformed_tool_model_brep(transformations[5]))
+        return tmodel
+
+    def _get_transformed_model(self, transformations, xtransform_function=None):
         """Get the transformed meshes of the robot model.
 
         Args:
@@ -220,7 +314,24 @@ class UR(object):
                 tmodel.append(Mesh.from_vertices_and_faces(mtxyz, faces))
         return tmodel
 
-    def xdraw(self, configuration, xtransform_function=None):
+    def _get_transformed_tool_model(self, T5, xtransform_function=None):
+        """Get the transformed meshes of the tool model.
+
+        Args:
+            T5 (:class:`Transformation`): The transformation of the robot's
+                last joint.
+            xtransform_function (function name, ): the name of the function
+                used to transform the model. Defaults to None.
+
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        T = self.get_tool0_transformation(T5)
+        return self.tool.get_transformed_model(T, xtransform_function)
+
+
+    def _xdraw(self, configuration, xtransform_function=None):
     	"""Get the transformed meshes of the robot and the tool model.
 
     	Args:
@@ -238,22 +349,6 @@ class UR(object):
         	tmodel += self.get_transformed_tool_model(transformations[5], xtransform_function)
         return tmodel
 
-
-    def get_transformed_tool_model(self, T5, xtransform_function=None):
-        """Get the transformed meshes of the tool model.
-
-        Args:
-            T5 (:class:`Transformation`): The transformation of the robot's
-                last joint.
-            xtransform_function (function name, ): the name of the function
-                used to transform the model. Defaults to None.
-
-        Returns:
-            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
-                respective class of the CAD environment
-        """
-        T = self.get_tool0_transformation(T5)
-        return self.tool.get_transformed_model(T, xtransform_function)
 
     def forward_kinematics(self, configuration):
         """Forward kinematics function.
