@@ -31,10 +31,13 @@ class BaseClient(object):
 
         #self.msg_rcv = ""
         if (sys.version_info > (3, 0)):
+            print("Python3.x")
             self.msg_rcv = b""
+            
         else:
+            print("Python2.x")
             self.msg_rcv = ""
-
+            
         self.snd_queue = Queue()
         self.rcv_queue = Queue()
         self.timeout = 0.008
@@ -120,6 +123,7 @@ class BaseClient(object):
         msg = self.identifier
         self._send(MSG_IDENTIFIER, msg)
 
+
     def close(self):
         self.stdout("Closing...")
         self.running = False
@@ -141,8 +145,6 @@ class BaseClient(object):
         """ send message according to message id """
 
         buf = None
-        
-
 
         if msg_id == MSG_FLOAT_LIST:
             msg_snd_len = struct.calcsize(str(len(msg)) + "f") + 4 # float array: length of message in bytes: len*4
@@ -180,8 +182,8 @@ class BaseClient(object):
                 return
 
         
-        print("sending")
-        print(buf)
+        #print("sending")
+        #print(buf)
         self.socket.send(buf)
         self.stdout("Sent message %i with length %i." % (msg_id, len(buf)))
 
@@ -222,6 +224,8 @@ class BaseClient(object):
 
     def process(self, msg_len, msg_id, raw_msg):
 
+        #self.stdout("Processing")
+        #self.stdout(raw_msg)
         msg = None
 
         if msg_id == MSG_QUIT:
@@ -243,8 +247,8 @@ if __name__ == "__main__":
     ur = BaseClient("UR", "127.0.0.1", 30003)
     ur.connect_to_server()
     ur.start()
-    ur.send(MSG_FLOAT_LIST, [-172.36, 442.80, 331.26, 2.8714, -1.2542, -0.0033])
+    #ur.send(MSG_FLOAT_LIST, [-172.36, 442.80, 331.26, 2.8714, -1.2542, -0.0033])
     #ur.send(MSG_CURRENT_POSE_CARTESIAN, [-17236, 44280, 33126, 28714, -12542, -00033])
-    time.sleep(5)
+    #time.sleep(5)
     #ur.send(MSG_CURRENT_POSE_CARTESIAN, [-10000, 100000, 100000, 28714, -12542, -00033])
     #ur.close()

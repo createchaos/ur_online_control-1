@@ -4,6 +4,8 @@ Created on 21.10.2017
 @author: rustr
 '''
 
+from __future__ import print_function
+
 import time
 import struct
 import sys, os
@@ -69,8 +71,8 @@ class URClient(BaseClient):
 
                 
 if __name__ == "__main__":
+    #server_address = "192.168.10.111"
     server_address = "192.168.10.111"
-    server_address = "127.0.0.1"
     
     server_port = 30003
     client = URClient(server_address, server_port)
@@ -78,6 +80,7 @@ if __name__ == "__main__":
     print(success) 
     if success:  
         client.start()
+    print("running")
     #client.send(MSG_FLOAT_LIST, [1.2, 3.6, 4, 6, 7])
     #client.send(MSG_INT, 1)
     #client.send(MSG_FLOAT_LIST, [1.2, 3.6, 4, 6, 7])

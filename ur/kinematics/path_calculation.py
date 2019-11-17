@@ -3,9 +3,9 @@ from __future__ import print_function
 import math
 
 from compas_fab.utilities import sign
+from compas_fab.robots import Configuration #from ..robot import BaseConfiguration
 
 from . import inverse_kinematics
-from ..robot import BaseConfiguration
 
 
 def format_joint_positions(joint_positions_a, joint_positions_b = [0,0,0,0,0,0]):
@@ -45,7 +45,8 @@ def calculate_configurations_for_path(frames, robot, current_positions = []):
 
     for i, frame in enumerate(frames):
         configs = robot.inverse_kinematics(frame)
-        qsols = [c.joint_values for c in configs]
+        #qsols = [c.joint_values for c in configs]
+        qsols = [c.values for c in configs]
         if not len(qsols):
             return []
         if i == 0:
@@ -79,6 +80,7 @@ def calculate_configurations_for_path(frames, robot, current_positions = []):
     for i in range(len(configurations)):
         configurations[i] = list(configurations[i])
         for j, q in enumerate(configurations[i]):
-            configurations[i][j] = BaseConfiguration.from_joints(q)
+            #configurations[i][j] = BaseConfiguration.from_joints(q)
+            configurations[i][j] = Configuration.from_revolute_values(q)
 
     return configurations
