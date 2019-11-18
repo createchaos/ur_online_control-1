@@ -2,7 +2,7 @@
 
 ## Iron Python Installation
 
-Install Ironpython 2.7.9. via following this [link] (https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
+Install Ironpython 2.7.9. via following this [link](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
 
 ## Compas Fab Installation
 
@@ -55,10 +55,12 @@ Then, add the following two directories to the Python Path in Rhino via >> EditP
 
 ## Example files
 
-You find the grasshopper playground in the ghcomp folder:
+You find the `grasshopper playground` in the ghcomp folder:
 
     ur_online_control.ghx
     ur10e_setup.3dm
 
 Copy these two files into your own project folder and use and modify it.
+
+[`grasshopper playground`](ghcomp/images/ghcomp_interface.jpg)
 
