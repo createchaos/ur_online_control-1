@@ -60,7 +60,7 @@ You find the `grasshopper playground` in the ghcomp folder:
     ur_online_control.ghx
     ur10e_setup.3dm
 
-Copy these two files into your own project folder and use and modify it. Voilà
+Copy these two files into your own project folder and use and modify it. Voilà!
 
 
 ![`grasshopper playground`](ghcomp/images/ghcomp_interface.jpg)
