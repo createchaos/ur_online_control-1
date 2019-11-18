@@ -10,9 +10,9 @@ import socket
 import time
 import sys
 
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.communication.states import *
-import ur_online_control_py3.communication.container as container
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.communication.states import *
+import ur_online_control.communication.container as container
 
 
 class BaseClientSocket(object):

@@ -19,8 +19,6 @@ if (sys.version_info > (3, 0)):
 else:
     python_version = 2
 
-
-
 class Server(object):
 
     def __init__(self, address = '127.0.0.1', port = 30003):

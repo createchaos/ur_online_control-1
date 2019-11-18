@@ -1,27 +1,64 @@
-# ur_online_control
+# UR Online Control
 
+## Iron Python Installation
 
-Requires compas 0.3.2 + compas_fab 0.2.1.
+Install Ironpython 2.7.9. via following this [link] (https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
 
+## Compas Fab Installation
 
-Installation notes (01.07.2019):
+Use the `afab19` environment and update it as follows:
 
-create a new environment in Anaconda
-1. open anaconda prompt in administrator mode
-2. conda create -n myenv python=2.7.16 (replace myenv by name of your choice, e.g. ur_online_control)
+    (base)  conda activate afab19
+    (afab19) conda install compas=0.11 compas_fab=0.9 --yes
+    (afab19) python -m compas_rhino.install
+    (afab19) python -m compas_fab.rhino.install -v 6.0
 
-install compas_fab 0.2.1
+### Installation Problems
 
-3. conda activate myenv (e.g. conda activate ur_online_control)
-4. conda install -c conda-forge compas_fab=0.2.1
+If you run into problems, please remove and reinstall your `afab19` environment as follows:
+    
+    (base)  conda config --add channels conda-forge
+    (base)  conda remove --name afab19 --all
+    (base)  create -n urfab python=3.6 compas=0.11 compas_fab=0.9 matplotlib=3.0 --yes
+    (base)  conda activate urfab
 
-install compas_fab for rhino
+## Jupyter Notebooks Installation
 
-5. python -m compas_fab.rhino.uninstall 6.0
-6. python -m compas_fab.rhino.install 6.0
+Some examples will also use Jupyter Notebooks, which needs to be installed **in the same environment**:
 
-clone current version of ur_online_control repository
-set path in rhino to parent folder or ur_online_control repository
-(e.g. if your folder is here: .../Desktop/stuff/ur_online_control, set a path in the rhino edit python script editor to: .../Desktop/stuff)
+    (afab19) conda install jupyter rise pythreejs jupyter_contrib_nbextensions jupyter_nbextensions_configurator --yes
 
-Ironpython: https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9
+## Verify Installation
+
+    (afab19) python
+    >>> import compas_fab
+    >>> compas_fab.__version__
+    '0.9.0'
+    >>> exit()
+
+## Additonal Python 2.7 Environment Installation
+
+Create a Python 2.7 `uronl` environment as follows:
+    
+    (base)  conda create -n uronl python=2.7.16
+    (base)  conda activate uronl
+
+## UR Online Control Installation
+
+First, clone the current version of the [ur_online_control repository](https://github.com/augmentedfabricationlab/ur_online_control) 
+into your project folder.
+
+Then, add the following two directories to the Python Path in Rhino via >> EditPythonScript >> Tools >> Options >> Add to search path:
+
+1. Ironpython Path, e.g., C:\Program Files\IronPython 2.7\Lib
+2. Parent folder or ur_online_control repository, e.g., C:\Users\yourname\workspace\projects
+
+## Example files
+
+You find the grasshopper playground in the ghcomp folder:
+
+    ur_online_control.ghx
+    ur10e_setup.3dm
+
+Copy these two files into your own project folder and use and modify it.
+

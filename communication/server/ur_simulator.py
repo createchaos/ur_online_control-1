@@ -21,7 +21,7 @@ sys.path.append(parent_parent_dir)
 sys.path.append(parent_parent_parent_dir)
 
 from base_client import BaseClient
-from ur_online_control_py3.communication.msg_identifiers import *
+from ur_online_control.communication.msg_identifiers import *
 
 class URClient(BaseClient):
     

@@ -14,7 +14,7 @@ else:
     from queue import LifoQueue
     print("Python 3.x")
 
-from ur_online_control_py3.communication.states import *
+from ur_online_control.communication.states import *
 from .base_client_socket import *
 
 class ActuatorSocket(BaseClientSocket):

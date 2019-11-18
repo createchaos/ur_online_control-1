@@ -12,9 +12,9 @@ if (sys.version_info > (3, 0)):
 else:
     python_version = 2
 
-import ur_online_control_py3.communication.container as container
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.communication.states import *
+import ur_online_control.communication.container as container
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.communication.states import *
 
 if python_version == 2:
     msg_identifier_names = {v: k for k, v in msg_identifier_dict.iteritems()}

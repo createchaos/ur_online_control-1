@@ -1335,7 +1335,7 @@
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.communication import is_available
+from ur_online_control.communication import is_available
 
 guid = str(ghenv.Component.InstanceGuid)
 txt_key = "txt_" + guid
@@ -2198,7 +2198,7 @@ from compas_rhino.utilities.misc import unload_modules
 
 unload_modules("compas")
 unload_modules("compas_fab")
-unload_modules("ur_online_control_py3")</item>
+unload_modules("ur_online_control")</item>
                     <item name="Description" type_name="gh_string" type_code="10">GhPython provides a Python script component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
                       <X>401</X>
@@ -2379,7 +2379,7 @@ unload_modules("ur_online_control_py3")</item>
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control_py3.ur.ur10e import UR10e
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control.ur.ur10e import UR10e
 from scriptcontext import sticky as st
 
 if model == "UR10e":
@@ -4278,13 +4278,13 @@ print(configuration)
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from compas_ghpython import unload_modules
-unload_modules('ur_online_control_py3')
+unload_modules('ur_online_control')
 
 import Rhino.Geometry as rg
 from compas.geometry import Frame 
 from compas.geometry.xforms import Transformation
 from compas_ghpython import draw_frame
-from ur_online_control_py3.ur.kinematics import calculate_configurations_for_path, format_joint_positions
+from ur_online_control.ur.kinematics import calculate_configurations_for_path, format_joint_positions
 
 
 print init_configuration
@@ -6843,7 +6843,7 @@ values = joint_configurations[0].values
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct import get_current_pose_cartesian
+from ur_online_control.ur_direct import get_current_pose_cartesian
 
 server_address = st["server_address"]
 server_port = 30005
@@ -7069,7 +7069,7 @@ else:
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct import get_current_pose_joints
+from ur_online_control.ur_direct import get_current_pose_joints
 from compas_fab.robots import Configuration
 
 
@@ -7336,7 +7336,7 @@ pose_joints = configuration.values</item>
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct import stop as stop_robot
+from ur_online_control.ur_direct import stop as stop_robot
 
 ur_ip = st["ur_ip"]
 
@@ -9965,7 +9965,7 @@ print(script)
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
 from compas.geometry import Frame
 from compas.geometry import Point, Vector
-from ur_online_control_py3.ur_direct import get_current_pose_cartesian
+from ur_online_control.ur_direct import get_current_pose_cartesian
 
 server_address = st["server_address"]
 server_port = 30005
@@ -11104,9 +11104,9 @@ base_frame = Frame(list(origin), list(xaxis), list(yaxis))
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control_py3.ur.ur10e import UR10e
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control.ur.ur10e import UR10e
 from scriptcontext import sticky as st
-from ur_online_control_py3.ur.tool import Tool
+from ur_online_control.ur.tool import Tool
 from compas.geometry import Frame
 
 
@@ -12445,7 +12445,7 @@ print (commands)</item>
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_driver import URDriver
+from ur_online_control.ur_driver import URDriver
 
 server_address = st["server_address"]
 server_port = st["server_port"]
@@ -12791,7 +12791,7 @@ else:
                     <item name="CodeInput" type_name="gh_string" type_code="10">import time
 from scriptcontext import sticky as st
 from Rhino.RhinoApp import WriteLine
-from ur_online_control_py3.ghcomp import GHClient, gh_component_timer
+from ur_online_control.ghcomp import GHClient, gh_component_timer
 import time
 
 server_address = st["server_address"]
@@ -13329,8 +13329,8 @@ else:
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from Rhino.RhinoApp import WriteLine
 
 if client:
@@ -14728,8 +14728,8 @@ for i, p in enumerate(planes_WCS):
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 import os
 import json
 from compas_fab.robots import Configuration
@@ -15717,8 +15717,8 @@ else:
                     <item name="CodeInput" type_name="gh_string" type_code="10">import os
 import Rhino.Geometry as rg
 from scriptcontext import sticky as st
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from compas.geometry import Frame, Transformation
 from compas_ghpython import draw_frame
 import json
@@ -16480,8 +16480,8 @@ safety_planes_WCS = [rg.Plane(planes[-1].Origin + rg.Vector3d.ZAxis * safety_dis
                     <item name="CodeInput" type_name="gh_string" type_code="10">import os
 import Rhino.Geometry as rg
 from scriptcontext import sticky as st
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from compas.geometry import Frame, Transformation
 from compas_ghpython import draw_frame
 import json
@@ -17625,8 +17625,8 @@ for i, p in enumerate(planes_WCS_simple):
                     <item name="CodeInput" type_name="gh_string" type_code="10">import os
 import Rhino.Geometry as rg
 from scriptcontext import sticky as st
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from compas.geometry import Frame, Transformation
 from compas_ghpython import draw_frame
 import json
@@ -18364,8 +18364,8 @@ safety_planes_WCS = [rg.Plane(planes[-1].Origin + rg.Vector3d.ZAxis * safety_dis
                     <item name="CodeInput" type_name="gh_string" type_code="10">import os
 import Rhino.Geometry as rg
 from scriptcontext import sticky as st
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from compas.geometry import Frame, Transformation
 from compas_ghpython import draw_frame
 import json
@@ -19309,7 +19309,7 @@ if your visualisation is showing something unexpected, check if you have chosen 
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct.utilities import send_script
+from ur_online_control.ur_direct.utilities import send_script
 
 server_address = st["server_address"]
 server_port = 30005
@@ -19842,7 +19842,7 @@ if send:
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct.utilities import send_script
+from ur_online_control.ur_direct.utilities import send_script
 
 server_address = st["server_address"]
 server_port = 30005
@@ -20090,7 +20090,7 @@ if send:
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct.utilities import send_script
+from ur_online_control.ur_direct.utilities import send_script
 
 server_address = st["server_address"]
 server_port = 30005
@@ -20338,7 +20338,7 @@ if send:
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct.utilities import send_script
+from ur_online_control.ur_direct.utilities import send_script
 
 server_address = st["server_address"]
 server_port = 30005
@@ -20586,7 +20586,7 @@ if send:
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct.utilities import send_script
+from ur_online_control.ur_direct.utilities import send_script
 
 server_address = st["server_address"]
 server_port = 30005
@@ -20834,7 +20834,7 @@ if send:
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
-from ur_online_control_py3.ur_direct.utilities import send_script
+from ur_online_control.ur_direct.utilities import send_script
 
 server_address = st["server_address"]
 server_port = 30005
@@ -21784,8 +21784,8 @@ for i, p in enumerate(planes_WCS):
                     <item name="CodeInput" type_name="gh_string" type_code="10">import os
 import Rhino.Geometry as rg
 from scriptcontext import sticky as st
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from compas.geometry import Frame, Transformation
 from compas_ghpython import draw_frame
 import json
@@ -22521,8 +22521,8 @@ safety_planes_WCS = [rg.Plane(planes[-1].Origin + rg.Vector3d.ZAxis * safety_dis
                     <item name="CodeInput" type_name="gh_string" type_code="10">import os
 import Rhino.Geometry as rg
 from scriptcontext import sticky as st
-from ur_online_control_py3.communication.msg_identifiers import *
-from ur_online_control_py3.utilities.lists import flatten_list
+from ur_online_control.communication.msg_identifiers import *
+from ur_online_control.utilities.lists import flatten_list
 from compas.geometry import Frame, Transformation
 from compas_ghpython import draw_frame
 import json

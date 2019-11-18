@@ -16,7 +16,7 @@ else:
     from Queue import Queue
 
 
-from ur_online_control_py3.communication.msg_identifiers import *
+from ur_online_control.communication.msg_identifiers import *
 
 class BaseClient(object):
 

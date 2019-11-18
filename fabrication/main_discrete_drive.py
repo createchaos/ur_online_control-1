@@ -19,10 +19,10 @@ sys.path.append(parent_parent_dir)
 for path in sys.path:
     print(path)
 
-import ur_online_control_py3.communication.container as container
-from ur_online_control_py3.communication.server import Server
-from ur_online_control_py3.communication.client_wrapper import ClientWrapper
-from ur_online_control_py3.communication.formatting import format_commands
+import ur_online_control.communication.container as container
+from ur_online_control.communication.server import Server
+from ur_online_control.communication.client_wrapper import ClientWrapper
+from ur_online_control.communication.formatting import format_commands
 
 if len(sys.argv) > 1:
     server_address = sys.argv[1]

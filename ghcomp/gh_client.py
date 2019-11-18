@@ -4,8 +4,8 @@ Created on 27.09.2016
 @author: rustr
 '''
 
-from ur_online_control_py3.communication.server import BaseClient
-from ur_online_control_py3.communication.msg_identifiers import *
+from ur_online_control.communication.server import BaseClient
+from ur_online_control.communication.msg_identifiers import *
 from utilities import gh_component_timer
 
 class GHClient(BaseClient):
