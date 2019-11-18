@@ -4,7 +4,7 @@
 
 Install Ironpython 2.7.9. via following this [link](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
 
-## Compas Fab Installation
+## Compas Fab Installation - Update
 
 Use the `afab19` environment and update it as follows:
 
@@ -13,14 +13,16 @@ Use the `afab19` environment and update it as follows:
     (afab19) python -m compas_rhino.install
     (afab19) python -m compas_fab.rhino.install -v 6.0
 
-### Installation Problems
+### Compas Fab Installation - Fresh
 
-If you run into problems, please remove and reinstall your `afab19` environment as follows:
+If you run into installation problems, please remove and reinstall your `afab19` environment as follows:
     
     (base)  conda config --add channels conda-forge
     (base)  conda remove --name afab19 --all
     (base)  conda create -n urfab python=3.6 compas=0.11 compas_fab=0.9 --yes
     (base)  conda activate urfab
+    (afab19) python -m compas_rhino.install
+    (afab19) python -m compas_fab.rhino.install -v 6.0
 
 ## Jupyter Notebooks Installation
 
