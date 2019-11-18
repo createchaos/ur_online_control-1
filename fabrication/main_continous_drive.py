@@ -8,7 +8,6 @@ import time
 import sys
 import os
 
-# set the paths to find library
 file_dir = os.path.dirname( __file__)
 parent_dir = os.path.abspath(os.path.join(file_dir, ".."))
 parent_parent_dir = os.path.abspath(os.path.join(parent_dir, ".."))
@@ -19,11 +18,10 @@ sys.path.append(parent_parent_dir)
 for path in sys.path:
     print(path)
 
-import ur_online_control.communication.container as container
-from ur_online_control.communication.server import Server
-from ur_online_control.communication.client_wrapper import ClientWrapper
-from ur_online_control.communication.formatting import format_commands
-from helpers import send_cmd_place_sand
+import ur_online_control_py3.communication.container as container
+from ur_online_control_py3.communication.server import Server
+from ur_online_control_py3.communication.client_wrapper import ClientWrapper
+from ur_online_control_py3.communication.formatting import format_commands
 
 if len(sys.argv) > 1:
     server_address = sys.argv[1]

@@ -23,7 +23,6 @@ import ur_online_control_py3.communication.container as container
 from ur_online_control_py3.communication.server import Server
 from ur_online_control_py3.communication.client_wrapper import ClientWrapper
 from ur_online_control_py3.communication.formatting import format_commands
-from helpers import send_cmd_place_sand
 
 if len(sys.argv) > 1:
     server_address = sys.argv[1]
