@@ -62,5 +62,5 @@ You find the `grasshopper playground` in the ghcomp folder:
 
 Copy these two files into your own project folder and use and modify it.
 
-[`grasshopper playground`](ghcomp/images/ghcomp_interface.jpg)
+![`grasshopper playground`](ghcomp/images/ghcomp_interface.jpg)
 
