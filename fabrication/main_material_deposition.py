@@ -31,8 +31,8 @@ if len(sys.argv) > 1:
     ur_ip = sys.argv[3]
     print(sys.argv)
 else:
-    server_address = "192.168.10.111"
-    #server_address = "127.0.0.1"
+    #server_address = "192.168.10.111"
+    server_address = "127.0.0.1"
     #server_address = "0.0.0.0"
     server_port = 30003
     #ur_ip = "192.168.10.10"
