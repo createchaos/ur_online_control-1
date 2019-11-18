@@ -19,7 +19,7 @@ If you run into problems, please remove and reinstall your `afab19` environment 
     
     (base)  conda config --add channels conda-forge
     (base)  conda remove --name afab19 --all
-    (base)  conda create -n urfab python=3.6 compas=0.11 compas_fab=0.9 matplotlib=3.0 --yes
+    (base)  conda create -n urfab python=3.6 compas=0.11 compas_fab=0.9 --yes
     (base)  conda activate urfab
 
 ## Jupyter Notebooks Installation
