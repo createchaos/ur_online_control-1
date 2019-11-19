@@ -1,31 +1,69 @@
-# connect to server
-textmsg(">> Opening socket.")
-success = socket_open(SERVER_ADDRESS, PORT)
-textmsg(">> Socket open.")
-if success:
-	send_id_message()
-	textmsg("Successfully established connection to the server.")
+  rq_obj_detect = 0
+  set_tool_voltage(24)
+  set_tool_communication(True, 115200, 0, 1, 1.5, 3.5)
+  rq_wait_for_gripper_connected()
+  rq_init_comm_if_connected(9, "1")
+  rq_init_comm_if_connected(2, "2")
+  rq_init_comm_if_connected(3, "3")
+  rq_init_comm_if_connected(4, "4")
+  rq_print_connected_grippers()
+  connectivity_checked = [-1,-1,-1,-1]
+  status_checked = [-1,-1,-1,-1]
+  current_speed = [-1,-1,-1,-1]
+  current_force = [-1,-1,-1,-1]
+  set_closed_norm(100.0, 1)
+  set_open_norm(0.0, 1)
+  set_closed_mm(0.0, 1)
+  set_open_mm(50.0, 1)
+  set_closed_norm(100.0, 2)
+  set_open_norm(0.0, 2)
+  set_closed_mm(0.0, 2)
+  set_open_mm(50.0, 2)
+  set_closed_norm(100.0, 3)
+  set_open_norm(0.0, 3)
+  set_closed_mm(0.0, 3)
+  set_open_mm(50.0, 3)
+  set_closed_norm(100.0, 4)
+  set_open_norm(0.0, 4)
+  set_closed_mm(0.0, 4)
+  set_open_mm(50.0, 4)
 
-	# start the threads
-	thread_execute = run thread_execute_from_buffer()
-	thread_publish = run thread_publish_state()
-
-
-	# the main loop
-	while RUNNING == True:
-		if BUFFER_LENGTH < MAX_BUFFER_SIZE:
-			leave = read_and_identify()
-			if leave:
-				RUNNING = False
-				break
-			end
-		end
-		sync()
-	end
-
-	kill thread_execute
-	kill thread_publish
-	socket_close()
-else:
-	textmsg("Cannot connect to the server.")
-end
+  while (True):
+    $ 1 "Robot Program"
+    # begin: URCap Program Node
+    #   Source: Robotiq_Grippers, 1.7.1.2, Robotiq Inc.
+    #   Type: Vacuum
+    $ 2 "Vacuum Grip  (1)           "
+    local gripper_id_ascii = rq_gripper_id_to_ascii("1")
+    local gripper_id_list = rq_get_sid("1")
+    
+    if(not rq_is_gripper_in_sid_list(gripper_id_ascii, gripper_id_list)):
+        popup("A vacuum is not connected. ID: 1", "Vacuum Error", False, True, True)
+    end
+    
+    rq_vacuum_grip_raw(False, 40, 60, 30, "1")
+    
+        rq_wait_for_vacuum_object_suction_complete("1")
+    
+    # end: URCap Program Node
+    # begin: URCap Program Node
+    #   Source: Robotiq_Grippers, 1.7.1.2, Robotiq Inc.
+    #   Type: Vacuum
+    $ 3 "Vacuum Release  (1)           "
+    local gripper_id_ascii = rq_gripper_id_to_ascii("1")
+    local gripper_id_list = rq_get_sid("1")
+    
+    if(not rq_is_gripper_in_sid_list(gripper_id_ascii, gripper_id_list)):
+        popup("A vacuum is not connected. ID: 1", "Vacuum Error", False, True, True)
+    end
+    
+    if(vacuumGripCheckThread1Running):
+        stopVacuumGripCheckThread(vacuumGripCheckThread1)
+        vacuumGripCheckThread1Running = False
+    end
+    
+    rq_vacuum_release_raw(False, 100, 60, 30, 0.05, True, "1")
+    
+    # end: URCap Program Node
+  end
+#end
