@@ -16,3 +16,9 @@ def stop(ur_ip):
 
     if ur_available:
         send_script(ur_ip, script)
+
+
+if __name__ == "__main__":
+
+    ur_ip = "192.168.10.10"
+    stop(ur_ip)

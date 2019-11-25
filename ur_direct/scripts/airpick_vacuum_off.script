@@ -1,0 +1,19 @@
+global Waypoint_1_p=p[.930634753245, -.021061737099, .699368696791, -.173408189851, 1.632433840039, .137043361701]
+global Waypoint_1_q=[2.87441349029541, -1.1661647123149415, 1.442047421132223, -3.341281076470846, -1.1088469664203089, 1.5217247009277344]
+  
+textmsg(">> Entering program.")
+ctr = 0
+while (True):
+    
+    ctr = ctr + 1
+    textmsg(">> Loop:")
+    textmsg(ctr)
+
+    local gripper_id_ascii = rq_gripper_id_to_ascii("1")
+    local gripper_id_list = rq_get_sid("1")
+    
+    rq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=True, gripper_socket="1")
+   
+end
+
+textmsg(">> Program end.")
