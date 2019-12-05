@@ -35,7 +35,8 @@ class Element(object):
     def __init__(self, frame):
         super(Element, self).__init__()
         self.frame = frame
-        self.trajectory = None
+        self.id = ""
+        self.trajectory = None   
         self._gripping_frame = None
         self._source = None
         self._mesh = None
@@ -186,6 +187,9 @@ class Element(object):
         # Probably best to store JointTrajectory instead of JointTrajectoryPoints
         if self.trajectory:
             d['trajectory'] = [p.to_data() for p in self.trajectory]
+
+        if self.id:
+            d['id'] = self.id
             
         return d
 
@@ -198,6 +202,9 @@ class Element(object):
             self._source = _deserialize_from_data(data['_source'])
         if 'trajectory' in data:
             self.trajectory = [JointTrajectoryPoint.from_data(d) for d in data['trajectory']]
+        if 'id' in data:
+            self.id = data['id']
+
 
     def to_data(self):
         """Returns the data dictionary that represents the element.
@@ -278,4 +285,7 @@ class Element(object):
             elem.gripping_frame = self.gripping_frame.copy()
         if self._source:
             elem._source = self._source.copy()
+        if self.id:
+
+            elem.id = self.id
         return elem
