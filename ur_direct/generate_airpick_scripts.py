@@ -135,12 +135,6 @@ def generate_script_pick_and_place_interlock(tool_angle_axis, movel_cmds=[]):
     return program_str
 
 
-    #path = os.path.join(os.path.dirname(__file__), "scripts")
-    #methods_file = os.path.join(path, "airpick_methods.script") 
-    #methods_str = read_file_to_string(methods_file)
-    #program_str = methods_str + "\n" + script
-    #return program_str    
-
 def generate_script_airpick_on():
 
     path = os.path.join(os.path.dirname(__file__), "scripts")
@@ -148,8 +142,6 @@ def generate_script_airpick_on():
     program_str = read_file_to_string(program_file)
 
     vacuum_on_file = os.path.join(path, "airpick_vacuum_on.script")
-    #vacuum_on_str = read_file_to_string(vacuum_on_file)
-
     vacuum_on_list = read_file_to_list(vacuum_on_file)
     vacuum_on_str = "\t".join(vacuum_on_list)
 
@@ -164,49 +156,20 @@ def generate_script_airpick_off():
     program_str = read_file_to_string(program_file)
 
     vacuum_off_file = os.path.join(path, "airpick_vacuum_off.script")
-    #vacuum_on_str = read_file_to_string(vacuum_on_file)
-
     vacuum_off_list = read_file_to_list(vacuum_off_file)
     vacuum_off_str = "\t".join(vacuum_off_list)
 
     program_str = program_str.replace("{AIRPICK_PROGRAM}", vacuum_off_str)
     return program_str
 
-def get_test_script():
-    path = os.path.join(os.path.dirname(__file__), "scripts")
-    program_file = os.path.join(path, "test.script")
-    program_str = read_file_to_string(program_file)
-    return program_str
-
-def get_airpick_on_script():
-    path = os.path.join(os.path.dirname(__file__), "scripts")
-    program_file = os.path.join(path, "airpick_vacuum_off_full.script")
-    #program_file = os.path.join(path, "test.script")
-    program_str = read_file_to_string(program_file)
-    return program_str
-
-def get_airpick_off_script():
-    path = os.path.join(os.path.dirname(__file__), "scripts")
-    program_file = os.path.join(path, "airpick_vacuum_off_full.script")
-    program_str = read_file_to_string(program_file)
-    return program_str
-
 if __name__ == "__main__":
     
     ur_ip = "192.168.10.10"
-    #program = generate_script_airpick_on()
 
     tool_angle_axis = [0.0, -2.8878212124549687e-11, 158.28878352076936, 0.0, 0.0, 0.0]
     movel_cmds = [[932.16352622584691, 45.665029053475799, 24.999999999999982, 2.2214414690791831, -2.2214414690791831, 0.0, 20.0, 0.0], [932.16352622584691, 45.665029053475799, 24.999999999999982, 2.2214414690791831, -2.2214414690791831, 0.0, 20.0, 0.0], [932.16352622584691, 45.665029053475799, 24.999999999999982, 2.2214414690791831, -2.2214414690791831, 0.0, 20.0, 20.0], [932.16352622584691, 45.665029053475799, 24.999999999999982, 2.2214414690791831, -2.2214414690791831, 0.0, 20.0, 20.0], [932.16352622584691, 45.665029053475799, 24.999999999999982, 2.2214414690791831, -2.2214414690791831, 0.0, 20.0, 0.0], [932.16352622584691, 45.665029053475799, 24.999999999999982, 2.2214414690791831, -2.2214414690791831, 0.0, 20.0, 0.0]]
     program = generate_script_pick_and_place_block(tool_angle_axis, movel_cmds)
 
-    #program_on = get_airpick_on_script()
-    #program_off = get_airpick_off_script()
-
-    #program = generate_script_airpick_off()
-
-    #program = get_airpick_off_script()
-    program = get_test_script()
     print(program)
 
     send_script(ur_ip, program,  port=UR_SERVER_PORT)

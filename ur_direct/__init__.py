@@ -5,6 +5,3 @@ from generate_airpick_scripts import generate_script_airpick_on
 from generate_airpick_scripts import generate_script_airpick_off
 from generate_airpick_scripts import generate_script_pick_and_place_block
 from generate_airpick_scripts import generate_script_pick_and_place_interlock
-
-from generate_airpick_scripts import get_airpick_on_script
-from generate_airpick_scripts import get_airpick_off_script
