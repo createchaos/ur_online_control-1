@@ -210,9 +210,12 @@ class Assembly(FromToData, FromToJson):
         """
         raise NotImplementedError
 
-    def element(self, key):
+    def element(self, key, data=False):
         """Get an element by its key."""
-        return self.network.vertex[key]['element']
+        if data:
+            return self.network.vertex[key]['element'], self.network.vertex[key]
+        else:
+            return self.network.vertex[key]['element']
 
     def elements(self, data=False):
         """Iterate over the elements of the assembly.
