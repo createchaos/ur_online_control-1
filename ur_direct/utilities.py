@@ -63,10 +63,9 @@ def generate_script_pick_and_place_block(base_script, move_commands=[]):
             base_script.airpick_off()
         else:
             pass
+    base_script.add_airpick_commands()
     base_script.end()
-    script = base_script.dict_to_script()
-    script = base_script.add_airpick_commands(script)
-    return script
+    return base_script.dict_to_script()
 
 def generate_script_pick_and_place_interlock(base_script, move_commands=[]):
     print(move_commands)
@@ -92,7 +91,7 @@ class URCommandScript:
         self.airpick_commands = False
 
     def dict_to_script(self):
-        return '/n'.join(self.commands_dict.values())
+        return '\n'.join(self.commands_dict.values())
 
     def start(self):
         self.commands_dict.update({
@@ -147,10 +146,12 @@ class URCommandScript:
 
     def add_airpick_commands(self, script):
         path = os.path.join(os.path.dirname(__file__), "scripts")
-        program_file = os.path.join(path, "airpick_program.script")
+        program_file = os.path.join(path, "airpick_methods.script")
         program_str = read_file_to_string(program_file)
-        program_str = program_str.replace("{AIRPICK_PROGRAM}", script)
-        return program_str
+        i = len(self.commands_dict)
+        self.commands_dict.update({
+            i: program_str
+        })
 
     def check_available(self):
         system_call = "ping -r 1 -n 1 {}".format(self.ur_ip)
