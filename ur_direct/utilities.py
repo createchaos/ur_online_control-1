@@ -26,6 +26,17 @@ def is_available(ur_ip):
         return False
 
 
+def send_script(ur_ip, script, port=30002):
+    try:
+        s = socket.create_connection((ur_ip, port), timeout=2)
+        s.send(script)
+        print("Script sent to %s on port %i" % (ur_ip, port))
+        s.close()
+    except socket.timeout:
+        print("UR with ip %s not available on port %i" % (ur_ip, port))
+        raise
+
+
 class MyTCPHandler(BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
@@ -53,8 +64,9 @@ def generate_script_pick_and_place_block(base_script, move_commands=[]):
         else:
             pass
     base_script.end()
-    return base_script
-
+    script = base_script.dict_to_script()
+    script = base_script.add_airpick_commands(script)
+    return script
 
 def generate_script_pick_and_place_interlock(base_script, move_commands=[]):
     print(move_commands)
