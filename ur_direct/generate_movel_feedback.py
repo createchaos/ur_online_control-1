@@ -10,8 +10,8 @@ script += "\ttextmsg(SERVER_ADDRESS)\n"
 script += "\ttextmsg(PORT)\n"
 script += "\tset_tcp(p{TCP})\n"
 script += "\tMM2M = 1000.0\n"
-
 script += "\tsocket_open(SERVER_ADDRESS, PORT)\n"
+
 script += "\tmovel(p[-0.94920865760722839, -0.7210000000126604, 0.15530000000698363, 2.2214414690791879, -2.2214414690791782, 2.1090559403470218e-15], v=0.10000, r=0.020000)\n"
 script += "\tmovel(p[-0.94920865760722817, -0.7210000000126604, -0.034699999993016359, 2.2214414690791879, -2.2214414690791782, 2.1090559403470218e-15], v=0.10000, r=0.000000)\n"
 script += "\tmovel(p[-0.94920865760722839, -0.7210000000126604, 0.15530000000698363, 2.2214414690791879, -2.2214414690791782, 2.1090559403470218e-15], v=0.10000, r=0.020000)\n"
@@ -27,9 +27,11 @@ script += "\ttextmsg(\"<< Exiting program.\")\n"
 script += "end\n"
 script += "program()\n\n\n"
 
+
 def list_str_to_list(str):
     str = str[(str.find("[")+1):str.find("]")]
     return [float(x) for x in str.split(",")]
+
 
 class MyTCPHandler(BaseRequestHandler):
 
@@ -40,8 +42,6 @@ class MyTCPHandler(BaseRequestHandler):
             pose += self.request.recv(1024)
         self.server.rcv_msg = pose
         self.server.server_close() # this throws an exception
-
-#def funcname(parameter_list):
     
 
 def send_movel_script_feedback(server_ip, server_port, ur_ip, tool_angle_axis, cmd):

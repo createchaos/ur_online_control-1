@@ -56,7 +56,6 @@ def generate_script_pick_and_place_block(tool_angle_axis, movel_cmds=[]):
     x, y, z, ax, ay, az, speed, radius = movel_cmds[5]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
 
-
     script = "\n"
     script += "\ttextmsg(\">> program start\")\n"
 
@@ -75,6 +74,7 @@ def generate_script_pick_and_place_block(tool_angle_axis, movel_cmds=[]):
     return program_str
 
     #pick_and_place with approach plane
+
 def generate_script_pick_and_place_interlock(tool_angle_axis, movel_cmds=[]):
 
     
