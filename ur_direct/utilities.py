@@ -1,5 +1,5 @@
 import socket
-from SocketServer import TCPServer, BaseRequestHandler
+from socketserver import TCPServer, BaseRequestHandler
 import sys
 import os
 # set the paths to find library
@@ -53,32 +53,32 @@ def generate_base_script(server_ip, server_port, tool_angle_axis, ur_ip):
     return base_script
 
 
-def generate_script_pick_and_place_block(base_script, move_commands=[]):
-    for move_command in move_commands:
-        x, y, z, dx, dy, dz, r, v = move_command
-        base_script.add_move_linear(x, y, z, dx, dy, dz, r, v)
-        if move_commands[1] == move_command:
-            base_script.airpick_on()
-        elif move_commands[4] == move_command:
-            base_script.airpick_off()
-        else:
-            pass
+def generate_script_pick_and_place_block(base_script, move_commands=[], interlock=False):
     base_script.add_airpick_commands()
-    base_script.end()
-    return base_script.dict_to_script()
-
-def generate_script_pick_and_place_interlock(base_script, move_commands=[]):
-    print(move_commands)
     for i, [x, y, z, dx, dy, dz, r, v] in zip(range(len(move_commands)), move_commands):
         base_script.add_move_linear(x, y, z, dx, dy, dz, r, v)
         if i == 1:
             base_script.airpick_on()
-        elif i == 5:
+        elif i == 4 and not interlock:
+            base_script.airpick_off()
+        elif i == 5 and interlock:
             base_script.airpick_off()
         else:
             pass
     base_script.end()
-    return base_script
+    return base_script.dict_to_script()
+
+def airpick_on(base_script):
+    base_script.add_airpick_commands()
+    base_script.airpick_on()
+    base_script.end()
+    return base_script.dict_to_script()
+
+def airpick_off(base_script):
+    base_script.add_airpick_commands()
+    base_script.airpick_off()
+    base_script.end()
+    return base_script.dict_to_script()
 
 
 class URCommandScript:
@@ -101,9 +101,8 @@ class URCommandScript:
             3: "\tPORT = {}".format(self.server_port),
             4: "\ttextmsg(SERVER_ADDRESS)",
             5: "\ttextmsg(PORT)",
-            6: "\tset_tcp(p{})".format(str([self.tool_angle_axis[i] if i >= 3 else self.tool_angle_axis[i]/1000. for i in range(len(self.tool_angle_axis))])),
-            7: "\tMM2M = 1000.0",
-            8: "\tsocket_open(SERVER_ADDRESS, PORT)"
+            6: "\tset_tcp(p{})".format(self.tool_angle_axis),
+            7: "\tsocket_open(SERVER_ADDRESS, PORT)"
         })
 
     def end(self):
@@ -133,18 +132,18 @@ class URCommandScript:
     def airpick_on(self):
         i = len(self.commands_dict)
         self.commands_dict.update({
-            i: 'rq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket="1")'
+            i: "\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')"
         })
         self.airpick_commands = True
 
     def airpick_off(self):
         i = len(self.commands_dict)
         self.commands_dict.update({
-            i: 'rq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket="1")'
+            i: "\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')"
         })
         self.airpick_commands = True
 
-    def add_airpick_commands(self, script):
+    def add_airpick_commands(self):
         path = os.path.join(os.path.dirname(__file__), "scripts")
         program_file = os.path.join(path, "airpick_methods.script")
         program_str = read_file_to_string(program_file)
@@ -185,3 +184,22 @@ class URCommandScript:
             server.serve_forever()
         except:
             return list_str_to_list(server.rcv_msg)
+
+if __name__ == "__main__":
+    server_port = 30005
+    server_ip = "192.168.10.11"
+    ur_ip = "192.168.10.10"
+
+    tool_angle_axis = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    movel_cmds = [
+        [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
+        [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
+        [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
+        [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
+        [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
+        [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0]
+    ]
+    base_script = generate_base_script(server_ip, server_port, tool_angle_axis, ur_ip)
+    program = generate_script_pick_and_place_block(base_script, movel_cmds)
+
+    print(program)
