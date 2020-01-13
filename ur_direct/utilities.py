@@ -92,63 +92,61 @@ class URCommandScript:
         return '\n'.join(self.commands_dict.values())
 
     def start(self):
-        self.commands_dict.update({
-            0: "def program():",
-            1: "\ttextmsg(\">> Entering program.\")",
-            2: "\tSERVER_ADDRESS = \"{}\"".format(self.server_ip),
-            3: "\tPORT = {}".format(self.server_port),
-            4: "\ttextmsg(SERVER_ADDRESS)",
-            5: "\ttextmsg(PORT)",
-            6: "\tset_tcp(p{})".format(self.tool_angle_axis),
-            7: "\tsocket_open(SERVER_ADDRESS, PORT)"
-        })
+        commands = [
+            "def program():",
+            "\ttextmsg(\">> Entering program.\")",
+            "\tSERVER_ADDRESS = \"{}\"".format(self.server_ip),
+            "\tPORT = {}".format(self.server_port),
+            "\ttextmsg(SERVER_ADDRESS)",
+            "\ttextmsg(PORT)",
+            "\tset_tcp(p{})".format(self.tool_angle_axis),
+            "\tsocket_open(SERVER_ADDRESS, PORT)",
+            "\t# open line for airpick commands"
+        ]
+        self.add_lines(commands)
 
     def end(self):
+        commands = [
+            "\tsocket_close()",
+            "\ttextmsg(\"<< Exiting program.\")",
+            "end",
+            "program()\n\n\n"]
+        self.add_lines(commands)
+
+    def add_line(self, line, i=None):
+        if i is None:
+            i = len(self.commands_dict)
+        else:
+            pass
+        self.commands_dict[i] = line
+
+    def add_lines(self, lines):
         i = len(self.commands_dict)
-        self.commands_dict.update({
-            i: "\tsocket_close()",
-            i+1: "\ttextmsg(\"<< Exiting program.\")",
-            i+2: "end",
-            i+3: "program()\n\n\n"
-        })
+        [self.add_line(line, i+line_nr) for (line_nr, line) in zip(range(len(lines)), lines)]
 
     def get_current_position_cartesian(self):
-        i = len(self.commands_dict)
-        self.commands_dict.update({
-            i: "\tcurrent_pose = get_forward_kin()",
-            i+1: "\ttextmsg(current_pose)",
-            i+2: "\tMM2M = 1000.0",
-            i+3: "\tsocket_send_string([current_pose[0] * MM2M, current_pose[1] * MM2M, current_pose[2] * MM2M, current_pose[3], current_pose[4], current_pose[5]])"
-        })
+        commands = ["\tcurrent_pose = get_forward_kin()",
+                    "\ttextmsg(current_pose)",
+                    "\tMM2M = 1000.0",
+                    "\tsocket_send_string([current_pose[0] * MM2M, current_pose[1] * MM2M, current_pose[2] * MM2M, current_pose[3], current_pose[4], current_pose[5]])"]
+        self.add_lines(commands)
 
     def add_move_linear(self, x, y, z, dx, dy, dz, v, r):
-        i = len(self.commands_dict)
-        self.commands_dict.update({
-            i: "\tmovel(p[{}, {}, {}, {}, {}, {}], v={}, r={})".format(x, y, z, dx, dy, dz, v, r)
-        })
+        self.add_line("\tmovel(p[{}, {}, {}, {}, {}, {}], v={}, r={})".format(x, y, z, dx, dy, dz, v, r))
 
     def airpick_on(self):
-        i = len(self.commands_dict)
-        self.commands_dict.update({
-            i: "\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')"
-        })
+        self.add_line("\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')")
         self.airpick_commands = True
 
     def airpick_off(self):
-        i = len(self.commands_dict)
-        self.commands_dict.update({
-            i: "\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')"
-        })
+        self.add_line("\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')")
         self.airpick_commands = True
 
     def add_airpick_commands(self):
         path = os.path.join(os.path.dirname(__file__), "scripts")
         program_file = os.path.join(path, "airpick_methods.script")
         program_str = read_file_to_string(program_file)
-        i = len(self.commands_dict)
-        self.commands_dict.update({
-            i: program_str
-        })
+        self.add_line(program_str, 8)
 
     def check_available(self):
         system_call = "ping -r 1 -n 1 {}".format(self.ur_ip)
@@ -160,10 +158,6 @@ class URCommandScript:
 
     def send_script(self, port=30002):
         script = self.dict_to_script()
-        if self.airpick_commands:
-            script = self.add_airpick_commands(script)
-        else:
-            pass
 
         # start server
         server = TCPServer((self.server_ip, self.server_port), MyTCPHandler)
@@ -182,6 +176,7 @@ class URCommandScript:
             server.serve_forever()
         except:
             return list_str_to_list(server.rcv_msg)
+
 
 if __name__ == "__main__":
     server_port = 30005
