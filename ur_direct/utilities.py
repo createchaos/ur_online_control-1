@@ -62,8 +62,8 @@ def generate_script_pick_and_place_block(move_commands=[], interlock=False):
             script.airpick_off()
         else:
             pass
-    base_script.end()
-    return base_script.dict_to_script()
+    script.end()
+    return script.dict_to_script()
 
 
 def airpick_toggle(toggle=False):
@@ -134,11 +134,17 @@ class URCommandScript:
         self.add_line("\tmovel(p[{}, {}, {}, {}, {}, {}], v={}, r={})".format(x, y, z, dx, dy, dz, v, r))
 
     def airpick_on(self):
-        self.add_line("\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')")
+        self.add_lines([
+            "local gripper_id_ascii = rq_gripper_id_to_ascii('1')",
+            "local gripper_id_list = rq_get_sid('1')",
+            "\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')"])
         self.airpick_commands = True
 
     def airpick_off(self):
-        self.add_line("\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')")
+        self.add_lines([
+            "local gripper_id_ascii = rq_gripper_id_to_ascii('1')",
+            "local gripper_id_list = rq_get_sid('1')",
+            "\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')"])
         self.airpick_commands = True
 
     def add_airpick_commands(self):
