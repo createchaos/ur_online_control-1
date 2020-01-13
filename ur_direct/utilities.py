@@ -48,11 +48,14 @@ class MyTCPHandler(BaseRequestHandler):
         self.server.server_close() # this throws an exception
 
 
-def generate_script_pick_and_place_block(move_commands=[], interlock=False):
+def generate_script_pick_and_place_block(tool_angle_axis=[], move_commands=[], interlock=False):
     script = URCommandScript()
     script.start()
     script.add_airpick_commands()
-    for i, [x, y, z, dx, dy, dz, r, v] in zip(range(len(move_commands)), move_commands):
+    script.set_tcp(tool_angle_axis)
+    for i, move_command in zip(range(len(move_commands)), move_commands):
+        move_command = [cmd/1000 if c not in [3, 4, 5] else cmd for c, cmd in zip(range(len(move_command)), move_command)]
+        [x, y, z, dx, dy, dz, r, v] = move_command
         script.add_move_linear(x, y, z, dx, dy, dz, r, v)
         if i == 1:
             script.airpick_on()
@@ -123,6 +126,10 @@ class URCommandScript:
         i = len(self.commands_dict)
         [self.add_line(line, i+line_nr) for (line_nr, line) in zip(range(len(lines)), lines)]
 
+    def set_tcp(self, tcp):
+        tcp = [tcp[i]/1000 if i < 3 else tcp[i] for i in range(len(tcp))]
+        self.add_line("\tset_tcp(p{})".format(tcp))
+
     def get_current_position_cartesian(self):
         commands = ["\tcurrent_pose = get_forward_kin()",
                     "\ttextmsg(current_pose)",
@@ -135,16 +142,16 @@ class URCommandScript:
 
     def airpick_on(self):
         self.add_lines([
-            "\tlocal gripper_id_ascii = rq_gripper_id_to_ascii('1')",
-            "\tlocal gripper_id_list = rq_get_sid('1')",
-            "\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')"])
+            '\tlocal gripper_id_ascii = rq_gripper_id_to_ascii("1")',
+            '\tlocal gripper_id_list = rq_get_sid("1")',
+            '\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket="1")'])
         self.airpick_commands = True
 
     def airpick_off(self):
         self.add_lines([
-            "\tlocal gripper_id_ascii = rq_gripper_id_to_ascii('1')",
-            "\tlocal gripper_id_list = rq_get_sid('1')",
-            "\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')"])
+            '\tlocal gripper_id_ascii = rq_gripper_id_to_ascii("1")',
+            '\tlocal gripper_id_list = rq_get_sid("1")',
+            '\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket="1")'])
         self.airpick_commands = True
 
     def add_airpick_commands(self):
