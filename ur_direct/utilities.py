@@ -81,6 +81,14 @@ def airpick_toggle(toggle=False):
     return script.dict_to_script()
 
 
+def get_current_pose_cartesian():
+    script = URCommandScript()
+    script.start()
+    script.get_current_position_cartesian()
+    script.end()
+    return script.dict_to_script()
+
+
 class URCommandScript:
     def __init__(self):
         self.commands_dict = {}
@@ -204,6 +212,6 @@ if __name__ == "__main__":
         [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
         [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0]
     ]
-    #program = generate_script_pick_and_place_block(movel_cmds)
-    program = airpick_toggle(True)
-    print(program)
+    program = generate_script_pick_and_place_block(tool_angle_axis, movel_cmds)
+    #program = airpick_toggle(True)
+    #print(program)
