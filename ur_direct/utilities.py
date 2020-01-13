@@ -135,15 +135,15 @@ class URCommandScript:
 
     def airpick_on(self):
         self.add_lines([
-            "local gripper_id_ascii = rq_gripper_id_to_ascii('1')",
-            "local gripper_id_list = rq_get_sid('1')",
+            "\tlocal gripper_id_ascii = rq_gripper_id_to_ascii('1')",
+            "\tlocal gripper_id_list = rq_get_sid('1')",
             "\trq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket='1')"])
         self.airpick_commands = True
 
     def airpick_off(self):
         self.add_lines([
-            "local gripper_id_ascii = rq_gripper_id_to_ascii('1')",
-            "local gripper_id_list = rq_get_sid('1')",
+            "\tlocal gripper_id_ascii = rq_gripper_id_to_ascii('1')",
+            "\tlocal gripper_id_list = rq_get_sid('1')",
             "\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket='1')"])
         self.airpick_commands = True
 
