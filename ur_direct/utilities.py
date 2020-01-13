@@ -1,5 +1,6 @@
 import socket
-from socketserver import TCPServer, BaseRequestHandler
+from SocketServer import TCPServer, BaseRequestHandler
+#from socketserver import TCPServer, BaseRequestHandler
 import sys
 import os
 # set the paths to find library
@@ -47,45 +48,43 @@ class MyTCPHandler(BaseRequestHandler):
         self.server.server_close() # this throws an exception
 
 
-def generate_base_script(server_ip, server_port, tool_angle_axis, ur_ip):
-    base_script = URCommandScript(server_ip, server_port, tool_angle_axis, ur_ip)
-    base_script.start()
-    return base_script
-
-
-def generate_script_pick_and_place_block(base_script, move_commands=[], interlock=False):
-    base_script.add_airpick_commands()
+def generate_script_pick_and_place_block(move_commands=[], interlock=False):
+    script = URCommandScript()
+    script.start()
+    script.add_airpick_commands()
     for i, [x, y, z, dx, dy, dz, r, v] in zip(range(len(move_commands)), move_commands):
-        base_script.add_move_linear(x, y, z, dx, dy, dz, r, v)
+        script.add_move_linear(x, y, z, dx, dy, dz, r, v)
         if i == 1:
-            base_script.airpick_on()
+            script.airpick_on()
         elif i == 4 and not interlock:
-            base_script.airpick_off()
+            script.airpick_off()
         elif i == 5 and interlock:
-            base_script.airpick_off()
+            script.airpick_off()
         else:
             pass
     base_script.end()
     return base_script.dict_to_script()
 
 
-def airpick_toggle(base_script, toggle=False):
-    base_script.add_airpick_commands()
+def airpick_toggle(toggle=False):
+    script = URCommandScript()
+    script.start()
+    script.add_airpick_commands()
     if toggle:
-        base_script.airpick_on()
+        script.airpick_on()
     elif not toggle:
-        base_script.airpick_off()
-    base_script.end()
-    return base_script.dict_to_script()
+        script.airpick_off()
+    script.end()
+    return script.dict_to_script()
 
 
 class URCommandScript:
-    def __init__(self, server_ip, server_port, tool_angle_axis, ur_ip):
+    def __init__(self):
         self.commands_dict = {}
-        self.server_ip = server_ip
-        self.server_port = server_port
-        self.tool_angle_axis = tool_angle_axis
-        self.ur_ip = ur_ip
+        # self.server_ip = server_ip
+        # self.server_port = server_port
+        # self.tool_angle_axis = tool_angle_axis
+        # self.ur_ip = ur_ip
         self.airpick_commands = False
 
     def dict_to_script(self):
@@ -95,12 +94,12 @@ class URCommandScript:
         commands = [
             "def program():",
             "\ttextmsg(\">> Entering program.\")",
-            "\tSERVER_ADDRESS = \"{}\"".format(self.server_ip),
-            "\tPORT = {}".format(self.server_port),
-            "\ttextmsg(SERVER_ADDRESS)",
-            "\ttextmsg(PORT)",
-            "\tset_tcp(p{})".format(self.tool_angle_axis),
-            "\tsocket_open(SERVER_ADDRESS, PORT)",
+            # "\tSERVER_ADDRESS = \"{}\"".format(self.server_ip),
+            # "\tPORT = {}".format(self.server_port),
+            # "\ttextmsg(SERVER_ADDRESS)",
+            # "\ttextmsg(PORT)",
+            # "\tset_tcp(p{})".format(self.tool_angle_axis),
+            # "\tsocket_open(SERVER_ADDRESS, PORT)",
             "\t# open line for airpick commands"
         ]
         self.add_lines(commands)
@@ -146,7 +145,7 @@ class URCommandScript:
         path = os.path.join(os.path.dirname(__file__), "scripts")
         program_file = os.path.join(path, "airpick_methods.script")
         program_str = read_file_to_string(program_file)
-        self.add_line(program_str, 8)
+        self.add_line(program_str, 2)
 
     def check_available(self):
         system_call = "ping -r 1 -n 1 {}".format(self.ur_ip)
@@ -192,7 +191,6 @@ if __name__ == "__main__":
         [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0],
         [900.0, 45.0, 25.0, 2.0, -2.0, 0.0, 20.0, 0.0]
     ]
-    base_script = generate_base_script(server_ip, server_port, tool_angle_axis, ur_ip)
-    program = generate_script_pick_and_place_block(base_script, movel_cmds)
-
+    #program = generate_script_pick_and_place_block(movel_cmds)
+    program = airpick_toggle(True)
     print(program)

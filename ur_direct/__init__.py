@@ -1,8 +1,7 @@
 # from get_current_pose_joints import get_current_pose_joints
 # from get_current_pose_cartesian import get_current_pose_cartesian
 # from stop import stop
-from utilities import generate_base_script
-from utilities import generate_script_pick_and_place_block
+from utilities import *
 # from generate_airpick_scripts import generate_script_airpick_on
 # from generate_airpick_scripts import generate_script_airpick_off
 # from generate_airpick_scripts import generate_script_pick_and_place_block
