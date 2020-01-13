@@ -68,15 +68,13 @@ def generate_script_pick_and_place_block(base_script, move_commands=[], interloc
     base_script.end()
     return base_script.dict_to_script()
 
-def airpick_on(base_script):
-    base_script.add_airpick_commands()
-    base_script.airpick_on()
-    base_script.end()
-    return base_script.dict_to_script()
 
-def airpick_off(base_script):
+def airpick_toggle(base_script, toggle=False):
     base_script.add_airpick_commands()
-    base_script.airpick_off()
+    if toggle:
+        base_script.airpick_on()
+    elif not toggle:
+        base_script.airpick_off()
     base_script.end()
     return base_script.dict_to_script()
 
