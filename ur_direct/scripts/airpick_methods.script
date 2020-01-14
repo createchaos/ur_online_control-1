@@ -341,11 +341,9 @@
         end
     end
     
-    def rq_vacuum_release(advanced_mode=False, shutoff_distance_cm=5, wait_for_object_released=True, gripper_socket="1"):
+    def rq_vacuum_release(advanced_mode=False, shutoff_distance_cm=5, wait_for_object_released=True, gripper_socket="1", pressure = 255, timeout = 255):
         local shutoff_distance = scale(shutoff_distance_cm, [0, 99], [0.00, 0.99])
-        local pressure = 255
         local minimum = 0
-        local timeout = 255
         rq_vacuum_release_raw(advanced_mode, pressure, minimum, timeout, shutoff_distance, wait_for_object_released, gripper_socket)
     end
     

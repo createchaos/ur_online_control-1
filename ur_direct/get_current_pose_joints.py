@@ -22,8 +22,8 @@ def list_str_to_list(str):
     str = str[(str.find("[")+1):str.find("]")]
     return [float(x) for x in str.split(",")]
 
-class MyTCPHandler(BaseRequestHandler):
 
+class MyTCPHandler(BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
         pose = ""
