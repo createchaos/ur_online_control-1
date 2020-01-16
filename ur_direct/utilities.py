@@ -49,6 +49,13 @@ class MyTCPHandler(BaseRequestHandler):
         self.server.rcv_msg = pose
         self.server.server_close()  # this throws an exception
 
+def stop(ur_ip, server_port):
+    commands = URCommandScript(ur_ip=ur_ip, server_port=server_port)
+    commands.start()
+    commands.add_line("\tstopl(0.5)")
+    commands.end()
+    commands.generate()
+    commands.send_script()
 
 def move_linear(move_command, tool_angle_axis, feedback=None, server_ip=None, server_port=None):
     """Script for a single linear movement"""
@@ -230,6 +237,15 @@ class URCommandScript:
         program_str = read_file_to_string(program_file)
         self.add_line(program_str, 2)
 
+    def is_available():
+        """Ping the network, to check for availability"""
+        system_call = "ping -r 1 -n 1 {}".format(self.ur_ip)
+        response = os.system(system_call)
+        if response == 0:
+            return True
+        else:
+            return False
+
     def transmit(self):
         try:
             s = socket.create_connection((self.ur_ip, self.server_port), timeout=2)
@@ -242,17 +258,20 @@ class URCommandScript:
 
     def send_script(self):
         """Transmit the script to the UR robot"""
-        if self.socket_status:
-            # start server
-            server = TCPServer((self.server_ip, self.server_port), MyTCPHandler)
-            # send file
-            self.transmit()
-            try:
-                server.serve_forever()
-            except:
-                return list_str_to_list(server.rcv_msg)
+        if self.is_available:
+            if self.socket_status:
+                # start server
+                server = TCPServer((self.server_ip, self.server_port), MyTCPHandler)
+                # send file
+                self.transmit()
+                try:
+                    server.serve_forever()
+                except:
+                    return list_str_to_list(server.rcv_msg)
+            else:
+                self.transmit()
         else:
-            self.transmit()
+            pass
 
 if __name__ == "__main__":
     server_port = 30002
