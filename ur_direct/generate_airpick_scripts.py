@@ -10,6 +10,7 @@ sys.path.append(parent_parent_dir)
 
 from ur_online_control.utilities import read_file_to_string, read_file_to_list
 from ur_online_control.ur_direct.utilities import send_script, is_available
+from get_current_pose_joints import get_current_pose_joints
 
 UR_SERVER_PORT = 30002
 
@@ -134,14 +135,13 @@ def generate_script_pick_and_place_interlock(tool_angle_axis, movel_cmds=[]):
     program_str = program_str.replace("{AIRPICK_PROGRAM}", script)
     return program_str
 
-def generate_script_timber_clay_drop_first(tool_angle_axis, movel_cmds=[]):
+def generate_script_timber_clay_drop_first(tool_angle_axis, movel_cmds=[], timeout_pick = 0.5):
     
     script_lines = []
 
     # move to approach plane
     x, y, z, ax, ay, az, speed, radius = movel_cmds[0]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
-
 
     # move to pick up plane safe level
     x, y, z, ax, ay, az, speed, radius = movel_cmds[1]
@@ -154,6 +154,9 @@ def generate_script_timber_clay_drop_first(tool_angle_axis, movel_cmds=[]):
     # turn vacuum on
     script_lines.append('rq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket="1")')
     #script_lines.append("sleep(1)")
+
+    # timeout
+    script_lines.append(str("sleep("+str(timeout_pick)+")"))
 
     # move to pick up plane safe level
     x, y, z, ax, ay, az, speed, radius = movel_cmds[3]
@@ -194,6 +197,9 @@ def generate_script_timber_clay_drop_first(tool_angle_axis, movel_cmds=[]):
     # turn vacuum on
     script_lines.append('rq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket="1")')
     #script_lines.append("sleep(1)")
+
+    # timeout
+    script_lines.append(str("sleep("+str(timeout_pick)+")"))
 
     # move to pick up plane safe level
     x, y, z, ax, ay, az, speed, radius = movel_cmds[11]
@@ -265,9 +271,10 @@ def generate_script_timber_clay_drop_last(tool_angle_axis, movel_cmds=[], timeou
     program_str = program_str.replace("{AIRPICK_PROGRAM}", script)
     return program_str
 
-def generate_script_timber_clay_drop(tool_angle_axis, movel_cmds=[], timeout_press = 1, timeout_pick = 0.5):
+def generate_script_timber_clay_drop(tool_angle_axis, movel_cmds=[], timeout_press = 1, timeout_pick = 0.5, orientation = "right"):
     
     script_lines = []
+
 
     # move to current plane safe level
     x, y, z, ax, ay, az, speed, radius = movel_cmds[0]
@@ -275,7 +282,7 @@ def generate_script_timber_clay_drop(tool_angle_axis, movel_cmds=[], timeout_pre
 
     # move to current plane
     x, y, z, ax, ay, az, speed, radius = movel_cmds[1]
-    script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/6000., radius/1000.))
+    script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/10000., 0.))
 
     
     # timeout
@@ -287,18 +294,20 @@ def generate_script_timber_clay_drop(tool_angle_axis, movel_cmds=[], timeout_pre
 
     # move to current plane safe level
     x, y, z, ax, ay, az, speed, radius = movel_cmds[2]
-    script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
+    script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/500., radius/1000.))
 
     # move to approach plane
+    if orientation == "left":
+        script_lines.append("movej([-1.57079, -1.57078, -2.00715, -1.13448, 1.57074, 0.0], a = 0.5, v = 0.25)")
+    else:
+        script_lines.append("movej([1.57079, -1.57078, -2.00715, -1.13448, 1.57074, 0.0], a = 0.5, v = 0.25)")
+
+    # move to pick up plane safe level
     x, y, z, ax, ay, az, speed, radius = movel_cmds[3]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
 
-    # move to pick up plane safe level
-    x, y, z, ax, ay, az, speed, radius = movel_cmds[4]
-    script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
-
     # move to pick up plane
-    x, y, z, ax, ay, az, speed, radius = movel_cmds[5]
+    x, y, z, ax, ay, az, speed, radius = movel_cmds[4]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/3000., radius/1000.))
 
     # turn vacuum on
@@ -309,15 +318,15 @@ def generate_script_timber_clay_drop(tool_angle_axis, movel_cmds=[], timeout_pre
     script_lines.append(str("sleep("+str(timeout_pick)+")"))
 
     # move to pick up plane safe level
-    x, y, z, ax, ay, az, speed, radius = movel_cmds[6]
+    x, y, z, ax, ay, az, speed, radius = movel_cmds[5]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
     
     # move to approach plane
-    x, y, z, ax, ay, az, speed, radius = movel_cmds[7]
+    x, y, z, ax, ay, az, speed, radius = movel_cmds[6]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
 
     # move to waiting plane safe level
-    x, y, z, ax, ay, az, speed, radius = movel_cmds[8]
+    x, y, z, ax, ay, az, speed, radius = movel_cmds[7]
     script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
 
 
