@@ -345,7 +345,6 @@ def generate_script_timber_clay_drop(tool_angle_axis, movel_cmds=[], timeout_pre
 def generate_script_timber_clay_glue(tool_angle_axis, movel_cmds=[], sleep_time=2, glue_strength=0.25):
    
     script_lines = []
-    time = 2
     index = 0
     while index < len(movel_cmds)-2:
 
@@ -355,18 +354,14 @@ def generate_script_timber_clay_glue(tool_angle_axis, movel_cmds=[], sleep_time=
 
         # move to current plane
         x, y, z, ax, ay, az, speed, radius = movel_cmds[index+1]
-        script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/1000., radius/1000.))
-
-        # put on/off the glue
-        strength = 0.25
-        time = 2
+        script_lines.append("movel(p%s, v=%f, r=%f)" % (str([x/1000., y/1000., z/1000, ax, ay, az]), speed/3000., radius/1000.))
 
         # gluegun on
-        script_lines.append("set_digital_out(3, 1)")        
+        script_lines.append("set_digital_out(3, True)")        
         # break
         script_lines.append(str("sleep("+str(sleep_time)+")"))
         # gluegun off        
-        script_lines.append("set_digital_out(3,0)")
+        script_lines.append("set_digital_out(3, False)")
         
         # move to current plane safe level
         x, y, z, ax, ay, az, speed, radius = movel_cmds[index+2]
