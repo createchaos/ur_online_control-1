@@ -66,6 +66,13 @@ def move_linear(move_command, tool_angle_axis, feedback=None, server_ip=None, se
     script.end()
     return script.generate()
 
+def generate_moves_linear(move_commands, tool_angle_axis, feedback=None, server_ip=None, server_port=None):
+    script = URCommandScript(server_ip=server_ip, server_port=server_port)
+    script.start()
+    script.set_tcp(tool_angle_axis)
+    [script.add_move_linear(move_command, feedback) for move_command in move_commands]
+    script.end()
+    return script.generate()
 
 def generate_script_pick_and_place_block(tool_angle_axis=[], move_commands=[], vacuum_on=2, vacuum_off=5):
     """Script for multiple linear movements and airpick on and off commands"""
