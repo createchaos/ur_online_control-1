@@ -66,7 +66,7 @@ def move_linear(move_command, tool_angle_axis, feedback=None, server_ip=None, se
     script.end()
     return script.generate()
 
-def generate_moves_linear(move_commands, tool_angle_axis, feedback=None, server_ip=None, server_port=None):
+def generate_moves_linear(tool_angle_axis, move_commands, feedback=None, server_ip=None, server_port=None):
     script = URCommandScript(server_ip=server_ip, server_port=server_port)
     script.start()
     script.set_tcp(tool_angle_axis)
