@@ -93,6 +93,7 @@
   </component>
   <component name="SvnConfiguration">
     <configuration />
+    <supportedVersion>125</supportedVersion>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -133,10 +134,11 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="461" y="163" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1578847236824" />
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1578929045869">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="-1685" y="104" key="com.intellij.ide.util.TipDialog" timestamp="1579519482621">
+      <screen x="-2560" y="-360" width="2560" height="1400" />
     </state>
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-2560.-360.2560.1400@0.0.1920.1040" timestamp="1578903330624" />
+    <state x="-1685" y="104" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-2560.-360.2560.1400@-2560.-360.2560.1400" timestamp="1579519482621" />
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-2560.-360.2560.1400@0.0.1920.1040" timestamp="1579517909756" />
     <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1578929045869" />
   </component>
 </project>
