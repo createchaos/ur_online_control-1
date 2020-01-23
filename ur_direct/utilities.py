@@ -235,7 +235,8 @@ class URCommandScript:
 
     def airpick_off(self):
         """Turn airpick off"""
-        self.add_line('\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=False, gripper_socket="1", pressure = 55, timeout = 55)')
+        self.add_line('\trq_vacuum_release(advanced_mode=True, shutoff_distance_cm=1, wait_for_object_released=True, gripper_socket="1", pressure = 55, timeout = 55)')
+        self.add_line("\tsleep(0.1)")
 
     def add_airpick_commands(self):
         """Add airpick functionality to the script"""
