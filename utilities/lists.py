@@ -1,8 +1,14 @@
-'''
+"""
 Created on 15.10.2017
 
 @author: rustr
-'''
+"""
+
+__all__ = [
+    'flatten_list',
+    'divide_list_by_number'
+]
+
 
 def flatten_list(array):
     return [item for sublist in array for item in sublist]

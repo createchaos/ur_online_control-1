@@ -1,0 +1,10 @@
+  textmsg(">> Entering program.")
+
+  local gripper_id_ascii = rq_gripper_id_to_ascii("1")
+  local gripper_id_list = rq_get_sid("1")
+    
+  rq_vacuum_grip(advanced_mode=True, maximum_vacuum=60, minimum_vacuum=10, timeout_ms=10, wait_for_object_detected=True, gripper_socket="1")
+    
+  #end
+
+  textmsg(">> Exiting program.")
