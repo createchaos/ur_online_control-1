@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import socket
 import os
-from .server import start_server, stop_server
+from .mixins.server_mixins import ServerMixins
 from .mixins.airpick_mixins import AirpickMixins
 
 __all__ = [
@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class URCommandScript(AirpickMixins):
+class URCommandScript(AirpickMixins, ServerMixins):
     """Class containing commands for the UR Robot system"""
     def __init__(self, server_ip=None, server_port=None, ur_ip=None, ur_port=None):
         self.commands_dict = {}
@@ -21,6 +21,9 @@ class URCommandScript(AirpickMixins):
         self.ur_port = ur_port
         self.script = None
         self.received_messages = {}
+        self.server_thread = None
+        self.exit_message = "Done"
+        self.checked_messages = 0
 
     # Functionality
     def start(self):
@@ -57,7 +60,7 @@ class URCommandScript(AirpickMixins):
         """Close the socket"""
         if self.socket_status:
             commands = [
-                '\tsocket_send_string("\nDone")',
+                '\tsocket_send_line("Done")',
                 "\tsocket_close()"]
             self.add_lines(commands)
         else:
@@ -89,7 +92,7 @@ class URCommandScript(AirpickMixins):
     def get_current_pose(self, get_type, send):
         """Create get position code"""
         pose_type = {
-            "cartesian": "get_actual_tcp_pose()",
+            "cartesian": "get_forward_kin()",
             "joints": "get_actual_joint_positions()"
         }
         commands = ["\tcurrent_pose = {}".format(pose_type[get_type]),
@@ -97,8 +100,7 @@ class URCommandScript(AirpickMixins):
         self.add_lines(commands)
         if send:
             self.socket_open()
-            self.add_line(
-                "\tsocket_send_string(current_pose)")
+            self.add_line('\tsocket_send_line(current_pose)')
         else:
             pass
 
@@ -123,35 +125,23 @@ class URCommandScript(AirpickMixins):
             print("UR with ip {} not available on port {}".format(self.ur_ip, self.ur_port))
             raise
 
-    def add_message(self, message):
-        i = len(self.received_messages)
-        self.received_messages[i] = message
-
     def send_script(self):
         """Transmit the script to the UR robot"""
         if self.is_available:
             if self.socket_status:
                 # start server
-                server = start_server(self.server_ip, self.server_port)
+                self.start_server()
                 self.transmit()
-                while "Done" not in self.received_messages.values():
-                    if server.rcv_msg is None:
-                        pass
-                    elif type(server.rcv_msg) == list:
-                        [self.add_message(i) for i in server.rcv_msg if i not in self.received_messages.values()]
-                        print(self.received_messages)
-                    elif server.rcv_msg is not None and type(
-                            server.rcv_msg) != list and server.rcv_msg not in self.received_messages.values():
-                        self.add_message(server.rcv_msg)
-                        print(self.received_messages)
-                    else:
-                        pass
-                stop_server(server)
-                return self.received_messages
+                print("Waiting...")
+                self.listen_thread.join()
+                print(self.received_messages)
+                self.server_thread.join()
+
             else:
                 self.transmit()
+            return True
         else:
-            pass
+            return False
 
     # Geometric effects
     def set_tcp(self, tcp):

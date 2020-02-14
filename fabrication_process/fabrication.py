@@ -20,7 +20,7 @@ from threading import Thread, Condition
 import time
 
 
-class Fabrication():
+class Fabrication:
     
     def __init__(self):
         self.iterations = 0
@@ -112,7 +112,6 @@ class Fabrication():
 
     def perform_task(self, task):
         """ This method has to be overwitten ... """
-        
         self.log("TASK START: ---->>>>>")
         ok = True
         # do something
