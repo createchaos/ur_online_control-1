@@ -14,57 +14,44 @@ class URCommandScript(AirpickMixins, ServerMixins):
     """Class containing commands for the UR Robot system"""
     def __init__(self, server_ip=None, server_port=None, ur_ip=None, ur_port=None):
         self.commands_dict = {}
-        self.socket_status = False
         self.server_ip = server_ip
         self.server_port = server_port
         self.ur_ip = ur_ip
         self.ur_port = ur_port
         self.script = None
-        self.received_messages = {}
-        self.server_thread = None
-        self.exit_message = "Done"
-        self.checked_messages = 0
 
-    # Functionality
+        self.feedback = False
+        self.server_thread = None
+        self.server_started = False
+        self.server = None
+        self.received_messages = {}
+        self.checked_messages = 0
+        self.exit_message = "Done"
+
+        # Functionality
     def start(self):
         """To build the start of the script"""
-        commands = [
-            "def program():",
-            "\ttextmsg(\">> Entering program.\")",
-            "\t# open line for airpick commands"]
-        self.add_lines(commands)
+        self.add_lines(["def program():",
+                        "\ttextmsg(\">> Entering program.\")",
+                        "\t# open line for airpick commands"])
 
     def end(self):
         """To build the end of the script"""
-        self.socket_close()
-        commands = [
-            "\ttextmsg(\"<< Exiting program.\")",
-            "end",
-            "program()\n\n\n"]
-        self.add_lines(commands)
+        if self.feedback:
+            self.socket_send_line('"Done"')
+        self.add_lines(["\ttextmsg(\"<< Exiting program.\")",
+                        "end",
+                        "program()\n\n\n"])
 
     def generate(self):
         """Translate the dictionary to a long string"""
         self.script = '\n'.join(self.commands_dict.values())
         return self.script
 
-    def socket_open(self):
-        """Open socket for communication outside of the UR script"""
-        if not self.socket_status:
-            self.add_line('\tsocket_open("{}", {})'.format(self.server_ip, self.server_port))
-            self.socket_status = True
-        else:
-            pass
-
-    def socket_close(self):
-        """Close the socket"""
-        if self.socket_status:
-            commands = [
-                '\tsocket_send_line("Done")',
-                "\tsocket_close()"]
-            self.add_lines(commands)
-        else:
-            pass
+    def socket_send_line(self, line):
+        self.add_lines(['\tsocket_open("{}", {})'.format(self.server_ip, self.server_port),
+                        '\tsocket_send_line({})'.format(line),
+                        "\tsocket_close()"])
 
     # Dictionary building
     def add_line(self, line, i=None):
@@ -95,14 +82,10 @@ class URCommandScript(AirpickMixins, ServerMixins):
             "cartesian": "get_forward_kin()",
             "joints": "get_actual_joint_positions()"
         }
-        commands = ["\tcurrent_pose = {}".format(pose_type[get_type]),
-                    "\ttextmsg(current_pose)"]
-        self.add_lines(commands)
+        self.add_lines(["\tcurrent_pose = {}".format(pose_type[get_type]),
+                        "\ttextmsg(current_pose)"])
         if send:
-            self.socket_open()
-            self.add_line('\tsocket_send_line(current_pose)')
-        else:
-            pass
+            self.socket_send_line('current_pose')
 
     # Connectivity
     def is_available(self):
@@ -117,26 +100,26 @@ class URCommandScript(AirpickMixins, ServerMixins):
     def transmit(self):
         try:
             s = socket.create_connection((self.ur_ip, self.ur_port), timeout=2)
+        except socket.timeout:
+            print("UR with ip {} not available on port {}".format(self.ur_ip, self.ur_port))
+            raise
+        finally:
             enc_script = self.script.encode('utf-8')
             s.send(enc_script)
             print("Script sent to {} on port {}".format(self.ur_ip, self.ur_port))
             s.close()
-        except socket.timeout:
-            print("UR with ip {} not available on port {}".format(self.ur_ip, self.ur_port))
-            raise
 
-    def send_script(self):
+    def send_script(self, feedback=None, server=None):
         """Transmit the script to the UR robot"""
+        if feedback:
+            self.feedback = feedback
         if self.is_available:
-            if self.socket_status:
-                # start server
-                self.start_server()
+            if self.feedback:
+                self.get_server(server)
                 self.transmit()
                 print("Waiting...")
-                self.listen_thread.join()
+                self.server_listen()
                 print(self.received_messages)
-                self.server_thread.join()
-
             else:
                 self.transmit()
             return True

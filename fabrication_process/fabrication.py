@@ -37,6 +37,8 @@ class Fabrication:
         
         self.current_base_plane = None
         self.current_base_pose_cartesian = None
+
+        self.server = None
     
     def check_base_estimation(self, new_base_plane):
         
@@ -67,7 +69,8 @@ class Fabrication:
         with self.t.state:
             self.t.paused = True  # make self block and wait
     
-    def start(self):
+    def start(self, server=None):
+        self.server = server
         self.t.start()
     
     def join(self):
@@ -94,7 +97,7 @@ class Fabrication:
                 ok = self.perform_task(self.current_task)
 
                 if ok:
-                    self.current_task.set_built_state(True)
+                    #self.current_task.set_built_state(True)
                     self.tasks.pop(0)
                     self.log("POP TASK OFF THE LIST...")
                     
