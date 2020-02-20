@@ -6,6 +6,7 @@ if sys.version_info[0] == 2:
     import SocketServer as ss
 elif sys.version_info[0] == 3:
     import socketserver as ss
+from ..utilities import isclose
 ss.TCPServer.allow_reuse_address = True
 
 __all__ = [
@@ -33,6 +34,7 @@ class TCPFeedbackServer:
         self.handler = handler
 
         self.reset()
+        self.msgs = {}
 
     def reset(self):
         self.server = ThreadedTCPServer((self.ip, self.port), self.handler)
@@ -56,3 +58,52 @@ class TCPFeedbackServer:
 
     def is_alive(self):
         return self.t.is_alive()
+
+    def check_exit(self, exit_msg, tol):
+        if "Done" in self.msgs.values():
+            return True
+        elif len(self.msgs) == self.check_msgs:
+            return False
+        else:
+            msg = self.msgs[self.check_msgs]
+            self.check_msgs += 1
+            if type(msg) == list and type(exit_msg) == list:
+                return all(isclose(msg[i], exit_msg[i], abs_tol=tol) for i in range(len(msg)))
+            elif msg == exit_msg or msg == 'Done':
+                return True
+
+    def listen(self, exit_msg="Done", tolerance=25):
+        self.check_msgs = 0
+        while not self.check_exit(exit_msg, tolerance):
+            if self.server.rcv_msg is None:
+                pass
+            elif type(self.server.rcv_msg) != list and len(self.msgs) < 1:
+                self.add_message(self.server.rcv_msg)
+            elif type(self.server.rcv_msg) == list and len(self.msgs) < len(self.server.rcv_msg):
+                if len(self.msgs) is None:
+                    ind = 0
+                else:
+                    ind = len(self.msgs)
+                self.add_message(self.server.rcv_msg[ind][0])
+        else:
+            return True
+
+    def add_message(self, msg):
+        i = len(self.msgs)
+        msg = msg.decode('utf-8')
+        if ("[", "]") in msg:
+            msg = msg.split('[', 1)[1].split(']')[0]
+        if "," in msg:
+            msg = msg.split(',')
+            if len(msg) == 6:
+                msg = [float(crd) * 1000 if c not in [3, 4, 5] else float(crd) for c, crd in enumerate(msg)]
+        self.msgs[i] = msg
+        self.log(msg)
+
+    def log(self, msg):
+        self.log_messages.append("SERVER: " + str(msg))
+        if len(self.log_messages) > self.log_messages_length:
+            self.log_messages = self.log_messages[-self.log_messages_length:]
+
+    def get_log_messages(self):
+        return "\n".join(self.log_messages)

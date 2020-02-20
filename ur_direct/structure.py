@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import socket
 import os
-from .mixins.server_mixins import ServerMixins
 from .mixins.airpick_mixins import AirpickMixins
 
 __all__ = [
@@ -10,7 +9,7 @@ __all__ = [
 ]
 
 
-class URCommandScript(AirpickMixins, ServerMixins):
+class URCommandScript(AirpickMixins):
     """Class containing commands for the UR Robot system"""
     def __init__(self, server_ip=None, server_port=None, ur_ip=None, ur_port=None):
         self.commands_dict = {}
@@ -20,12 +19,6 @@ class URCommandScript(AirpickMixins, ServerMixins):
         self.ur_port = ur_port
         self.script = None
 
-        self.feedback = False
-        self.server_thread = None
-        self.server_started = False
-        self.server = None
-        self.received_messages = {}
-        self.checked_messages = 0
         self.exit_message = "Done"
 
         # Functionality
@@ -35,9 +28,9 @@ class URCommandScript(AirpickMixins, ServerMixins):
                         "\ttextmsg(\">> Entering program.\")",
                         "\t# open line for airpick commands"])
 
-    def end(self):
+    def end(self, feedback=None):
         """To build the end of the script"""
-        if self.feedback:
+        if feedback:
             self.socket_send_line('"Done"')
         self.add_lines(["\ttextmsg(\"<< Exiting program.\")",
                         "end",
@@ -68,16 +61,16 @@ class URCommandScript(AirpickMixins, ServerMixins):
         [self.add_line(line, i+line_nr) for (line_nr, line) in zip(range(len(lines)), lines)]
 
     # Feedback functionality
-    def get_current_position_cartesian(self, send=False):
-        """Get the current cartesian position"""
+    def get_current_pose_cartesian(self, send=False):
+        """Get the current cartesian pose"""
         self.get_current_pose("cartesian", send)
 
-    def get_current_position_joints(self, send=False):
-        """Get the current joints positions"""
+    def get_current_pose_joints(self, send=False):
+        """Get the current joints pose"""
         self.get_current_pose("joints", send)
 
     def get_current_pose(self, get_type, send):
-        """Create get position code"""
+        """Create get pose code"""
         pose_type = {
             "cartesian": "get_forward_kin()",
             "joints": "get_actual_joint_positions()"
@@ -97,34 +90,17 @@ class URCommandScript(AirpickMixins, ServerMixins):
         else:
             return False
 
-    def transmit(self):
+    def send_script(self):
         try:
             s = socket.create_connection((self.ur_ip, self.ur_port), timeout=2)
         except socket.timeout:
             print("UR with ip {} not available on port {}".format(self.ur_ip, self.ur_port))
             raise
         finally:
-            enc_script = self.script.encode('utf-8')
+            enc_script = self.script.encode('utf-8') # encoding allows use of python 3.7
             s.send(enc_script)
             print("Script sent to {} on port {}".format(self.ur_ip, self.ur_port))
             s.close()
-
-    def send_script(self, feedback=None, server=None):
-        """Transmit the script to the UR robot"""
-        if feedback:
-            self.feedback = feedback
-        if self.is_available:
-            if self.feedback:
-                self.get_server(server)
-                self.transmit()
-                print("Waiting...")
-                self.server_listen()
-                print(self.received_messages)
-            else:
-                self.transmit()
-            return True
-        else:
-            return False
 
     # Geometric effects
     def set_tcp(self, tcp):
