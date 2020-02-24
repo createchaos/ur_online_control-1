@@ -56,7 +56,7 @@ Setup with two robots:
     ur_online_control_base_setup_x2.ghx
     u10e_setup_x2.3dm
 
-Copy the rh and ghx files into your own project folder, use and modify it. Voilà!
+Copy the .3dm and .ghx files of your choice into your own project folder, use and modify it. Voilà!
 
 
 ![`grasshopper playground`](ghcomp/images/gui_example.PNG)
