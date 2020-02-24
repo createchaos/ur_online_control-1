@@ -9,7 +9,6 @@ __all__ = [
     'is_available',
     'send_script',
     'stop',
-    'move_linear',
     'generate_moves_linear',
     'generate_script_pick_and_place_block',
     'airpick_toggle',
@@ -27,6 +26,7 @@ def is_available(ip):
     else:
         return False
 
+
 def send_script(script, ip, port=30002):
     """Send the script to the UR"""
     try:
@@ -40,6 +40,7 @@ def send_script(script, ip, port=30002):
         print("Script sent to {} on port {}".format(ip, port))
         s.close()
 
+
 def stop(ip, port):
     ur_cmds = URCommandScript(ur_ip=ip, ur_port=port)
     ur_cmds.start()
@@ -48,22 +49,16 @@ def stop(ip, port):
     ur_cmds.generate()
     ur_cmds.send_script()
 
-def move_linear(tcp, command, ur_ip, ur_port, feedback=None, server_ip=None, server_port=None):
-    """Script for a single linear movement"""
-    ur_cmds = URCommandScript(server_ip=server_ip, server_port=server_port, ur_ip=ur_ip, ur_port=ur_port)
-    ur_cmds.start()
-    ur_cmds.set_tcp(tcp)
-    ur_cmds.add_move_linear(command, feedback)
-    ur_cmds.end()
-    ur_cmds.generate()
-    return ur_cmds
-
 
 def generate_moves_linear(tcp, move_commands, ur_ip, ur_port, feedback=None, server_ip=None, server_port=None):
+    """Script for a linear movement(s)"""
     ur_cmds = URCommandScript(server_ip=server_ip, server_port=server_port, ur_ip=ur_ip, ur_port=ur_port)
     ur_cmds.start()
     ur_cmds.set_tcp(tcp)
-    [ur_cmds.add_move_linear(move_command, feedback) for move_command in move_commands]
+    if type(move_commands[0]) == list:
+        [ur_cmds.add_move_linear(move_command, feedback) for move_command in move_commands]
+    else:
+        ur_cmds.add_move_linear(move_commands, feedback)
     ur_cmds.end()
     ur_cmds.generate()
     return ur_cmds
@@ -89,9 +84,9 @@ def generate_script_pick_and_place_block(tcp, move_commands, ur_ip, ur_port, fee
     return ur_cmds
 
 
-def airpick_toggle(toggle=False, max_vac=75, min_vac=25, detect=True, pressure=55, timeout=55):
+def airpick_toggle(toggle, ur_ip, ur_port, max_vac=75, min_vac=25, detect=True, pressure=55, timeout=55):
     """Script to toggle the airpick on/off"""
-    ur_cmds = URCommandScript()
+    ur_cmds = URCommandScript(ur_ip=ur_ip, ur_port=ur_port)
     ur_cmds.start()
     ur_cmds.add_airpick_commands()
     if toggle:
