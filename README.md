@@ -1,9 +1,5 @@
 # UR Online Control
 
-### Iron Python Installation
-
-Install Ironpython 2.7.9. via following this [link](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
-
 ### Compas Fab Installation - Fresh
 
 If you run into installation problems, please remove and reinstall your `afab19` environment as follows:
@@ -31,6 +27,10 @@ Use the `afab19` environment and update it as follows:
     >>> compas_fab.__version__
     '0.10.1'
     >>> exit()
+
+### Iron Python Installation
+
+Install Ironpython 2.7.9. via following this [link](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
 
 ### UR Online Control Installation
 
