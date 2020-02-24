@@ -59,5 +59,5 @@ Setup with two robots:
 Copy the rh and ghx files into your own project folder, use and modify it. Voilà!
 
 
-![`grasshopper playground`](ghcomp/images/gui_example.png)
+![`grasshopper playground`](ghcomp/images/gui_example.PNG)
 
