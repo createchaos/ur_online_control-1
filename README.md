@@ -29,7 +29,7 @@ Use the `afab19` environment and update it as follows:
     (afab19) python
     >>> import compas_fab
     >>> compas_fab.__version__
-    '0.9.0'
+    '0.10.1'
     >>> exit()
 
 ### UR Online Control Installation
