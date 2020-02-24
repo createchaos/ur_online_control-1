@@ -10,7 +10,7 @@ If you run into installation problems, please remove and reinstall your `afab19`
     
     (base)  conda config --add channels conda-forge
     (base)  conda remove --name afab19 --all
-    (base)  conda create -n afab19 python=3.6 compas=0.11 compas_fab=0.9 --yes
+    (base)  conda create -n afab19 python=3.6 compas=0.15.2 compas_fab=0.10.1 --yes
     (base)  conda activate afab19
     (afab19) python -m compas_rhino.install
     (afab19) python -m compas_fab.rhino.install -v 6.0
@@ -20,7 +20,7 @@ If you run into installation problems, please remove and reinstall your `afab19`
 Use the `afab19` environment and update it as follows:
 
     (base)  conda activate afab19
-    (afab19) conda install compas=0.11 compas_fab=0.9 --yes
+    (afab19) conda install compas=0.15.2 compas_fab=0.10.1 --yes
     (afab19) python -m compas_rhino.install
     (afab19) python -m compas_fab.rhino.install -v 6.0
 
