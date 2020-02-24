@@ -4,15 +4,6 @@
 
 Install Ironpython 2.7.9. via following this [link](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
 
-## Compas Fab Installation - Update
-
-Use the `afab19` environment and update it as follows:
-
-    (base)  conda activate afab19
-    (afab19) conda install compas=0.11 compas_fab=0.9 --yes
-    (afab19) python -m compas_rhino.install
-    (afab19) python -m compas_fab.rhino.install -v 6.0
-
 ### Compas Fab Installation - Fresh
 
 If you run into installation problems, please remove and reinstall your `afab19` environment as follows:
@@ -24,11 +15,14 @@ If you run into installation problems, please remove and reinstall your `afab19`
     (afab19) python -m compas_rhino.install
     (afab19) python -m compas_fab.rhino.install -v 6.0
 
-## Jupyter Notebooks Installation
+## Compas Fab Installation - Update
 
-Some examples will also use Jupyter Notebooks, which needs to be installed **in the same environment**:
+Use the `afab19` environment and update it as follows:
 
-    (afab19) conda install jupyter rise pythreejs jupyter_contrib_nbextensions jupyter_nbextensions_configurator --yes
+    (base)  conda activate afab19
+    (afab19) conda install compas=0.11 compas_fab=0.9 --yes
+    (afab19) python -m compas_rhino.install
+    (afab19) python -m compas_fab.rhino.install -v 6.0
 
 ## Verify Installation
 
@@ -37,13 +31,6 @@ Some examples will also use Jupyter Notebooks, which needs to be installed **in 
     >>> compas_fab.__version__
     '0.9.0'
     >>> exit()
-
-## Additonal Python 2.7 Environment Installation
-
-Create a Python 2.7 `uronl` environment as follows:
-    
-    (base)  conda create -n uronl python=2.7.16
-    (base)  conda activate uronl
 
 ## UR Online Control Installation
 
@@ -59,11 +46,18 @@ Then, add the following two directories to the Python Path in Rhino via >> EditP
 
 You find the `grasshopper playground` in the ghcomp folder:
 
-    ur_online_control.ghx
-    ur10e_setup.3dm
+Setup with one robot:
 
-Copy these two files into your own project folder and use and modify it. Voilà!
+    ur_online_control_base_setup_x1.ghx
+    u10e_setup_x1.3dm
+
+Setup with two robots:
+
+    ur_online_control_base_setup_x2.ghx
+    u10e_setup_x2.3dm
+
+Copy the rh and ghx files into your own project folder, use and modify it. Voilà!
 
 
-![`grasshopper playground`](ghcomp/images/ghcomp_interface.jpg)
+![`grasshopper playground`](ghcomp/images/gui_example.png)
 
