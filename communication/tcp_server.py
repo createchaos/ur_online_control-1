@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-
 import sys
 import threading
 if sys.version_info[0] == 2:
@@ -35,6 +34,8 @@ class TCPFeedbackServer:
 
         self.reset()
         self.msgs = {}
+        self.log_messages = []
+        self.log_messages_length = 25
 
     def reset(self):
         self.server = ThreadedTCPServer((self.ip, self.port), self.handler)
@@ -91,7 +92,7 @@ class TCPFeedbackServer:
     def add_message(self, msg):
         i = len(self.msgs)
         msg = msg.decode('utf-8')
-        if ("[", "]") in msg:
+        if "[" in msg and "]" in msg:
             msg = msg.split('[', 1)[1].split(']')[0]
         if "," in msg:
             msg = msg.split(',')

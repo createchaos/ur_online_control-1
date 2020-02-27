@@ -1,7 +1,6 @@
 from __future__ import absolute_import
-
-import socket
 import os
+import socket
 from .mixins.airpick_mixins import AirpickMixins
 
 __all__ = [
@@ -114,8 +113,8 @@ class URCommandScript(AirpickMixins):
         [x, y, z, dx, dy, dz, v, r] = move
         self.add_line("\tmovel(p[{}, {}, {}, {}, {}, {}], v={}, r={})".format(x, y, z, dx, dy, dz, v, r))
         if feedback == "Full":
-            self.get_current_position_cartesian(True)
+            self.get_current_pose_cartesian(True)
         elif feedback == "UR_only":
-            self.get_current_position_cartesian(False)
+            self.get_current_pose_cartesian(False)
         else:
             pass

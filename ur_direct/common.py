@@ -1,9 +1,8 @@
 from __future__ import absolute_import
-
 import os
 import socket
 from .structure import URCommandScript
-from ...communication import TCPFeedbackServer
+from ..communication import TCPFeedbackServer
 
 __all__ = [
     'is_available',
@@ -15,6 +14,7 @@ __all__ = [
     'get_current_pose_cartesian',
     'get_current_pose_joints'
 ]
+
 
 
 def is_available(ip):
@@ -30,10 +30,9 @@ def is_available(ip):
 def send_script(script, ip, port=30002):
     """Send the script to the UR"""
     try:
-        s = socket.create_connection((ip, ur_port), timeout=2)
+        s = socket.create_connection((ip, port), timeout=2)
     except socket.timeout:
         print("UR with ip {} not available on port {}".format(ip, port))
-        raise
     finally:
         enc_script = script.encode('utf-8') # encoding allows use of python 3.7
         s.send(enc_script)
@@ -117,12 +116,11 @@ def _get_current_pose(pose_type, tcp, server_ip, server_port, ur_ip, ur_port, se
                      "joints": ur_cmds.get_current_pose_joints}
     pose_type_map[pose_type](send)
     ur_cmds.end(feedback=True)
-    script = ur_cmds.generate()
-    print(script)
-    server = TCPFeedbackServer(ip=server_ip,port=server_port)
+    ur_cmds.generate()
+    server = TCPFeedbackServer(ip=server_ip, port=server_port)
     server.start()
     ur_cmds.send_script()
-    server.listen(exit_msg=ur_cmds.exit_message)
+    server.listen()
     server.close()
     server.join()
     return server.msgs[0]
@@ -146,21 +144,22 @@ if __name__ == "__main__":
         [-637.50000000632883, 0.99999999999897682, 250.7000000069842, 2.2214414690791831, 2.2214414690791831, 2.1080925436802876e-15, 100, 0],
         [-637.50000000632883, 0.99999999999897682, 250.7000000069842, 2.2214414690791831, 2.2214414690791831, 2.1080925436802876e-15, 100, 0]
     ]
-    program = generate_script_pick_and_place_block(tool_angle_axis, list([move_command, move_command2]), ur_ip, ur_port, feedback='Full', server_ip=server_ip, server_port=server_port)
-    program2 = generate_script_pick_and_place_block(tool_angle_axis, list([move_command, move_command2]), ur_ip, ur_port, feedback='Full', server_ip=server_ip, server_port=server_port)
+    # program = generate_script_pick_and_place_block(tool_angle_axis, list([move_command, move_command2]), ur_ip, ur_port, feedback='Full', server_ip=server_ip, server_port=server_port)
+    # program2 = generate_script_pick_and_place_block(tool_angle_axis, list([move_command, move_command2]), ur_ip, ur_port, feedback='Full', server_ip=server_ip, server_port=server_port)
+    print(get_current_pose_cartesian(tool_angle_axis, server_ip, server_port, ur_ip, ur_port, True))
 
-    print(program.script)
-    program.exit_message = move_command[:6]
-    program2.exit_message = move_command[:6]
-    import communication.tcp_server as tcp
-    server = tcp.TCPFeedbackServer()
-    server.start()
-    print(program.send_script())
-    server.listen(program.exit_message)
-    stop(ur_ip, ur_port)
-    print(program2.send_script())
-    server.listen(program2.exit_message)
-    stop(ur_ip, ur_port)
-    print(server.msgs)
-    server.close()
-    server.join()
+    # print(program.script)
+    # program.exit_message = move_command[:6]
+    # program2.exit_message = move_command[:6]
+    # import communication.tcp_server as tcp
+    # server = tcp.TCPFeedbackServer()
+    # server.start()
+    # print(program.send_script())
+    # server.listen(program.exit_message)
+    # stop(ur_ip, ur_port)
+    # print(program2.send_script())
+    # server.listen(program2.exit_message)
+    # stop(ur_ip, ur_port)
+    # print(server.msgs)
+    # server.close()
+    # server.join()
