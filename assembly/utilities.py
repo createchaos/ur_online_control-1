@@ -1,3 +1,5 @@
+import json
+
 def _serialize_to_data(obj):
     return dict(
         dtype='{}/{}'.format(obj.__class__.__module__, obj.__class__.__name__),
@@ -13,3 +15,8 @@ def _deserialize_from_data(data):
         cls = getattr(__import__(module, fromlist=[attr]), attr)
 
     return cls.from_data(data['data'])
+
+def to_json(object, filepath):
+    with open(filepath, 'w+') as f:
+        json.dump(object.data, f, sort_keys=True, indent=4)
+
