@@ -1,28 +1,29 @@
 # UR Online Control
 
-### Compas Fab Installation - Fresh
 
-If you run into installation problems, please remove and reinstall your `afab19` environment as follows:
+## Getting started
+
+### Compas and Compas Fab Installation (via Anaconda Terminal) - Fresh
     
     (base)  conda config --add channels conda-forge
-    (base)  conda remove --name afab19 --all
-    (base)  conda create -n afab19 python=3.6 compas=0.11.4 compas_fab=0.10.1 --yes
-    (base)  conda activate afab19
-    (afab19) python -m compas_rhino.install
-    (afab19) python -m compas_fab.rhino.install -v 6.0
+    (base)  conda remove --name your_env_name --all
+    (base)  conda create -n your_env_name python=3.6 compas=0.11.4 compas_fab=0.10.1 --yes
+    (base)  conda activate your_env_name
+    (your_env_name) python -m compas_rhino.install
+    (your_env_name) python -m compas_fab.rhino.install -v 6.0
 
-### Compas Fab Installation - Update
+### Compas and Compas Fab Installation (via Anaconda Terminal) - Update
 
-Use the `afab19` environment and update it as follows:
+Activate your `your_env_name` environment and update it as follows:
 
-    (base)  conda activate afab19
-    (afab19) conda install compas=0.11.4 compas_fab=0.10.1 --yes
-    (afab19) python -m compas_rhino.install
-    (afab19) python -m compas_fab.rhino.install -v 6.0
+    (base)  conda activate your_env_name
+    (your_env_name) conda install compas=0.11.4 compas_fab=0.10.1 --yes
+    (your_env_name) python -m compas_rhino.install
+    (your_env_name) python -m compas_fab.rhino.install -v 6.0
 
 ### Verify Installation
 
-    (afab19) python
+    (your_env_name) python
     >>> import compas_fab
     >>> compas_fab.__version__
     '0.10.1'
@@ -42,7 +43,7 @@ Then, add the following two directories to the Python Path in Rhino via >> EditP
 1. Ironpython Path, e.g., C:\Program Files\IronPython 2.7\Lib
 2. Parent folder or ur_online_control repository, e.g., C:\Users\yourname\workspace\projects
 
-### Example files
+## Example files
 
 You find the `grasshopper playground` in the ghcomp folder:
 
