@@ -12,24 +12,24 @@ class UR10e(UR):
     Manual link:
     #define UR10_PARAMS
     https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_kinematics/src/ur_kin.cpp
-    but in mm, not in m
+    in meters
     """
 
     # define UR10_PARAMS
-    d1 = 0.1807*1000.
-    a2 = -0.6127*1000.
-    a3 = -0.57155*1000.
-    d4 = 0.17415*1000
-    d5 = 0.11985*1000
-    d6 = 0.11655*1000
+    d1 = 0.1807
+    a2 = -0.6127
+    a3 = -0.57155
+    d4 = 0.17415
+    d5 = 0.11985
+    d6 = 0.11655
 
-    shoulder_offset = 0.176*1000. #220.941
-    elbow_offset = -0.137*1000. #-171.9
+    shoulder_offset = 0.176 #0.220941
+    elbow_offset = -0.137 #-0.1719
 
     # The UR has a very simple workspace: is is s sphere with a cylinder in the
     # center cuff off. The axis of this cylinder is j0. For more info: UR manual.
-    working_area_sphere_diameter = 2650.  # max. working area diameter, recommended 2600
-    working_area_cylinder_diameter = 190.
+    working_area_sphere_diameter = 2.65  # max. working area diameter, recommended 2.6
+    working_area_cylinder_diameter = 0.19
 
     def __init__(self):
         super(UR10e, self).__init__()
