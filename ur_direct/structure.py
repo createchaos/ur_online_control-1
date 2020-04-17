@@ -104,12 +104,14 @@ class URCommandScript(AirpickMixins):
     # Geometric effects
     def set_tcp(self, tcp):
         """Set the tcp"""
-        tcp = [tcp[i]/1000 if i < 3 else tcp[i] for i in range(len(tcp))]
+        #tcp = [tcp[i]/1000 if i < 3 else tcp[i] for i in range(len(tcp))]
+        tcp = [tcp[i] for i in range(len(tcp))]
         self.add_line("\tset_tcp(p{})".format(tcp))
 
     def add_move_linear(self, move_command, feedback=None):
         """Add a move command to the script"""
-        move = [cmd / 1000 if c not in [3, 4, 5] else cmd for c, cmd in zip(range(len(move_command)), move_command)]
+        #move = [cmd / 1000 if c not in [3, 4, 5] else cmd for c, cmd in zip(range(len(move_command)), move_command)]
+        move = [cmd for c, cmd in zip(range(len(move_command)), move_command)]
         [x, y, z, dx, dy, dz, v, r] = move
         self.add_line("\tmovel(p[{}, {}, {}, {}, {}, {}], v={}, r={})".format(x, y, z, dx, dy, dz, v, r))
         if feedback == "Full":
