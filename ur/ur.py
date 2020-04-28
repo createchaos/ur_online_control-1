@@ -91,15 +91,15 @@ class UR(object):
         """Transform the frame in world coordinate system (WCS) into a frame in
         robot coordinate system (RCS), which is defined by the robots' basis frame.
         """
-        frame_RCS = frame_WCS.transformed(self.transformation_WCS_RCS)
-        #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
+        frame_RCS = frame_WCS.transformed(self.transformation_RCS_WCS)
+        #frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS)
         return frame_RCS
 
     def get_frame_in_WCS(self, frame_RCS):
         """Transform the frame in robot coordinate system (RCS) into a frame in
         world coordinate system (WCS), which is defined by the robots' basis frame.
         """
-        frame_WCS = frame_RCS.transformed(self.transformation_RCS_WCS)
+        frame_WCS = frame_RCS.transformed(self.transformation_WCS_RCS)
         return frame_WCS
 
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
@@ -180,12 +180,12 @@ class UR(object):
         T5 = Rotation.from_axis_and_angle(subtract_vectors(j5[1], j5[0]), q5, j5[1]) * T4
 
         # now apply the transformation to the base
-        T0 = self.transformation_RCS_WCS * T0
-        T1 = self.transformation_RCS_WCS * T1
-        T2 = self.transformation_RCS_WCS * T2
-        T3 = self.transformation_RCS_WCS * T3
-        T4 = self.transformation_RCS_WCS * T4
-        T5 = self.transformation_RCS_WCS * T5
+        T0 = self.transformation_WCS_RCS * T0
+        T1 = self.transformation_WCS_RCS * T1
+        T2 = self.transformation_WCS_RCS * T2
+        T3 = self.transformation_WCS_RCS * T3
+        T4 = self.transformation_WCS_RCS * T4
+        T5 = self.transformation_WCS_RCS * T5
 
         return T0, T1, T2, T3, T4, T5
 
