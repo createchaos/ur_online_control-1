@@ -7,7 +7,7 @@
     
     (base)  conda config --add channels conda-forge
     (base)  conda remove --name your_env_name --all
-    (base)  conda create -n your_env_name python=3.6 compas=0.13.3 compas_fab=0.10.2 --yes
+    (base)  conda create -n your_env_name python=3.6 compas=0.11.4 compas_fab=0.10.1 --yes
     (base)  conda activate your_env_name
     (your_env_name) python -m compas_rhino.install
     (your_env_name) python -m compas_fab.rhino.install -v 6.0
@@ -17,7 +17,7 @@
 Activate your `your_env_name` environment and update it as follows:
 
     (base)  conda activate your_env_name
-    (your_env_name) conda install compas=0.13.3 compas_fab=0.10.2 --yes
+    (your_env_name) conda install compas=0.11.4 compas_fab=0.10.1 --yes
     (your_env_name) python -m compas_rhino.install
     (your_env_name) python -m compas_fab.rhino.install -v 6.0
 

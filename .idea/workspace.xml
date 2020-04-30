@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="11b848b3-e852-42b0-a578-43bc4a672895" name="Default Changelist" comment="" />
+    <list default="true" id="11b848b3-e852-42b0-a578-43bc4a672895" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/ur_online_control/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ur_online_control/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ur_online_control/__version__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ur_online_control/__version__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ur_online_control/sample_module.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_sample.py" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -18,12 +30,16 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ur_direct/scripts" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="configurable.group.language" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Gido\Documents\workspace\development\ur_online_control\ur_direct\scripts" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Gido\Documents\workspace\development\ur_online_control\ur\kinematics" />
+      <recent name="C:\Users\Gido\Documents\workspace\development\ur_online_control" />
     </key>
   </component>
   <component name="RunManager" selected="Python.utilities">
@@ -107,58 +123,41 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="414" y="176" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578845377743">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="414" y="176" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1578845377743" />
-    <state x="704" y="324" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1579011683707">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="704" y="324" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1579011683707" />
     <state x="-1550" y="88" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1582121042759">
       <screen x="-2560" y="-360" width="2560" height="1400" />
     </state>
     <state x="-1550" y="88" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/-2560.-360.2560.1400@-2560.-360.2560.1400" timestamp="1582121042759" />
-    <state width="1899" height="282" key="GridCell.Tab.0.bottom" timestamp="1579008851614">
+    <state x="260" y="279" key="FileChooserDialogImpl" timestamp="1586598370705">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1579008851614" />
-    <state width="1899" height="282" key="GridCell.Tab.0.center" timestamp="1579008851614">
+    <state x="260" y="279" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1586598370705" />
+    <state x="260" y="279" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1586335747668" />
+    <state width="936" height="139" key="GridCell.Tab.0.bottom" timestamp="1588094203814">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1579008851614" />
-    <state width="1899" height="282" key="GridCell.Tab.0.left" timestamp="1579008851614">
+    <state width="936" height="139" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.4.1920.1040@0.0.1920.1040" timestamp="1588094203814" />
+    <state width="936" height="139" key="GridCell.Tab.0.center" timestamp="1588094203814">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1579008851614" />
-    <state width="1899" height="282" key="GridCell.Tab.0.right" timestamp="1579008851614">
+    <state width="936" height="139" key="GridCell.Tab.0.center/0.0.1920.1040/1920.4.1920.1040@0.0.1920.1040" timestamp="1588094203814" />
+    <state width="936" height="139" key="GridCell.Tab.0.left" timestamp="1588094203814">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1579008851614" />
-    <state x="461" y="163" key="SettingsEditor" timestamp="1578847236824">
+    <state width="936" height="139" key="GridCell.Tab.0.left/0.0.1920.1040/1920.4.1920.1040@0.0.1920.1040" timestamp="1588094203814" />
+    <state width="936" height="139" key="GridCell.Tab.0.right" timestamp="1588094203814">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1578847236824" />
-    <state x="-1685" y="104" key="com.intellij.ide.util.TipDialog" timestamp="1579519482621">
-      <screen x="-2560" y="-360" width="2560" height="1400" />
+    <state width="936" height="139" key="GridCell.Tab.0.right/0.0.1920.1040/1920.4.1920.1040@0.0.1920.1040" timestamp="1588094203814" />
+    <state x="2576" y="349" key="com.intellij.ide.util.TipDialog" timestamp="1588235464193">
+      <screen x="1920" y="4" width="1920" height="1040" />
     </state>
-    <state x="-1685" y="104" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-2560.-360.2560.1400@-2560.-360.2560.1400" timestamp="1579519482621" />
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-2560.-360.2560.1400@0.0.1920.1040" timestamp="1579517909756" />
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1578929045869" />
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1587120075515" />
+    <state x="2576" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1586415713513" />
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/1920.4.1920.1040@0.0.1920.1040" timestamp="1588232613815" />
+    <state x="2576" y="349" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/1920.4.1920.1040@1920.4.1920.1040" timestamp="1588235464193" />
     <state x="-1471" y="258" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1582133444387">
       <screen x="-2560" y="-360" width="2560" height="1400" />
     </state>
     <state x="-1471" y="258" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040/-2560.-360.2560.1400@-2560.-360.2560.1400" timestamp="1582133444387" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ur/ur.py</url>
-          <line>2</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
