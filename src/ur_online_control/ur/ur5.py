@@ -1,8 +1,6 @@
-from __future__ import print_function
+from __future__ import absolute_import
 
 import math
-
-#from ur_online_control import get_data
 
 from ur_online_control.ur.configuration import Configuration
 from ur_online_control.ur.ur import UR
