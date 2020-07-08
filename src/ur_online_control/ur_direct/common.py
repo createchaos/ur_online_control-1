@@ -133,6 +133,11 @@ if __name__ == "__main__":
     ur_port = 30002
 
     #must be changed to meters for testing!
+    tcp = [0.0, -2.8878212124549688e-14, 0.091999999999999998, 0.0, 0.0, 0.0]
+    msg = get_current_pose_cartesian(tcp, server_ip, server_port, ur_ip, ur_port, send=True)
+
+    print(msg)
+
 
     """
     tool_angle_axis = [0.0, -2.8878212124549687e-11, 158.28878352076936, 0.0, 0.0, 0.0]
