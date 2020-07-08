@@ -2,8 +2,8 @@
 
 import math
 
-from .configuration import Configuration
-from .ur import UR
+from ur_online_control.ur.configuration import Configuration
+from ur_online_control.ur.ur import UR
 
 
 class UR10e(UR):
@@ -41,8 +41,6 @@ class UR10e(UR):
 
     def inverse_kinematics(self, tool0_frame_RCS):
         configurations = super(UR10e, self).inverse_kinematics(tool0_frame_RCS)
-        for q in configurations:
-            print(q)
         for i in range(len(configurations)):
             configurations[i].values[5] -= math.pi
         return configurations

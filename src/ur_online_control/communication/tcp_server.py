@@ -5,7 +5,7 @@ if sys.version_info[0] == 2:
     import SocketServer as ss
 elif sys.version_info[0] == 3:
     import socketserver as ss
-from ..utilities import isclose
+from ur_online_control.utilities import isclose
 ss.TCPServer.allow_reuse_address = True
 
 __all__ = [
@@ -96,8 +96,6 @@ class TCPFeedbackServer:
             msg = msg.split('[', 1)[1].split(']')[0]
         if "," in msg:
             msg = msg.split(',')
-            if len(msg) == 6:
-                msg = [float(crd) * 1000 if c not in [3, 4, 5] else float(crd) for c, crd in enumerate(msg)]
         self.msgs[i] = msg
         self.log(msg)
 

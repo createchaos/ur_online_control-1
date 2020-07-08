@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 import os
 import socket
-from .structure import URCommandScript
-from ..communication import TCPFeedbackServer
+from ur_online_control.ur_direct.structure import URCommandScript
+from ur_online_control.communication import TCPFeedbackServer
 
 __all__ = [
     'is_available',
