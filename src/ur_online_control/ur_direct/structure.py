@@ -78,7 +78,8 @@ class URCommandScript(AirpickMixins):
                         "\ttextmsg(current_pose)"])
         if send:
             self.socket_send_line('current_pose')
-
+            #self.add_line("\ttextmsg('sending done')")
+            
     # Connectivity
     def is_available(self):
         """Ping the network, to check for availability"""

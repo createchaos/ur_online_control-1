@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import os
 import socket
+
 from .structure import URCommandScript
 from ..communication import TCPFeedbackServer
 
@@ -127,12 +128,19 @@ def _get_current_pose(pose_type, tcp, server_ip, server_port, ur_ip, ur_port, se
 
 
 if __name__ == "__main__":
+
+    
+
     server_port = 50002
     server_ip = "192.168.10.11"
     ur_ip = "192.168.10.20"
     ur_port = 30002
 
     #must be changed to meters for testing!
+    tcp = [0.0, -2.8878212124549688e-14, 0.091999999999999998, 0.0, 0.0, 0.0]
+
+    msg = get_current_pose_joints(tcp, server_ip, server_port, ur_ip, ur_port, send=True)
+    print(msg)
 
     """
     tool_angle_axis = [0.0, -2.8878212124549687e-11, 158.28878352076936, 0.0, 0.0, 0.0]
