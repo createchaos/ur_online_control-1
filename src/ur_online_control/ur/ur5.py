@@ -4,8 +4,8 @@ import math
 
 #from ur_online_control import get_data
 
-from .configuration import Configuration
-from .ur import UR
+from ur_online_control.ur.configuration import Configuration
+from ur_online_control.ur.ur import UR
 
 
 class UR5(UR):

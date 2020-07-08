@@ -1,12 +1,11 @@
-from __future__ import print_function
+#from __future__ import print_function
 
 import math
 
 #from compas_fab.utilities import sign
 #from compas_fab.robots import Configuration #from ..robot import BaseConfiguration
-from .utilities import sign
-from ..configuration import Configuration
-from . import inverse_kinematics
+from ur_online_control.ur.kinematics.utilities import sign
+from ur_online_control.ur.configuration import Configuration
 
 
 def format_joint_positions(joint_positions_a, joint_positions_b = [0,0,0,0,0,0]):
@@ -73,10 +72,7 @@ def calculate_configurations_for_path(frames, robot, current_positions = []):
                 qsols_sorted.append(qsols_formatted[selected_idx])
             configurations.append(qsols_sorted)
 
-    print(len(configurations))
-    print(len(configurations[0]))
     configurations = list(zip(*configurations))
-    print(len(configurations))
 
     for i in range(len(configurations)):
         configurations[i] = list(configurations[i])

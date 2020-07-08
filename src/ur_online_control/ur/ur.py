@@ -1,4 +1,4 @@
-#from __future__ import absolute_import
+from __future__ import absolute_import
 
 import math
 import os
@@ -14,11 +14,11 @@ from compas.geometry import Transformation
 
 #from compas_ghpython.geometry.xforms import xform_from_transformation
 from compas_ghpython.geometry.xforms import xtransformed
-from .configuration import Configuration
+from ur_online_control.ur.configuration import Configuration
 
-from .kinematics import forward_kinematics
-from .kinematics import inverse_kinematics
-from .tool import Tool
+from ur_online_control.ur.kinematics import forward_kinematics
+from ur_online_control.ur.kinematics import inverse_kinematics
+from ur_online_control.ur.tool import Tool
 
 class UR(object):
     """The UR robot class.
@@ -213,7 +213,7 @@ class UR(object):
         for m, T in zip(self.model, transformations):
             tmodel.append(xtransformed(m, T))
         return tmodel
-    
+
     def get_transformed_tool_model(self, T5, xtransform_function=None):
         """Get the transformed meshes of the tool model.
 
@@ -244,7 +244,7 @@ class UR(object):
         if self.tool:
         	tmodel.append(self.get_transformed_tool_model(transformations[5]))
         return tmodel
-    
+
     def get_transformed_model_brep(self, transformations):
         """Get the transformed meshes of the robot model.
         Args:
@@ -258,7 +258,7 @@ class UR(object):
         for m, T in zip(self.model_breps, transformations):
             tmodel.append(xtransformed(m, T))
         return tmodel
-    
+
     def get_transformed_tool_model_brep(self, T5, xtransform_function=None):
         """Get the transformed meshes of the tool model.
 
@@ -307,7 +307,7 @@ class UR(object):
             tool0_frame_RCS (:class:`Frame`): The tool0 frame to reach in robot
                 coordinate system (RCS).
         Returns:
-            configurations (:obj:`list` of :class:`Configuration`): A list 
+            configurations (:obj:`list` of :class:`Configuration`): A list
             of possible configurations.
         """
         solutions = inverse_kinematics(tool0_frame_RCS, self.params)
@@ -315,7 +315,7 @@ class UR(object):
         for joint_values in solutions:
             configurations.append(Configuration.from_revolute_values(joint_values))
         return configurations
-    
+
     '''
     def _get_transformed_model(self, transformations, xtransform_function=None):
         """Get the transformed meshes of the robot model.
@@ -357,7 +357,7 @@ class UR(object):
         T = self.get_tool0_transformation(T5)
         return self.tool.get_transformed_model(T, xtransform_function)
 
-    
+
     def _xdraw(self, configuration, xtransform_function=None):
     	"""Get the transformed meshes of the robot and the tool model.
 
