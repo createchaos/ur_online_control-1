@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import time
 import sys
 import threading
 if sys.version_info[0] == 2:
@@ -21,10 +22,8 @@ class FeedbackHandler(ss.StreamRequestHandler):
         self.server.rcv_msg.append(data)
 
 
-class ThreadedTCPServer(ss.ThreadingMixIn, ss.TCPServer):
+class TCPServer(ss.TCPServer):
     allow_reuse_address = True
-    timeout = 1
-
 
 class TCPFeedbackServer:
     def __init__(self, ip="192.168.10.11", port=50002, handler=FeedbackHandler):
@@ -38,7 +37,7 @@ class TCPFeedbackServer:
         self.log_messages_length = 25
 
     def reset(self):
-        self.server = ThreadedTCPServer((self.ip, self.port), self.handler)
+        self.server = TCPServer((self.ip, self.port), self.handler)
         self.server.rcv_msg = []
         self.t = threading.Thread(target=self.server.serve_forever)
         self.t.daemon = True
@@ -73,8 +72,9 @@ class TCPFeedbackServer:
             elif msg == exit_msg or msg == 'Done':
                 return True
 
-    def listen(self, exit_msg="Done", tolerance=25):
+    def listen(self, exit_msg="Done", tolerance=25, timeout=60):
         self.check_msgs = 0
+        tCurrent = time.time()
         while not self.check_exit(exit_msg, tolerance):
             if self.server.rcv_msg is None:
                 pass
@@ -86,6 +86,8 @@ class TCPFeedbackServer:
                 else:
                     ind = len(self.msgs)
                 self.add_message(self.server.rcv_msg[ind][0])
+            elif time.time() >= tCurrent + timeout:
+                break
         else:
             return True
 
@@ -106,3 +108,4 @@ class TCPFeedbackServer:
 
     def get_log_messages(self):
         return "\n".join(self.log_messages)
+

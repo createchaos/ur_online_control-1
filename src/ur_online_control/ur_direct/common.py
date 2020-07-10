@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import os
 import socket
+import time
 from ur_online_control.ur_direct.structure import URCommandScript
 from ur_online_control.communication import TCPFeedbackServer
 
@@ -120,7 +121,8 @@ def _get_current_pose(pose_type, tcp, server_ip, server_port, ur_ip, ur_port, se
     server = TCPFeedbackServer(ip=server_ip, port=server_port)
     server.start()
     ur_cmds.send_script()
-    server.listen()
+    server.listen(timeout=5)
+    time.sleep(1)
     server.close()
     server.join()
     return server.msgs[0]
