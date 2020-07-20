@@ -1,4 +1,4 @@
-# UR Online Control
+﻿# UR Online Control
 
 
 ## Getting started
@@ -45,7 +45,7 @@ Then, add the following two directories to the Python Path in Rhino via >> EditP
 
 ## Example files
 
-You find the `grasshopper playground` in the ghcomp folder:
+You find the `grasshopper playground` in the rhino folder:
 
 Setup with one robot:
 
