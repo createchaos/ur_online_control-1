@@ -12,6 +12,7 @@ __all__ = [
     'generate_moves_linear',
     'generate_script_pick_and_place_block',
     'airpick_toggle',
+    'areagrip_toggle',
     'get_current_pose_cartesian',
     'get_current_pose_joints'
 ]
@@ -93,6 +94,18 @@ def airpick_toggle(toggle, ur_ip, ur_port, max_vac=75, min_vac=25, detect=True, 
         ur_cmds.airpick_on(max_vac, min_vac, detect)
     elif not toggle:
         ur_cmds.airpick_off(pressure, timeout)
+    ur_cmds.end()
+    ur_cmds.generate()
+    return ur_cmds
+
+def areagrip_toggle(toggle, ur_ip, ur_port, sleep):
+    """Script to toggle the airpick on/off"""
+    ur_cmds = URCommandScript(ur_ip=ur_ip, ur_port=ur_port)
+    ur_cmds.start()
+    if toggle:
+        ur_cmds.add_areagrip_on(sleep = sleep)
+    elif not toggle:
+        ur_cmds.add_areagrip_off(sleep = sleep)
     ur_cmds.end()
     ur_cmds.generate()
     return ur_cmds
