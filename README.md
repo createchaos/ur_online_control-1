@@ -17,7 +17,7 @@
 Activate your `your_env_name` environment and update it as follows:
 
     (base)  conda activate your_env_name
-    (your_env_name) conda install compas=0.11.4 compas_fab=0.10.1 --yes
+    (your_env_name) conda install compas=0.15.6 compas_fab=0.11.0 --yes
     (your_env_name) python -m compas_rhino.install
     (your_env_name) python -m compas_fab.rhino.install -v 6.0
 
