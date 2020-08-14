@@ -1,7 +1,7 @@
 # UR Online Control
 ### Setup Instructions w/ annotations
 
-1. ###### Compas and Compas_Fab Installation (via Anaconda Terminal); clean install
+###### 1. Compas and Compas_Fab Installation (via Anaconda Terminal); clean install
 
     ```ruby
     (base)  conda config --add channels conda-forge
@@ -20,7 +20,7 @@
     (your_env_name) python -m compas_fab.rhino.install -v 6.0
     ```
 
-2. ###### Verify Installation
+###### 2. Verify Installation
     ```ruby
     (your_env_name) python
     >>> import compas_fab
@@ -29,13 +29,13 @@
     >>> exit()
     ```
 
-3. ###### Iron Python Installation
+###### 3. Iron Python Installation
     Install Ironpython 2.7.9. via this link: https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9
     > New version of IronPython is out: 2.7.10; probably unnecessary since it only adds .net support
     > For Windows: use the .msi file
     > For Apple: use the .pkg file
 
-4. ###### UR Online Control Installation
+###### 4. UR Online Control Installation
     Clone the current version of the ur_online_control repository onto your computer: https://github.com/augmentedfabricationlab/ur_online_control
     > Clone into a git_repositories folder that you have set up, or into your project folder.
     > I recommend having a folder called git_repositories (or similar) somewhere on your hard drive and downloading all git repos to that location:
@@ -43,10 +43,21 @@
     instructions 1
     instructions 2: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
 
-5. ###### Link Directories to Rhino Search Path
+###### 5. Link Directories to Rhino Search Path
     Add the directories for ur_conline_control and IronPython to Rhino: `Rhino >> EditPythonScript >> Tools >> Options >> Add to search path:`
     1. Ironpython install directory, e.g. C:\Program Files\IronPython 2.7\Lib
     2. ur_online_control repository or its parent directory, e.g. C:\Users\YourName\Desktop\git_repositories
+
+###### 6. Test w/ robots:
+Files are in the rhino folder of ur_online_control repo
+Rhino File: ExampleRobotSimple.3dm
+Grasshopper File: ExampleRobotSimple.gh
+- verify which UR3 has which ip
+  - toolbox one is 192.168.10.10
+- set the robot ip in the grasshopper script
+- choose ip for server (pc) and set it as the computer's ipv4 ip under network adapter properties
+- port for the robot is preset: 30002
+- port for server (pc) is set to: 30003
 
 
 ---
@@ -79,66 +90,3 @@ In order for them to work you’ll have to install the following:
 
 4. Add the src folders from each of the two repositories to your rhino paths: `Rhino >> Command:EditPythonScript >> Tools >> Options >> Module Search Paths >> Add to search path >> press Ok >> restart Rhino`
     > It doesn’t matter where, this is needed to make sure it remembers the changes in the paths. You can then delete it
-
----
-
-## Getting started (original)
-### Compas and Compas Fab Installation (via Anaconda Terminal) - Fresh
-
-    (base)  conda config --add channels conda-forge
-    (base)  conda remove --name your_env_name --all
-    (base)  conda create -n your_env_name python=3.6 compas=0.11.4 compas_fab=0.10.1 --yes
-    (base)  conda activate your_env_name
-    (your_env_name) python -m compas_rhino.install
-    (your_env_name) python -m compas_fab.rhino.install -v 6.0
-
-### Compas and Compas Fab Installation (via Anaconda Terminal) - Update
-
-Activate your `your_env_name` environment and update it as follows:
-
-    (base)  conda activate your_env_name
-    (your_env_name) conda install compas=0.11.4 compas_fab=0.10.1 --yes
-    (your_env_name) python -m compas_rhino.install
-    (your_env_name) python -m compas_fab.rhino.install -v 6.0
-
-### Verify Installation
-
-    (your_env_name) python
-    >>> import compas_fab
-    >>> compas_fab.__version__
-    '0.10.1'
-    >>> exit()
-
-### Iron Python Installation
-
-Install Ironpython 2.7.9. via following this [link](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9)
-
-### UR Online Control Installation
-
-First, clone the current version of the [ur_online_control repository](https://github.com/augmentedfabricationlab/ur_online_control)
-into your project folder.
-
-Then, add the following two directories to the Python Path in Rhino via >> EditPythonScript >> Tools >> Options >> Add to search path:
-
-1. Ironpython Path, e.g., C:\Program Files\IronPython 2.7\Lib
-2. Parent folder or ur_online_control repository, e.g., C:\Users\yourname\workspace\projects
-
-
-## Example files
-
-You find the `grasshopper playground` in the ghcomp folder:
-
-Setup with one robot:
-
-    ur_online_control_base_setup_x1.ghx
-    u10e_setup_x1.3dm
-
-Setup with two robots:
-
-    ur_online_control_base_setup_x2.ghx
-    u10e_setup_x2.3dm
-
-Copy the .3dm and .ghx files of your choice into your own project folder, use and modify it. Voilà!
-
-
-![`grasshopper playground`](ghcomp/images/gui_example.PNG)
