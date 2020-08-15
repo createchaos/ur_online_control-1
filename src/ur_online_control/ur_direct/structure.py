@@ -121,3 +121,15 @@ class URCommandScript(AirpickMixins):
             self.get_current_pose_cartesian(False)
         else:
             pass
+
+    def add_digital_out(self, number, value):
+        self.add_line("\tset_digital_out({}, {})".format(number, value))
+
+    def add_areagrip_on(self, sleep = 1.):
+        self.add_digital_out(7, True)
+        self.add_line("\tsleep({})".format(sleep))
+
+    def add_areagrip_off(self, sleep = 0.1):
+        self.add_digital_out(7, False)
+        self.add_line("\tsleep({})".format(sleep))
+
