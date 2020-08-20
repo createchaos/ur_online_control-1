@@ -64,13 +64,10 @@ Grasshopper File: ExampleRobotSimple.gh
 - port for server (pc) is set to: 30003
 
 
----
-
-
 ### ur_online_control_assembly instructions
 
 UR setup example files:
-- u10e_setup_x1.3dm (is this x2???)
+- u10e_setup_x1.3dm
 - ur_online_control_assembly.ghx
 
 **Setup / Dependency Install**
@@ -93,4 +90,4 @@ In order for them to work you’ll have to install the following:
         ```
 
 4. Add the src folders from each of the two repositories to your rhino paths: `Rhino >> Command:EditPythonScript >> Tools >> Options >> Module Search Paths >> Add to search path >> press Ok >> restart Rhino`
-    > It doesn’t matter where, this is needed to make sure it remembers the changes in the paths. You can then delete it (delete what?)
+
