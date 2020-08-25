@@ -105,5 +105,5 @@ ENV/
 .vscode/
 
 #Rhino Files
-.rhl
-.3dmbak
+*.rhl
+*.3dmbak
