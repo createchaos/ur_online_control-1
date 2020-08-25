@@ -63,7 +63,6 @@ Grasshopper File: ExampleRobotSimple.gh
 - port for the robot is preset: 30002
 - port for server (pc) is set to: 30003
 
-
 ### ur_online_control_assembly instructions
 
 UR setup example files:
