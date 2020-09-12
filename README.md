@@ -5,7 +5,7 @@
 
 #### Run Anaconda prompt as admin
 
-    ```ruby
+    ```console
     (base)  conda config --add channels conda-forge
     #--add channels         //puts the conda-forge channel at the top of the channels priority list;
     #                       //can also use --prepend; --append adds to bottom of list
