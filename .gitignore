@@ -107,3 +107,5 @@ ENV/
 #Rhino Files
 *.rhl
 *.3dmbak
+rhino/assembly.json
+rhino/assembly_received.json
