@@ -10,6 +10,7 @@
 #--add channels         //puts the conda-forge channel at the top of the channels priority list;
 #                       //can also use --prepend; --append adds to bottom of list
 #conda config --show    //will show info about conda config, including existing channels
+#to troubleshoot: do conda 'config --show' and check channel name; if bad use: 'conda remove -c [CHANNEL NAME]' then add again
 (base)  conda remove --name your_env_name --all
 #removes the environment if already exists
 
