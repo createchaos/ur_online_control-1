@@ -34,19 +34,25 @@ To get a local copy up and running follow these simple steps.
    - ur_online_control
    - assembly_information_model
 2. Install [Speckle](https://github.com/speckleworks/SpeckleInstaller/releases/tag/1.8.31)
-
+    - restart rhino and grasshopper after installing plugin
+    -
 <!-- USAGE EXAMPLES -->
 ## Usage
 Example files are in the [Rhino](/rhino) folder of this repo. Load the UR3_ECL_setup.3dm file to visualize our robot cell setup in the ECL.
-The Speck
+
 ### Speckle
+Log into Speckle via Default Authentification method
+username: ianting@princeton.edu
+password: arc311_f2020
+The speckle components have been already set up in the grasshopper files, you just need
 
 ### UR Simple Commands
 Use the [ur_simple_speckle.gh](/rhino) file
+This sends ur_script commands as strings through Speckle
 
 ### UR Assemblies
 Use the [ur_assemply_speckle.gh](/rhino) file
-
+This sends an assembly information model through json. The movement planes in this datastructure are interpreted as movement frames for the robot.
 
 <!-- WIP -->
 # WIP
