@@ -1,54 +1,106 @@
-# UR Online Control
+
+
+
+<!-- TABLE OF CONTENTS -->
+## Table of Contents
+
+* [About the Project](#About)
+* [Setup](#Setup)
+* [Usage](#usage)
+* [WIP](#WIP)
+
+
+
+
+<!-- ABOUT THE PROJECT -->
+## UR Remote Control w/Speckle <a name="About"></a>
+
+We use the ur_online_control libary with Speckle to control UR3 robotic manipulators.
+We also use the assembly_information_model library to send more complicated sets of geometry/commands for the robot, as a Compas network class object (Python).
+
+
+
+<!-- GETTING STARTED -->
+## Setup
+To get a local copy up and running follow these simple steps.
+
+### Prerequisites
+* Anaconda (and Python)
+* Rhino 6 and Grasshopper
+* Compas and Compas_Fab
+
+### Installation
+1. From Github get:
+   - ur_online_control
+   - assembly_information_model
+2. Install [Speckle](https://github.com/speckleworks/SpeckleInstaller/releases/tag/1.8.31)
+
+<!-- USAGE EXAMPLES -->
+## Usage
+Example files are in the [Rhino](/rhino) folder of this repo. Load the UR3_ECL_setup.3dm file to visualize our robot cell setup in the ECL.
+The Speck
+### Speckle
+
+### UR Simple Commands
+Use the [ur_simple_speckle.gh](/rhino) file
+
+### UR Assemblies
+Use the [ur_assemply_speckle.gh](/rhino) file
+
+
+<!-- WIP -->
+# WIP
+
 ### Setup Instructions w/ annotations
 
 ###### 1. Compas and Compas_Fab Installation (via Anaconda Terminal); clean install
 
 #### Run Anaconda prompt as admin
 
-```ruby
-(base)  conda config --add channels conda-forge
-#--add channels         //puts the conda-forge channel at the top of the channels priority list;
-#                       //can also use --prepend; --append adds to bottom of list
-#conda config --show    //will show info about conda config, including existing channels
-(base)  conda remove --name your_env_name --all
-#removes the environment if already exists
+    ```ruby
+    (base)  conda config --add channels conda-forge
+    #--add channels         //puts the conda-forge channel at the top of the channels priority list;
+    #                       //can also use --prepend; --append adds to bottom of list
+    #conda config --show    //will show info about conda config, including existing channels
+    (base)  conda remove --name your_env_name --all
+    #removes the environment if already exists
 
-(base)  conda create -n your_env_name python=3.8 compas compas_fab --yes
-#use newest versions instead
-#--yes or -y simply skips confirmation
-(base)  conda activate your_env_name
-(your_env_name) python -m compas_rhino.install
-#from python documentaiton: When called with -m module-name, the given module is located on the Python module path and executed as a script.
-(your_env_name) python -m compas_fab.rhino.install -v 6.0
-```
+    (base)  conda create -n your_env_name python=3.8 compas compas_fab --yes
+    #use newest versions instead
+    #--yes or -y simply skips confirmation
+    (base)  conda activate your_env_name
+    (your_env_name) python -m compas_rhino.install
+    #from python documentaiton: When called with -m module-name, the given module is located on the Python module path and executed as a script.
+    (your_env_name) python -m compas_fab.rhino.install -v 6.0
+    ```
 
 ###### 2. Verify Installation
-```ruby
-(your_env_name) python
->>> import compas_fab
->>> compas_fab.__version__
-'0.10.1'
->>> exit()
-```
+    ```ruby
+    (your_env_name) python
+    >>> import compas_fab
+    >>> compas_fab.__version__
+    '0.10.1'
+    >>> exit()
+    ```
 
 ###### 3. Iron Python Installation
-Install Ironpython 2.7.9. via this link: https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9
-> New version of IronPython is out: 2.7.10; probably unnecessary since it only adds .net support
-> For Windows: use the .msi file
-> For Apple: use the .pkg file
+    Install Ironpython 2.7.9. via this link: https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.9
+    > New version of IronPython is out: 2.7.10; probably unnecessary since it only adds .net support
+    > For Windows: use the .msi file
+    > For Apple: use the .pkg file
 
 ###### 4. UR Online Control Installation
-Clone the current version of the ur_online_control repository onto your computer: https://github.com/augmentedfabricationlab/ur_online_control
-> Clone into a git_repositories folder that you have set up, or into your project folder.
-> I recommend having a folder called git_repositories (or similar) somewhere on your hard drive and downloading all git repos to that location:
-Clone using Github Desktop or the terminal:
-instructions 1
-instructions 2: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
+    Clone the current version of the ur_online_control repository onto your computer: https://github.com/augmentedfabricationlab/ur_online_control
+    > Clone into a git_repositories folder that you have set up, or into your project folder.
+    > I recommend having a folder called git_repositories (or similar) somewhere on your hard drive and downloading all git repos to that location:
+    Clone using Github Desktop or the terminal:
+    instructions 1
+    instructions 2: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
 
 ###### 5. Link Directories to Rhino Search Path
-Add the directories for ur_conline_control and IronPython to Rhino: `Rhino >> EditPythonScript >> Tools >> Options >> Add to search path:`
-1. Ironpython install directory, e.g. C:\Program Files\IronPython 2.7\Lib
-2. ur_online_control repository or its parent directory, e.g. C:\Users\YourName\Desktop\git_repositories
+    Add the directories for ur_conline_control and IronPython to Rhino: `Rhino >> EditPythonScript >> Tools >> Options >> Add to search path:`
+    1. Ironpython install directory, e.g. C:\Program Files\IronPython 2.7\Lib
+    2. ur_online_control repository or its parent directory, e.g. C:\Users\YourName\Desktop\git_repositories
 
 ###### 6. Test w/ robots:
 Files are in the rhino folder of ur_online_control repo
@@ -89,4 +141,3 @@ In order for them to work you’ll have to install the following:
         ```
 
 4. Add the src folders from each of the two repositories to your rhino paths: `Rhino >> Command:EditPythonScript >> Tools >> Options >> Module Search Paths >> Add to search path >> press Ok >> restart Rhino`
-
