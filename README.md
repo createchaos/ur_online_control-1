@@ -31,7 +31,7 @@ We work in Rhino 6 and Grasshopper. Follow the instructions [here](https://githu
 ### Installation
 1. From Github clone:
    - [ur_online_control_speckle](https://github.com/createchaos/assembly_information_model) (this repository)
-   - make sure [directories are added to Rhino](###Link_Directories_to_Rhino_Search_Path)
+   - make sure [directories are added to Rhino](#link-directories-to-rhino-search-path)
 2. Install [Speckle](https://github.com/speckleworks/SpeckleInstaller/releases/tag/1.8.31)
     - restart Rhino and Grasshopper after installing plugin to make sure it loads correctly
 
