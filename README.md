@@ -30,20 +30,20 @@ To get a local copy up and running follow these simple steps.
 * Compas and Compas_Fab
 
 ### Installation
-1. From Github get:
-   - ur_online_control
-   - assembly_information_model
+1.
 2. Install [Speckle](https://github.com/speckleworks/SpeckleInstaller/releases/tag/1.8.31)
+    - uncheck the revit and dynamo
     - restart rhino and grasshopper after installing plugin
-    -
+DEFAULT ACCOUNT
 <!-- USAGE EXAMPLES -->
 ## Usage
 Example files are in the [Rhino](/rhino) folder of this repo. Load the UR3_ECL_setup.3dm file to visualize our robot cell setup in the ECL.
 
 ### Speckle
 Log into Speckle via Default Authentification method
-username: ianting@princeton.edu
-password: arc311_f2020
+- username: ianting@princeton.edu
+- password: arc311_f2020
+
 The speckle components have been already set up in the grasshopper files, you just need
 
 ### UR Simple Commands
